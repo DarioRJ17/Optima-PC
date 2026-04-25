@@ -1,5 +1,7 @@
 package com.optimapc.backend.auth;
 
+import java.util.Set;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -7,6 +9,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.optimapc.backend.auth.dto.AuthResponse;
 import com.optimapc.backend.auth.dto.LoginRequest;
+import com.optimapc.backend.auth.dto.PasswordStrength;
 import com.optimapc.backend.auth.dto.RegisterRequest;
 import com.optimapc.backend.usuario.Usuario;
 import com.optimapc.backend.usuario.UsuarioRepository;
@@ -64,4 +67,38 @@ public class AuthService {
             usuario.getEmail(),
             usuario.getFechaRegistro());
     }
+
+    public PasswordStrength evaluate(String password) {
+        if (password == null || password.isBlank()) return PasswordStrength.VERY_WEAK;
+
+        int score = 0;
+
+        // Longitud
+        if (password.length() >= 8)  score++;
+        if (password.length() >= 12) score++;
+        if (password.length() >= 16) score++;
+
+        // Variedad de caracteres
+        if (password.chars().anyMatch(Character::isUpperCase)) score++;
+        if (password.chars().anyMatch(Character::isLowerCase)) score++;
+        if (password.chars().anyMatch(Character::isDigit))     score++;
+        if (password.chars().anyMatch(c -> "!@#$%^&*()_+-=[]{}|;':\",./<>?".indexOf(c) >= 0)) score++;
+
+        // Penalización por patrones comunes
+        boolean hasCommonPattern = COMMON_PATTERNS.stream().anyMatch(p -> password.contains(p));
+        if (hasCommonPattern) score -= 1;
+
+        return switch (score) {
+            case 0, 1    -> PasswordStrength.VERY_WEAK;
+            case 2, 3    -> PasswordStrength.WEAK;
+            case 4       -> PasswordStrength.FAIR;
+            case 5, 6    -> PasswordStrength.STRONG;
+            default      -> PasswordStrength.VERY_STRONG;
+        };
+    }
+
+    private static final Set<String> COMMON_PATTERNS = Set.of(
+        "123", "1234", "12345", "abc", "password", "contraseña",
+        "qwerty", "admin", "user", "0000", "1111", "pass"
+    );
 }

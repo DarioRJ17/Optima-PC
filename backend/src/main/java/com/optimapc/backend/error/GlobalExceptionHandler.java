@@ -45,14 +45,22 @@ public class GlobalExceptionHandler {
             ResponseStatusException ex,
             HttpServletRequest request) {
         HttpStatus status = HttpStatus.valueOf(ex.getStatusCode().value());
+        String reason = ex.getReason() == null ? "Error en la solicitud" : ex.getReason();
+        Map<String, String> fieldErrors = null;
+
+        // Treat duplicate email as a field-level validation error for better UX.
+        if (status == HttpStatus.CONFLICT && ex.getReason() != null
+            && ex.getReason().toLowerCase().contains("email")) {
+            fieldErrors = Map.of("email", ex.getReason());
+        }
 
         ApiError apiError = new ApiError(
                 LocalDateTime.now(),
                 status.value(),
                 status.getReasonPhrase(),
-                ex.getReason() == null ? "Error en la solicitud" : ex.getReason(),
+            reason,
                 request.getRequestURI(),
-                null);
+            fieldErrors);
 
         return ResponseEntity.status(status).body(apiError);
     }

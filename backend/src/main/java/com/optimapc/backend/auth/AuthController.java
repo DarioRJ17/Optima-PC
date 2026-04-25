@@ -10,9 +10,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.optimapc.backend.auth.dto.AuthResponse;
 import com.optimapc.backend.auth.dto.LoginRequest;
+import com.optimapc.backend.auth.dto.PasswordStrength;
 import com.optimapc.backend.auth.dto.RegisterRequest;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 
 @Validated
 @RestController
@@ -34,4 +36,20 @@ public class AuthController {
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
+
+    @PostMapping("/password-strength")
+    public ResponseEntity<PasswordStrengthResponse> checkStrength(
+            @RequestBody @Valid PasswordCheckRequest request) {
+
+        PasswordStrength strength = authService.evaluate(request.password());
+        return ResponseEntity.ok(new PasswordStrengthResponse(strength));
+    }
+
+    public record PasswordCheckRequest(
+        @NotBlank String password
+    ) {}
+
+    public record PasswordStrengthResponse(
+        PasswordStrength strength   // "VERY_WEAK" | "WEAK" | "FAIR" | "STRONG" | "VERY_STRONG"
+    ) {}
 }
