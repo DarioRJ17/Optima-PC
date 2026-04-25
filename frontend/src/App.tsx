@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
 
 type AuthMode = 'login' | 'register'
@@ -20,6 +20,35 @@ type AuthResponse = {
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL?.trim() || 'http://localhost:8080'
 
+const STRENGTH_CONFIG: Record<string, { label: string; color: string; bars: number }> = {
+  VERY_WEAK:   { label: 'Muy débil',  color: '#ef4444', bars: 1 },
+  WEAK:        { label: 'Débil',      color: '#f97316', bars: 2 },
+  FAIR:        { label: 'Regular',    color: '#eab308', bars: 3 },
+  STRONG:      { label: 'Fuerte',     color: '#22c55e', bars: 4 },
+  VERY_STRONG: { label: 'Muy fuerte', color: '#16a34a', bars: 5 },
+}
+
+function PasswordStrengthMeter({ strength }: { strength: string }) {
+  const config = STRENGTH_CONFIG[strength] ?? STRENGTH_CONFIG.VERY_WEAK
+
+  return (
+    <div className="password-strength">
+      <div className="strength-bars">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div
+            key={i}
+            className="strength-bar"
+            style={{ backgroundColor: i < config.bars ? config.color : undefined }}
+          />
+        ))}
+      </div>
+      <span className="strength-label" style={{ color: config.color }}>
+        {config.label}
+      </span>
+    </div>
+  )
+}
+
 function App() {
   const [mode, setMode] = useState<AuthMode>('login')
 
@@ -31,24 +60,54 @@ function App() {
     password: '',
     confirmPassword: '',
   })
+  const [passwordStrength, setPasswordStrength] = useState<string | null>(null)
 
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [globalError, setGlobalError] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
   const [loading, setLoading] = useState(false)
 
+  useEffect(() => {
+  if (!registerData.password) {
+    setPasswordStrength(null)
+    return
+  }
+
+  const timer = setTimeout(async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/auth/password-strength`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: registerData.password }),
+      })
+      if (response.ok) {
+        const data = await response.json()
+        setPasswordStrength(data.strength)
+      }
+    } catch {
+      // silencioso, no es crítico
+    }
+  }, 300)
+
+  return () => clearTimeout(timer)
+}, [registerData.password])
+
   const switchMode = (newMode: AuthMode) => {
     setMode(newMode)
     setFieldErrors({})
     setGlobalError('')
     setSuccessMessage('')
+    setPasswordStrength(null)
   }
 
   const parseError = async (response: Response) => {
     try {
       const data = (await response.json()) as ApiError
-      setFieldErrors(data.fieldErrors ?? {})
-      setGlobalError(data.message || 'No se pudo procesar la solicitud')
+      const nextFieldErrors = data.fieldErrors ?? {}
+      const hasFieldErrors = Object.keys(nextFieldErrors).length > 0
+
+      setFieldErrors(nextFieldErrors)
+      setGlobalError(hasFieldErrors ? '' : data.message || 'No se pudo procesar la solicitud')
     } catch {
       setFieldErrors({})
       setGlobalError('Error de conexion con el servidor')
@@ -91,7 +150,7 @@ function App() {
     setSuccessMessage('')
 
     if (registerData.password !== registerData.confirmPassword) {
-      setFieldErrors({ confirmPassword: 'Las contrasenas no coinciden' })
+      setFieldErrors({ confirmPassword: 'Las contraseñas no coinciden' })
       setLoading(false)
       return
     }
@@ -166,7 +225,7 @@ function App() {
                   <p className="field-error">{fieldErrors.email}</p>
                 ) : null}
 
-                <label htmlFor="login-password">Contrasena</label>
+                <label htmlFor="login-password">Contraseña</label>
                 <input
                   id="login-password"
                   type="password"
@@ -184,7 +243,7 @@ function App() {
                 ) : null}
 
                 <a className="inline-link" href="#">
-                  Olvidaste tu contrasena?
+                  Olvidaste tu contraseña?
                 </a>
 
                 <button type="submit" disabled={loading}>
@@ -256,7 +315,7 @@ function App() {
                   <p className="field-error">{fieldErrors.email}</p>
                 ) : null}
 
-                <label htmlFor="register-password">Contrasena</label>
+                <label htmlFor="register-password">Contraseña</label>
                 <input
                   id="register-password"
                   type="password"
@@ -269,15 +328,16 @@ function App() {
                     }))
                   }
                 />
+                {passwordStrength && <PasswordStrengthMeter strength={passwordStrength} />}
                 {fieldErrors.password ? (
                   <p className="field-error">{fieldErrors.password}</p>
                 ) : null}
 
-                <label htmlFor="register-confirm-password">Confirmar contrasena</label>
+                <label htmlFor="register-confirm-password">Confirmar contraseña</label>
                 <input
                   id="register-confirm-password"
                   type="password"
-                  placeholder="Repite tu contrasena"
+                  placeholder="Repite tu contraseña"
                   value={registerData.confirmPassword}
                   onChange={(event) =>
                     setRegisterData((previous) => ({
@@ -293,6 +353,9 @@ function App() {
                 <button type="submit" disabled={loading}>
                   {loading ? 'Creando cuenta...' : 'Crear cuenta'}
                 </button>
+                {fieldErrors.confirmPassword ? (
+                  <p className="field-error">{fieldErrors.confirmPassword}</p>
+                ) : null}
               </form>
 
               <p className="mode-link">

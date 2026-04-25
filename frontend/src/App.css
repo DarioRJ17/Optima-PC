@@ -199,6 +199,36 @@ h1 {
   right: -58px;
 }
 
+.password-strength {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 2px 0 4px;
+}
+
+.strength-bars {
+  display: flex;
+  gap: 5px;
+  flex: 1;
+}
+
+.strength-bar {
+  height: 4px;
+  flex: 1;
+  border-radius: 2px;
+  background-color: #c8d2e2;
+  transition: background-color 0.3s ease;
+}
+
+.strength-label {
+  font-size: 0.88rem;
+  font-weight: 700;
+  white-space: nowrap;
+  min-width: 72px;
+  text-align: right;
+  transition: color 0.3s ease;
+}
+
 @media (max-width: 680px) {
   .auth-page {
     padding: 14px;
