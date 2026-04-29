@@ -41,7 +41,7 @@ public class ConfiguracionPC {
     public Double getPrecio() {
         return componentes.stream()
                 .filter(c -> c.getComponente() != null)
-                .mapToDouble(c -> c.getComponente().getPrecioActual() * c.getCantidad())
+                .mapToDouble(c -> c.getComponente().getPrecio() * c.getCantidad())
                 .sum();
     }
 

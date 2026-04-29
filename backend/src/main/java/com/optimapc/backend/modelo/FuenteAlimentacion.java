@@ -11,6 +11,9 @@ import lombok.Setter;
 @Table(name = "fuentes_alimentacion")
 public class FuenteAlimentacion extends Componente {
 
+    private String tipo;
+    private String eficiencia;
     private Integer potencia;
-    private String certificacion;
+    private String modular;
+    private String color;
 }

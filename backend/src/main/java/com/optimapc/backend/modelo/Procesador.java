@@ -11,8 +11,10 @@ import lombok.Setter;
 @Table(name = "procesadores")
 public class Procesador extends Componente {
 
-    private String socket;
     private Integer nucleos;
-    private Integer hilos;
     private Double frecuenciaBase;
+    private Double frecuenciaBoost;
+    private String microarquitectura;
+    private Integer tdp;
+    private String graficaIntegrada;
 }

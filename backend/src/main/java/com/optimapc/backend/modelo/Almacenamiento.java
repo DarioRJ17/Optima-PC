@@ -12,6 +12,8 @@ import lombok.Setter;
 public class Almacenamiento extends Componente {
 
     private Integer capacidad;
-    private String tipoUnidad;
-    private Double velocidadLectura;
+    private Double precioPorGB;
+    private String tipo;
+    private String factorForma;
+    private String interfaz;
 }

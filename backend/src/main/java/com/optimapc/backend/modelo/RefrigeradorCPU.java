@@ -8,10 +8,11 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "cajas")
-public class Caja extends Componente {
+@Table(name = "refrigeradores_cpu")
+public class RefrigeradorCPU extends Componente {
 
-    private String tipo;
+    private String rpm;
+    private String nivelRuido;
     private String color;
-    private String panelLateral;
+    private String tamano;
 }

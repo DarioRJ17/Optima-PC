@@ -11,7 +11,9 @@ import lombok.Setter;
 @Table(name = "memorias_ram")
 public class MemoriaRAM extends Componente {
 
-    private Integer capacidad;
-    private Integer frecuencia;
+    private String velocidad;
     private String tipoDDR;
+    private String modulos;
+    private String color;
+    private Integer latenciaCAS;
 }

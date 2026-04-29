@@ -12,7 +12,9 @@ import lombok.Setter;
 public class PlacaBase extends Componente {
 
     private String socket;
-    private String chipset;
-    private String formato;
+    private String factorForma;
+    private Integer memoriaMaxima;
+    private Integer ranurasMemoria;
+    private String color;
     private String tipoDDR;
 }

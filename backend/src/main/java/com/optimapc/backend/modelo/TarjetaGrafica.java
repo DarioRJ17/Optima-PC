@@ -11,8 +11,10 @@ import lombok.Setter;
 @Table(name = "tarjetas_graficas")
 public class TarjetaGrafica extends Componente {
 
-    private Integer vram;
     private String chipset;
-    private Integer consumo;
-    private Double benchmark;
+    private Integer memoria;
+    private Integer frecuenciaBase;
+    private Integer frecuenciaBoost;
+    private String color;
+    private Integer longitud;
 }

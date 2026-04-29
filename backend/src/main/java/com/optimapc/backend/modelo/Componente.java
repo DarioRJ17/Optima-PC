@@ -26,14 +26,5 @@ public abstract class Componente {
     private String nombre;
 
     @Column(nullable = false)
-    private String marca;
-
-    @Column(nullable = false)
-    private String modelo;
-
-    @Column(nullable = false)
-    private Double precioActual;
-
-    @Column(nullable = false)
-    private Boolean etiquetaEco;
+    private Double precio;
 }
