@@ -35,7 +35,11 @@ public class ConfiguracionPC {
     private Double indicadorEquilibrio; // TODO: Calcular este valor en base a los componentes
 
     @Transient
-    private Double rendimientoPorEuro; // TODO: Calcular este valor en base a los componentes
+    public Double getRendimientoPorEuro() {
+        // TODO: Implementar cálculo basado en benchmarks de componentes
+        // Fórmula: (benchmark_total / precio_total_euros)
+        return 0.0;
+    }
 
     @Transient
     public Double getPrecio() {

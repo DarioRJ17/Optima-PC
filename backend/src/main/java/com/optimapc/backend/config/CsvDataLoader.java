@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Set;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -16,17 +17,25 @@ import org.apache.commons.csv.CSVRecord;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.optimapc.backend.modelo.Almacenamiento;
 import com.optimapc.backend.modelo.Caja;
 import com.optimapc.backend.modelo.Componente;
+import com.optimapc.backend.modelo.ConfiguracionComponente;
+import com.optimapc.backend.modelo.ConfiguracionPC;
 import com.optimapc.backend.modelo.FuenteAlimentacion;
 import com.optimapc.backend.modelo.MemoriaRAM;
 import com.optimapc.backend.modelo.PlacaBase;
 import com.optimapc.backend.modelo.Procesador;
+import com.optimapc.backend.modelo.Premontado;
 import com.optimapc.backend.modelo.RefrigeradorCPU;
 import com.optimapc.backend.modelo.TarjetaGrafica;
+import com.optimapc.backend.modelo.TipoSO;
+import com.optimapc.backend.modelo.TipoUso;
+import com.optimapc.backend.modelo.Valoracion;
+import com.optimapc.backend.usuario.Usuario;
 
 @Component
 public class CsvDataLoader implements ApplicationRunner {
@@ -34,10 +43,24 @@ public class CsvDataLoader implements ApplicationRunner {
 	@PersistenceContext
 	private EntityManager entityManager;
 
+	private final PasswordEncoder passwordEncoder;
+
+	public CsvDataLoader(PasswordEncoder passwordEncoder) {
+		this.passwordEncoder = passwordEncoder;
+	}
+
 	@Override
 	@Transactional
 	public void run(ApplicationArguments args) throws Exception {
-		if (hayDatosSemilla()) {
+		importarComponentesSiNecesario();
+		sembrarUsuariosSiNecesario();
+		sembrarConfiguracionesSiNecesario();
+		sembrarPremontadosSiNecesario();
+		sembrarValoracionesSiNecesario();
+	}
+
+	private void importarComponentesSiNecesario() throws IOException {
+		if (tieneFilas(Componente.class)) {
 			return;
 		}
 
@@ -51,21 +74,239 @@ public class CsvDataLoader implements ApplicationRunner {
 		importarRefrigeradoresCpu();
 	}
 
-	private boolean hayDatosSemilla() {
-		return tieneFilas(Procesador.class)
-				|| tieneFilas(TarjetaGrafica.class)
-				|| tieneFilas(PlacaBase.class)
-				|| tieneFilas(MemoriaRAM.class)
-				|| tieneFilas(Almacenamiento.class)
-				|| tieneFilas(Caja.class)
-				|| tieneFilas(FuenteAlimentacion.class)
-				|| tieneFilas(RefrigeradorCPU.class);
+	private void sembrarUsuariosSiNecesario() {
+		asegurarUsuario("ana.romero@optimapc.local", "Ana", "Romero", "AnaRomero123!");
+		asegurarUsuario("carlos.martin@optimapc.local", "Carlos", "Martín", "CarlosMartin123!");
+		asegurarUsuario("laura.gomez@optimapc.local", "Laura", "Gómez", "LauraGomez123!");
+		asegurarUsuario("diego.perez@optimapc.local", "Diego", "Pérez", "DiegoPerez123!");
+		asegurarUsuario("nuria.santos@optimapc.local", "Nuria", "Santos", "NuriaSantos123!");
 	}
 
-	private boolean tieneFilas(Class<? extends Componente> entityClass) {
+	private void sembrarConfiguracionesSiNecesario() {
+		if (tieneConfiguracionesGenericas()) {
+			return;
+		}
+
+		Procesador procesador = primer(Procesador.class);
+		TarjetaGrafica tarjetaGrafica = primer(TarjetaGrafica.class);
+		PlacaBase placaBase = primer(PlacaBase.class);
+		MemoriaRAM memoriaRAM = primer(MemoriaRAM.class);
+		Almacenamiento almacenamiento = primer(Almacenamiento.class);
+		FuenteAlimentacion fuenteAlimentacion = primer(FuenteAlimentacion.class);
+		Caja caja = primer(Caja.class);
+		RefrigeradorCPU refrigeradorCPU = primer(RefrigeradorCPU.class);
+
+		ConfiguracionPC gaming = new ConfiguracionPC();
+		gaming.setTipoUsoPrevisto("Gaming equilibrado");
+		gaming.setFavorita(Boolean.TRUE);
+		agregarComponente(gaming, "CPU", procesador, 1);
+		agregarComponente(gaming, "GPU", tarjetaGrafica, 1);
+		agregarComponente(gaming, "Placa base", placaBase, 1);
+		agregarComponente(gaming, "RAM", memoriaRAM, 2);
+		agregarComponente(gaming, "Almacenamiento", almacenamiento, 1);
+		agregarComponente(gaming, "Fuente", fuenteAlimentacion, 1);
+		agregarComponente(gaming, "Caja", caja, 1);
+		agregarComponente(gaming, "Refrigeración", refrigeradorCPU, 1);
+		entityManager.persist(gaming);
+
+		ConfiguracionPC ofimatica = new ConfiguracionPC();
+		ofimatica.setTipoUsoPrevisto("Ofimática y estudio");
+		ofimatica.setFavorita(Boolean.FALSE);
+		agregarComponente(ofimatica, "CPU", procesador, 1);
+		agregarComponente(ofimatica, "Placa base", placaBase, 1);
+		agregarComponente(ofimatica, "RAM", memoriaRAM, 1);
+		agregarComponente(ofimatica, "Almacenamiento", almacenamiento, 1);
+		agregarComponente(ofimatica, "Fuente", fuenteAlimentacion, 1);
+		agregarComponente(ofimatica, "Caja", caja, 1);
+		entityManager.persist(ofimatica);
+
+		ConfiguracionPC edicion = new ConfiguracionPC();
+		edicion.setTipoUsoPrevisto("Edición y creación de contenido");
+		edicion.setFavorita(Boolean.FALSE);
+		agregarComponente(edicion, "CPU", procesador, 1);
+		agregarComponente(edicion, "GPU", tarjetaGrafica, 1);
+		agregarComponente(edicion, "Placa base", placaBase, 1);
+		agregarComponente(edicion, "RAM", memoriaRAM, 2);
+		agregarComponente(edicion, "Almacenamiento", almacenamiento, 2);
+		agregarComponente(edicion, "Fuente", fuenteAlimentacion, 1);
+		agregarComponente(edicion, "Caja", caja, 1);
+		entityManager.persist(edicion);
+	}
+
+	private void sembrarPremontadosSiNecesario() {
+		if (tieneFilas(Premontado.class)) {
+			return;
+		}
+
+		Procesador procesador = primer(Procesador.class);
+		TarjetaGrafica tarjetaGrafica = primer(TarjetaGrafica.class);
+		PlacaBase placaBase = primer(PlacaBase.class);
+		MemoriaRAM memoriaRAM = primer(MemoriaRAM.class);
+		Almacenamiento almacenamiento = primer(Almacenamiento.class);
+		FuenteAlimentacion fuenteAlimentacion = primer(FuenteAlimentacion.class);
+		Caja caja = primer(Caja.class);
+		RefrigeradorCPU refrigeradorCPU = primer(RefrigeradorCPU.class);
+
+		Premontado starter = new Premontado();
+		starter.setTipoUsoPrevisto("Entrada para gaming ligero");
+		starter.setFavorita(Boolean.TRUE);
+		starter.setDescripcion("Equipo equilibrado para jugar en 1080p y uso diario.");
+		starter.setMarca("OptimaPC");
+		starter.setDescuento(10);
+		starter.setSistemaOperativo(TipoSO.WINDOWS);
+		starter.setStock(5);
+		starter.setImagenUrl("https://images.example.com/premontado-starter.jpg");
+		starter.setEsReacondicionado(Boolean.FALSE);
+		starter.setUsosPrevistos(Set.of(TipoUso.GAMING, TipoUso.EDICION));
+		agregarComponente(starter, "CPU", procesador, 1);
+		agregarComponente(starter, "GPU", tarjetaGrafica, 1);
+		agregarComponente(starter, "Placa base", placaBase, 1);
+		agregarComponente(starter, "RAM", memoriaRAM, 2);
+		agregarComponente(starter, "Almacenamiento", almacenamiento, 1);
+		agregarComponente(starter, "Fuente", fuenteAlimentacion, 1);
+		agregarComponente(starter, "Caja", caja, 1);
+		agregarComponente(starter, "Refrigeración", refrigeradorCPU, 1);
+		entityManager.persist(starter);
+
+		Premontado office = new Premontado();
+		office.setTipoUsoPrevisto("Trabajo y estudio");
+		office.setFavorita(Boolean.FALSE);
+		office.setDescripcion("Premontado compacto y silencioso para productividad.");
+		office.setMarca("OptimaPC");
+		office.setDescuento(5);
+		office.setSistemaOperativo(TipoSO.LINUX);
+		office.setStock(8);
+		office.setImagenUrl("https://images.example.com/premontado-office.jpg");
+		office.setEsReacondicionado(Boolean.TRUE);
+		office.setUsosPrevistos(Set.of(TipoUso.OFIMATICA, TipoUso.PROGRAMACION));
+		agregarComponente(office, "CPU", procesador, 1);
+		agregarComponente(office, "Placa base", placaBase, 1);
+		agregarComponente(office, "RAM", memoriaRAM, 1);
+		agregarComponente(office, "Almacenamiento", almacenamiento, 1);
+		agregarComponente(office, "Fuente", fuenteAlimentacion, 1);
+		agregarComponente(office, "Caja", caja, 1);
+		entityManager.persist(office);
+
+		Premontado creator = new Premontado();
+		creator.setTipoUsoPrevisto("Edición profesional");
+		creator.setFavorita(Boolean.FALSE);
+		creator.setDescripcion("Configuración pensada para edición de foto y vídeo.");
+		creator.setMarca("OptimaPC");
+		creator.setDescuento(15);
+		creator.setSistemaOperativo(TipoSO.WINDOWS);
+		creator.setStock(3);
+		creator.setImagenUrl("https://images.example.com/premontado-creator.jpg");
+		creator.setEsReacondicionado(Boolean.FALSE);
+		creator.setUsosPrevistos(Set.of(TipoUso.EDICION, TipoUso.STREAMING, TipoUso.PROGRAMACION));
+		agregarComponente(creator, "CPU", procesador, 1);
+		agregarComponente(creator, "GPU", tarjetaGrafica, 1);
+		agregarComponente(creator, "Placa base", placaBase, 1);
+		agregarComponente(creator, "RAM", memoriaRAM, 2);
+		agregarComponente(creator, "Almacenamiento", almacenamiento, 2);
+		agregarComponente(creator, "Fuente", fuenteAlimentacion, 1);
+		agregarComponente(creator, "Caja", caja, 1);
+		agregarComponente(creator, "Refrigeración", refrigeradorCPU, 1);
+		entityManager.persist(creator);
+	}
+
+	private void sembrarValoracionesSiNecesario() {
+		if (tieneFilas(Valoracion.class)) {
+			return;
+		}
+
+		List<Usuario> usuarios = listar(Usuario.class);
+		List<Premontado> premontados = listar(Premontado.class);
+		if (usuarios.size() < 5 || premontados.size() < 3) {
+			return;
+		}
+
+		crearValoracion(usuarios.get(0), premontados.get(0), 5);
+		crearValoracion(usuarios.get(1), premontados.get(0), 4);
+		crearValoracion(usuarios.get(2), premontados.get(0), 5);
+
+		crearValoracion(usuarios.get(0), premontados.get(1), 4);
+		crearValoracion(usuarios.get(3), premontados.get(1), 3);
+
+		crearValoracion(usuarios.get(1), premontados.get(2), 5);
+		crearValoracion(usuarios.get(2), premontados.get(2), 4);
+		crearValoracion(usuarios.get(4), premontados.get(2), 5);
+	}
+
+	private void persistirUsuario(String email, String nombre, String apellidos, String passwordPlano) {
+		Usuario usuario = new Usuario();
+		usuario.setEmail(email);
+		usuario.setNombre(nombre);
+		usuario.setApellidos(apellidos);
+		usuario.setPassword(passwordEncoder.encode(passwordPlano));
+		entityManager.persist(usuario);
+	}
+
+	private void asegurarUsuario(String email, String nombre, String apellidos, String passwordPlano) {
+		if (buscarUsuarioPorEmail(email) != null) {
+			return;
+		}
+
+		persistirUsuario(email, nombre, apellidos, passwordPlano);
+	}
+
+	private Usuario buscarUsuarioPorEmail(String email) {
+		List<Usuario> usuarios = entityManager.createQuery(
+				"select u from Usuario u where lower(u.email) = lower(:email)",
+				Usuario.class)
+				.setParameter("email", email)
+				.getResultList();
+		return usuarios.isEmpty() ? null : usuarios.get(0);
+	}
+
+	private void crearValoracion(Usuario usuario, Premontado premontado, int puntuacion) {
+		Valoracion valoracion = new Valoracion();
+		valoracion.setUsuario(usuario);
+		valoracion.setPremontado(premontado);
+		valoracion.setPuntuacion(puntuacion);
+		usuario.getValoraciones().add(valoracion);
+		premontado.getValoraciones().add(valoracion);
+		entityManager.persist(valoracion);
+	}
+
+	private List<Valoracion> listarValoraciones(Premontado premontado) {
+		return entityManager.createQuery(
+				"select v from Valoracion v where v.premontado = :premontado order by v.id",
+				Valoracion.class)
+				.setParameter("premontado", premontado)
+				.getResultList();
+	}
+
+	private boolean tieneConfiguracionesGenericas() {
+		Long total = entityManager.createQuery(
+				"select count(c) from ConfiguracionPC c where type(c) = ConfiguracionPC",
+				Long.class)
+				.getSingleResult();
+		return total != null && total > 0;
+	}
+
+	private boolean tieneFilas(Class<?> entityClass) {
 		Long total = entityManager.createQuery("select count(e) from " + entityClass.getSimpleName() + " e", Long.class)
 				.getSingleResult();
 		return total != null && total > 0;
+	}
+
+	private <T> List<T> listar(Class<T> entityClass) {
+		return entityManager.createQuery("select e from " + entityClass.getSimpleName() + " e order by e.id", entityClass)
+				.getResultList();
+	}
+
+	private <T> T primer(Class<T> entityClass) {
+		return listar(entityClass).stream()
+				.findFirst()
+				.orElseThrow(() -> new IllegalStateException("No hay datos semilla para " + entityClass.getSimpleName()));
+	}
+
+	private void agregarComponente(ConfiguracionPC configuracion, String categoria, Componente componente, int cantidad) {
+		ConfiguracionComponente configuracionComponente = new ConfiguracionComponente();
+		configuracionComponente.setCategoria(categoria);
+		configuracionComponente.setCantidad(cantidad);
+		configuracionComponente.asociarComponente(componente);
+		configuracion.agregarComponente(configuracionComponente);
 	}
 
 	private void importarProcesadores() throws IOException {

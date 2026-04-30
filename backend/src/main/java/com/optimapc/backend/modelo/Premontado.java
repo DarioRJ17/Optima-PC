@@ -52,11 +52,17 @@ public class Premontado extends ConfiguracionPC {
     @Column(nullable = false)
     private Boolean esReacondicionado;
 
-    @Column(nullable = false)
-    private Double valoracionMedia = 0.0;
+    @Transient
+    private Double valoracionMedia() {
+        if (valoraciones.isEmpty()) return 0.0;
+        return valoraciones.stream().mapToInt(Valoracion::getPuntuacion).average().getAsDouble();
+    }
 
-    @Column(nullable = false)
-    private Integer numeroValoraciones = 0;
+    @Transient
+    private Integer getNumeroValoraciones() {
+        if (valoraciones.isEmpty()) return 0;
+        return valoraciones.size();
+    }
 
     @OneToMany(mappedBy = "premontado", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Valoracion> valoraciones = new ArrayList<>();
