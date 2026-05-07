@@ -4,7 +4,7 @@ import heroImage from './assets/hero.png'
 
 type AuthMode = 'login' | 'register'
 
-type ViewMode = 'home' | 'auth'
+type ViewMode = 'home' | 'auth' | 'product-detail'
 
 type ApiError = {
   message?: string
@@ -70,6 +70,24 @@ type CatalogPremontado = {
   numeroValoraciones: number
   favorita: boolean | null
   rendimientoPorEuro: number
+  componentes: PCComponent[]
+}
+
+type PCComponent = {
+  id: number
+  tipo: string
+  nombre: string
+  especificacion: string
+  precio: number
+  cantidad: number
+}
+
+type UserReview = {
+  id: number
+  usuarioNombre: string
+  calificacion: number
+  comentario: string
+  fecha: string
 }
 
 type ProductCard = {
@@ -212,7 +230,7 @@ function PerformanceMeter({ value }: { value: number }) {
   )
 }
 
-function ProductCardView({ product }: { product: ProductCard }) {
+function ProductCardView({ product, onViewDetails }: { product: ProductCard; onViewDetails: () => void }) {
   return (
     <article className={`product-card product-card--${product.tone}`}>
       <div className="product-card__media">
@@ -237,7 +255,7 @@ function ProductCardView({ product }: { product: ProductCard }) {
           {product.oldPrice ? <span className="old-price">{product.oldPrice}</span> : null}
           <strong className="price">{product.price}</strong>
         </div>
-        <button type="button" className="details-button">
+        <button type="button" className="details-button" onClick={onViewDetails}>
           Ver detalles
         </button>
       </div>
@@ -274,6 +292,274 @@ function PasswordStrengthMeter({ strength }: { strength: string }) {
   )
 }
 
+function PCComponentItem({ component }: { component: PCComponent }) {
+  const getIconoForTipo = (tipo: string) => {
+    const tipoNormalizado = tipo.toLowerCase().trim()
+    const tiposIconos: Record<string, string> = {
+      'cpu': '⚙️',
+      'gpu': '🖥️',
+      'ram': '💾',
+      'almacenamiento': '💿',
+      'fuente': '⚡',
+      'placa base': '📱',
+      'caja': '📦',
+      'refrigeración': '❄️',
+    }
+    return tiposIconos[tipoNormalizado] || '🔧'
+  }
+
+  const getDescripcionForTipo = (tipo: string) => {
+    const tipoNormalizado = tipo.toLowerCase().trim()
+    const descripciones: Record<string, string> = {
+      'cpu': 'El cerebro del ordenador que ejecuta las instrucciones y procesa los datos. Cuanto más potente, mejor rendimiento en aplicaciones y multitarea.',
+      'gpu': 'Procesa y renderiza imágenes, vídeos y gráficos 3D. Esencial para gaming, diseño gráfico, edición de vídeo y renderizado 3D.',
+      'ram': 'Memoria de acceso rápido que almacena temporalmente los datos que el procesador necesita. Más RAM permite ejecutar más programas simultáneamente.',
+      'almacenamiento': 'Disco que guarda permanentemente el sistema operativo, programas y archivos. Los SSD NVMe son mucho más rápidos que los discos duros tradicionales.',
+      'fuente': 'Proporciona energía estable a todos los componentes del ordenador.',
+      'placa base': 'Placa base que conecta todos los componentes del ordenador entre sí.',
+      'caja': 'Carcasa que aloja y protege todos los componentes del ordenador.',
+      'refrigeración': 'Sistema que mantiene la temperatura de los componentes bajo control para evitar sobrecalentamientos y mantener el rendimiento.',
+    }
+    return descripciones[tipoNormalizado] || 'Componente del ordenador'
+  }
+
+  const getNombreTipo = (tipo: string) => {
+    const tipoNormalizado = tipo.toLowerCase().trim()
+    const nombresAmigables: Record<string, string> = {
+      'cpu': 'Procesador',
+      'gpu': 'Tarjeta Gráfica',
+      'ram': 'Memoria RAM',
+      'almacenamiento': 'Almacenamiento',
+      'fuente': 'Fuente de Alimentación',
+      'placa base': 'Placa Base',
+      'caja': 'Carcasa',
+      'refrigeración': 'Refrigeración CPU',
+    }
+    return nombresAmigables[tipoNormalizado] || tipo
+  }
+
+  return (
+    <div className="component-item">
+      <div className="component-icon">{getIconoForTipo(component.tipo)}</div>
+      <div className="component-info">
+        <h4>{getNombreTipo(component.tipo)}</h4>
+        <p className="component-spec">{component.nombre}</p>
+        <p className="component-desc">{getDescripcionForTipo(component.tipo)}</p>
+      </div>
+    </div>
+  )
+}
+
+function UserReviewItem({ review }: { review: UserReview }) {
+  return (
+    <div className="review-item">
+      <div className="review-header">
+        <h5>{review.usuarioNombre}</h5>
+        <span className="review-date">{new Date(review.fecha).toLocaleDateString('es-ES')}</span>
+      </div>
+      <StarRating value={review.calificacion} />
+      <p className="review-text">{review.comentario}</p>
+    </div>
+  )
+}
+
+function RatingSummary({ product }: { product: CatalogPremontado }) {
+  const rating = Math.max(1, Math.min(5, Math.round(product.valoracionMedia || 0)))
+
+  return (
+    <div className="rating-summary">
+      <div className="rating-summary__header">
+        <h2>Valoraciones de clientes</h2>
+      </div>
+      <div className="rating-summary__main">
+        <div className="rating-summary__score">
+          <div className="rating-summary__number">{product.valoracionMedia?.toFixed(1) || '—'}</div>
+          <StarRating value={rating} />
+          <p className="rating-summary__count">Basado en {product.numeroValoraciones} valoraciones</p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ProductDetailView({ product, onBack }: { product: CatalogPremontado; onBack: () => void }) {
+  const rating = Math.max(1, Math.min(5, Math.round(product.valoracionMedia || 0)))
+  const price = product.precioReducido ?? product.precio
+
+  const [reviews, setReviews] = useState<UserReview[]>([])
+  const [reviewsLoading, setReviewsLoading] = useState(true)
+
+  useEffect(() => {
+    const loadReviews = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/catalogo/premontados/${product.id}/valoraciones`)
+        if (response.ok) {
+          const data = await response.json()
+          setReviews(data)
+        }
+      } catch {
+        setReviews([])
+      } finally {
+        setReviewsLoading(false)
+      }
+    }
+
+    void loadReviews()
+  }, [product.id])
+
+  return (
+    <main className="product-detail-page">
+      <button type="button" className="back-link" onClick={onBack}>
+        &larr; Volver a productos
+      </button>
+
+      <div className="product-detail-shell">
+        <section className="product-detail-header">
+          <div className="product-detail-image">
+            <img src={product.imagenUrl || heroImage} alt={product.titulo} />
+          </div>
+
+          <div className="product-detail-info">
+            <span className="pill pill--primary">{buildBadge(product as CatalogPremontado)}</span>
+
+            <h1>{product.titulo}</h1>
+            <p className="product-brand">{product.marca}</p>
+
+            <div className="product-rating-inline">
+              <span className="rating-count"> 
+                <StarRating value={rating} /> ({product.numeroValoraciones} valoraciones)
+              </span>
+            </div>
+
+            <div className="product-price-section">
+              {product.precioReducido && product.descuento ? (
+                <>
+                  <span className="discount-badge">-{product.descuento}%</span>
+                  <div className="price-row">
+                    <strong className="price">{formatEuro(price)}€</strong>
+                    <span className="old-price">{formatEuro(product.precio)}€</span>
+                  </div>
+                </>
+              ) : (
+                <strong className="price">{formatEuro(price)}€</strong>
+              )}
+            </div>
+
+            <p className="product-price-note">IVA incluido • Envío gratis</p>
+
+            <button type="button" className="cta-button">
+              🛒 Añadir al carrito
+            </button>
+
+            <div className="product-highlights">
+              {product.sistemaOperativo && (
+                <div className="highlight-item">
+                  <span className="highlight-icon">✓</span>
+                  <span>Sistema operativo {product.sistemaOperativo} incluido</span>
+                </div>
+              )}
+              <div className="highlight-item">
+                <span className="highlight-icon">✓</span>
+                <span>Refrigeración líquida AIO 280mm</span>
+              </div>
+              <div className="highlight-item">
+                <span className="highlight-icon">✓</span>
+                <span>WiFi 6E y Bluetooth 5.2 integrados</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="product-components">
+          <div className="section-header">
+            <h2>Componentes del ordenador</h2>
+            <p className="section-subtitle">Conoce cada pieza que compone este potente equipo y su función en el sistema</p>
+          </div>
+
+          <div className="components-grid">
+            {product.componentes.map((comp) => (
+              <PCComponentItem key={comp.id} component={comp} />
+            ))}
+          </div>
+        </section>
+
+        <section className="product-connectivity">
+          <h2>Conectividad y puertos</h2>
+          <div className="ports-grid">
+            <div className="port-item">
+              <p className="port-name">DisplayPort 1.4</p>
+              <p className="port-count">x3</p>
+            </div>
+            <div className="port-item">
+              <p className="port-name">Ethernet RJ45</p>
+              <p className="port-count">x1</p>
+            </div>
+            <div className="port-item">
+              <p className="port-name">Audio Jack 3.5mm</p>
+              <p className="port-count">x2</p>
+            </div>
+          </div>
+        </section>
+
+        <section className="product-features">
+          <h2>Características adicionales</h2>
+          <div className="features-grid">
+            <div className="feature-item">
+              <span className="feature-icon">✓</span>
+              <span>Sistema operativo Windows 11 Pro incluido</span>
+            </div>
+            <div className="feature-item">
+              <span className="feature-icon">✓</span>
+              <span>Refrigeración líquida AIO 280mm</span>
+            </div>
+            <div className="feature-item">
+              <span className="feature-icon">✓</span>
+              <span>WiFi 6E y Bluetooth 5.2 integrados</span>
+            </div>
+            <div className="feature-item">
+              <span className="feature-icon">✓</span>
+              <span>Iluminación RGB sincronizable</span>
+            </div>
+            <div className="feature-item">
+              <span className="feature-icon">✓</span>
+              <span>Montaje y testeo profesional incluido</span>
+            </div>
+            <div className="feature-item">
+              <span className="feature-icon">✓</span>
+              <span>Garantía de 3 años</span>
+            </div>
+          </div>
+        </section>
+
+        {product.descripcion && (
+          <section className="product-description">
+            <h2>Descripción</h2>
+            <p>{product.descripcion}</p>
+          </section>
+        )}
+
+        <section className="product-reviews">
+          <RatingSummary product={product} />
+
+          <div className="reviews-list">
+            <h3>Comentarios de clientes</h3>
+            {reviewsLoading ? (
+              <p>Cargando comentarios...</p>
+            ) : reviews.length > 0 ? (
+              reviews.map((review) => (
+                <UserReviewItem key={review.id} review={review} />
+              ))
+            ) : (
+              <p>No hay comentarios disponibles</p>
+            )}
+          </div>
+        </section>
+      </div>
+    </main>
+  )
+}
+
+
 function App() {
   const [view, setView] = useState<ViewMode>('home')
   const [mode, setMode] = useState<AuthMode>('login')
@@ -281,6 +567,7 @@ function App() {
   const [catalogItems, setCatalogItems] = useState<CatalogPremontado[]>([])
   const [catalogLoading, setCatalogLoading] = useState(true)
   const [catalogError, setCatalogError] = useState('')
+  const [selectedProduct, setSelectedProduct] = useState<CatalogPremontado | null>(null)
 
   // Estado de filtros
   const [selectedFilters, setSelectedFilters] = useState<{
@@ -401,6 +688,17 @@ function App() {
 
   const goHome = () => {
     setView('home')
+    setSelectedProduct(null)
+  }
+
+  const viewProductDetail = (product: CatalogPremontado) => {
+    setSelectedProduct(product)
+    setView('product-detail')
+  }
+
+  const backFromDetail = () => {
+    setView('home')
+    setSelectedProduct(null)
   }
 
   const parseError = async (response: Response) => {
@@ -495,26 +793,25 @@ function App() {
     }
   }
 
-  const catalogCards = catalogItems.map((item) => toProductCard(item, 'featured'))
-  const bestSellers = [...catalogCards]
-    .sort((left, right) => right.rating - left.rating || right.reviews - left.reviews)
+  const bestSellers = catalogItems
+    .sort((left, right) => (right.valoracionMedia || 0) - (left.valoracionMedia || 0) || (right.numeroValoraciones || 0) - (left.numeroValoraciones || 0))
     .slice(0, 3)
+  
   const offers = catalogItems
     .filter((item) => (item.descuento ?? 0) > 0)
-    .sort((left, right) => (right.descuento ?? 0) - (left.descuento ?? 0) || right.valoracionMedia - left.valoracionMedia)
-    .map((item) => toProductCard(item, 'offers'))
+    .sort((left, right) => (right.descuento ?? 0) - (left.descuento ?? 0) || (right.valoracionMedia || 0) - (left.valoracionMedia || 0))
     .slice(0, 3)
+  
   const refurbished = catalogItems
     .filter((item) => item.esReacondicionado)
-    .sort((left, right) => right.valoracionMedia - left.valoracionMedia || right.numeroValoraciones - left.numeroValoraciones)
-    .map((item) => toProductCard(item, 'refurbished'))
+    .sort((left, right) => (right.valoracionMedia || 0) - (left.valoracionMedia || 0) || (right.numeroValoraciones || 0) - (left.numeroValoraciones || 0))
     .slice(0, 3)
 
-  const fallbackCards = catalogCards.slice(0, 3)
+  const fallbackProducts = catalogItems.slice(0, 3)
   const sections = [
-    { title: 'Ordenadores más vendidos', icon: '↗', products: bestSellers.length > 0 ? bestSellers : fallbackCards },
-    { title: 'Mejores ofertas', icon: '🏷', products: offers.length > 0 ? offers : fallbackCards },
-    { title: 'Ordenadores reacondicionados', icon: '⟲', products: refurbished.length > 0 ? refurbished : fallbackCards },
+    { title: 'Ordenadores más vendidos', icon: '↗', products: bestSellers.length > 0 ? bestSellers : fallbackProducts },
+    { title: 'Mejores ofertas', icon: '🏷', products: offers.length > 0 ? offers : fallbackProducts },
+    { title: 'Ordenadores reacondicionados', icon: '⟲', products: refurbished.length > 0 ? refurbished : fallbackProducts },
   ]
 
   return (
@@ -675,15 +972,24 @@ function App() {
                   </div>
 
                   <div className="product-grid">
-                    {section.products.map((product) => (
-                      <ProductCardView key={product.id} product={product} />
-                    ))}
+                    {section.products.map((item) => {
+                      const productCard = toProductCard(item, 'featured')
+                      return (
+                        <ProductCardView 
+                          key={item.id} 
+                          product={productCard}
+                          onViewDetails={() => viewProductDetail(item)}
+                        />
+                      )
+                    })}
                   </div>
                 </section>
               ))}
             </div>
           </section>
         </main>
+      ) : view === 'product-detail' && selectedProduct ? (
+        <ProductDetailView product={selectedProduct} onBack={backFromDetail} />
       ) : (
         <main className="auth-page">
           <section className="auth-shell">
