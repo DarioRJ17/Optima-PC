@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -155,7 +156,6 @@ public class CsvDataLoader implements ApplicationRunner {
 		starter.setDescuento(10);
 		starter.setSistemaOperativo(TipoSO.WINDOWS);
 		starter.setStock(5);
-		starter.setImagenUrl("https://images.example.com/premontado-starter.jpg");
 		starter.setEsReacondicionado(Boolean.FALSE);
 		starter.setUsosPrevistos(Set.of(TipoUso.GAMING, TipoUso.EDICION));
 		agregarComponente(starter, "CPU", procesador, 1);
@@ -176,7 +176,6 @@ public class CsvDataLoader implements ApplicationRunner {
 		office.setDescuento(5);
 		office.setSistemaOperativo(TipoSO.LINUX);
 		office.setStock(8);
-		office.setImagenUrl("https://images.example.com/premontado-office.jpg");
 		office.setEsReacondicionado(Boolean.TRUE);
 		office.setUsosPrevistos(Set.of(TipoUso.OFIMATICA, TipoUso.PROGRAMACION));
 		agregarComponente(office, "CPU", procesador, 1);
@@ -195,7 +194,6 @@ public class CsvDataLoader implements ApplicationRunner {
 		creator.setDescuento(15);
 		creator.setSistemaOperativo(TipoSO.WINDOWS);
 		creator.setStock(3);
-		creator.setImagenUrl("https://images.example.com/premontado-creator.jpg");
 		creator.setEsReacondicionado(Boolean.FALSE);
 		creator.setUsosPrevistos(Set.of(TipoUso.EDICION, TipoUso.STREAMING, TipoUso.PROGRAMACION));
 		agregarComponente(creator, "CPU", procesador, 1);
@@ -220,16 +218,35 @@ public class CsvDataLoader implements ApplicationRunner {
 			return;
 		}
 
-		crearValoracion(usuarios.get(0), premontados.get(0), 5);
-		crearValoracion(usuarios.get(1), premontados.get(0), 4);
-		crearValoracion(usuarios.get(2), premontados.get(0), 5);
+		// Valoraciones para el primer premontado
+		crearValoracion(usuarios.get(0), premontados.get(0), 5, 
+			"Excelente ordenador, lleva funcionando perfectamente más de 6 meses. Muy recomendado para gaming.",
+			LocalDateTime.of(2025, 4, 20, 14, 30));
+		crearValoracion(usuarios.get(1), premontados.get(0), 4,
+			"Muy bueno en general. El único inconveniente es el ruido del ventilador bajo carga, pero es tolerable.",
+			LocalDateTime.of(2025, 4, 15, 10, 15));
+		crearValoracion(usuarios.get(2), premontados.get(0), 5,
+			"Perfectamente empaquetado y llegó sin problemas. El rendimiento es espectacular en los juegos más exigentes.",
+			LocalDateTime.of(2025, 4, 10, 9, 0));
 
-		crearValoracion(usuarios.get(0), premontados.get(1), 4);
-		crearValoracion(usuarios.get(3), premontados.get(1), 3);
+		// Valoraciones para el segundo premontado
+		crearValoracion(usuarios.get(0), premontados.get(1), 4,
+			"Muy buen PC para el precio. La refrigeración podría ser mejor pero funciona bien.",
+			LocalDateTime.of(2025, 4, 5, 16, 45));
+		crearValoracion(usuarios.get(3), premontados.get(1), 3,
+			"Cumple lo que promete pero nada excepcional. Esperaba un poco más por este precio.",
+			LocalDateTime.of(2025, 3, 28, 11, 20));
 
-		crearValoracion(usuarios.get(1), premontados.get(2), 5);
-		crearValoracion(usuarios.get(2), premontados.get(2), 4);
-		crearValoracion(usuarios.get(4), premontados.get(2), 5);
+		// Valoraciones para el tercer premontado
+		crearValoracion(usuarios.get(1), premontados.get(2), 5,
+			"¡Increíble! La mejor compra que he hecho. Funciona perfectamente para edición de vídeo.",
+			LocalDateTime.of(2025, 4, 8, 13, 10));
+		crearValoracion(usuarios.get(2), premontados.get(2), 4,
+			"Muy satisfecho con la compra. Buen rendimiento y servicio de atención muy rápido.",
+			LocalDateTime.of(2025, 4, 1, 15, 30));
+		crearValoracion(usuarios.get(4), premontados.get(2), 5,
+			"Ordenador de gran calidad. Recomendado 100%. Embalaje y entrega impecables.",
+			LocalDateTime.of(2025, 3, 25, 10, 0));
 	}
 
 	private void persistirUsuario(String email, String nombre, String apellidos, String passwordPlano) {
@@ -258,23 +275,25 @@ public class CsvDataLoader implements ApplicationRunner {
 		return usuarios.isEmpty() ? null : usuarios.get(0);
 	}
 
-	private void crearValoracion(Usuario usuario, Premontado premontado, int puntuacion) {
+	private void crearValoracion(Usuario usuario, Premontado premontado, int puntuacion, String comentario, LocalDateTime fecha) {
 		Valoracion valoracion = new Valoracion();
 		valoracion.setUsuario(usuario);
 		valoracion.setPremontado(premontado);
 		valoracion.setPuntuacion(puntuacion);
+		valoracion.setComentario(comentario);
+		valoracion.setFecha(fecha);
 		usuario.getValoraciones().add(valoracion);
 		premontado.getValoraciones().add(valoracion);
 		entityManager.persist(valoracion);
 	}
 
-	private List<Valoracion> listarValoraciones(Premontado premontado) {
-		return entityManager.createQuery(
-				"select v from Valoracion v where v.premontado = :premontado order by v.id",
-				Valoracion.class)
-				.setParameter("premontado", premontado)
-				.getResultList();
-	}
+	// private List<Valoracion> listarValoraciones(Premontado premontado) {
+	// 	return entityManager.createQuery(
+	// 			"select v from Valoracion v where v.premontado = :premontado order by v.id",
+	// 			Valoracion.class)
+	// 			.setParameter("premontado", premontado)
+	// 			.getResultList();
+	// }
 
 	private boolean tieneConfiguracionesGenericas() {
 		Long total = entityManager.createQuery(

@@ -18,5 +18,6 @@ public record PremontadoCatalogoDto(
         Double valoracionMedia,
         Integer numeroValoraciones,
         Boolean favorita,
-        Double rendimientoPorEuro) {
+        Double rendimientoPorEuro,
+        List<ComponenteDto> componentes) {
 }

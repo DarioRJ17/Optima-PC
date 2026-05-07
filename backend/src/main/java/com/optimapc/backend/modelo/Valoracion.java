@@ -15,6 +15,8 @@ import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @Entity
@@ -29,6 +31,12 @@ public class Valoracion {
 
     @Column(nullable = false)
     private Integer puntuacion;
+
+    @Column(length = 1000)
+    private String comentario;
+
+    @Column(nullable = false)
+    private LocalDateTime fecha;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "usuario_id", nullable = false)

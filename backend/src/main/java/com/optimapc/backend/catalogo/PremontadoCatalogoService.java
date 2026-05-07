@@ -64,6 +64,16 @@ public class PremontadoCatalogoService {
                 ? 0.0
                 : valoraciones.stream().mapToInt(Valoracion::getPuntuacion).average().orElse(0.0);
 
+        List<ComponenteDto> componentesDto = premontado.getComponentes().stream()
+                .map(cfg -> new ComponenteDto(
+                        cfg.getComponente().getId(),
+                        cfg.getCategoria(),
+                        cfg.getComponente().getNombre(),
+                        obtenerEspecificacion(cfg.getComponente()),
+                        cfg.getComponente().getPrecio(),
+                        cfg.getCantidad()))
+                .collect(Collectors.toList());
+
         return new PremontadoCatalogoDto(
                 premontado.getId(),
                 construirTitulo(premontado),
@@ -80,7 +90,31 @@ public class PremontadoCatalogoService {
                 redondear(valoracionMedia),
                 valoraciones.size(),
                 premontado.getFavorita(),
-                premontado.getRendimientoPorEuro());
+                premontado.getRendimientoPorEuro(),
+                componentesDto);
+    }
+
+    private String obtenerEspecificacion(com.optimapc.backend.modelo.Componente componente) {
+        // Obtener especificaciones específicas según el tipo de componente
+        String className = componente.getClass().getSimpleName();
+        switch (className) {
+            case "Procesador":
+                return componente.getNombre();
+            case "MemoriaRAM":
+                return componente.getNombre();
+            case "DiscoAlmacenamiento":
+                return componente.getNombre();
+            case "TarjetaGrafica":
+                return componente.getNombre();
+            case "PlacaBase":
+                return componente.getNombre();
+            case "FuenteAlimentacion":
+                return componente.getNombre();
+            case "Caja":
+                return componente.getNombre();
+            default:
+                return componente.getNombre();
+        }
     }
 
     private String construirTitulo(Premontado premontado) {
@@ -95,5 +129,23 @@ public class PremontadoCatalogoService {
 
     private double redondear(double value) {
         return Math.round(value * 10.0) / 10.0;
+    }
+
+    @Transactional(readOnly = true)
+    public List<ValoracionDto> obtenerValoracionesDelProducto(Long premontadoId) {
+        Premontado premontado = premontadoRepository.findById(premontadoId).orElse(null);
+        if (premontado == null) {
+            return List.of();
+        }
+
+        return premontado.getValoraciones().stream()
+                .sorted((v1, v2) -> v2.getFecha().compareTo(v1.getFecha()))
+                .map(v -> new ValoracionDto(
+                        v.getId(),
+                        v.getUsuario().getNombre() + " " + v.getUsuario().getApellidos(),
+                        v.getPuntuacion(),
+                        v.getComentario(),
+                        v.getFecha()))
+                .collect(Collectors.toList());
     }
 }
