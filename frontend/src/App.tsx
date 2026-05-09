@@ -38,6 +38,7 @@ type AppShellProps = {
   setLoading: Dispatch<SetStateAction<boolean>>
   setPasswordStrength: Dispatch<SetStateAction<string | null>>
   setUser: Dispatch<SetStateAction<{ nombre: string; apellidos: string; email: string } | null>>
+  user: { nombre: string; apellidos: string; email: string } | null
 }
 
 function AppShell({
@@ -61,8 +62,10 @@ function AppShell({
   setLoading,
   setPasswordStrength,
   setUser,
+  user,
 }: AppShellProps) {
   const navigate = useNavigate()
+  const [menuOpen, setMenuOpen] = useState(false)
 
   const clearAuthMessages = () => {
     setFieldErrors({})
@@ -178,19 +181,58 @@ function AppShell({
         </button>
 
         <nav className="topbar-actions" aria-label="Navegación principal">
-          <button type="button" className="nav-chip nav-chip--menu">
-            <span aria-hidden="true">☰</span>
-            <span>Menú</span>
-            <span aria-hidden="true">⌄</span>
-          </button>
-          <button type="button" className="nav-link" onClick={() => openAuth('login')}>
-            <span aria-hidden="true">↪</span>
-            <span>Iniciar sesión</span>
-          </button>
-          <button type="button" className="nav-primary" onClick={() => openAuth('register')}>
-            <span aria-hidden="true">👤+</span>
-            <span>Registrarse</span>
-          </button>
+          {user ? (
+            <div className="nav-user">
+              <button
+                type="button"
+                className="nav-chip nav-chip--menu"
+                onClick={() => setMenuOpen((s) => !s)}
+                aria-haspopup="true"
+                aria-expanded={menuOpen}
+              >
+                <span aria-hidden="true">👤</span>
+                <span>{user.nombre}</span>
+                <span aria-hidden="true">⌄</span>
+              </button>
+              {menuOpen ? (
+                <div className="nav-user__menu" role="menu">
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() => {
+                      // cerrar sesión
+                      setUser(null)
+                      try {
+                        localStorage.removeItem('token')
+                      } catch {
+                        // silencioso, no es crítico
+                      }
+                      navigate('/')
+                    }}
+                  >
+                    Cerrar sesión
+                  </button>
+                </div>
+              ) : null}
+            </div>
+          ) : (
+            <>
+              <button type="button" className="nav-chip nav-chip--menu">
+                <span aria-hidden="true">☰</span>
+                <span>Menú</span>
+                <span aria-hidden="true">⌄</span>
+              </button>
+              <button type="button" className="nav-link" onClick={() => openAuth('login')}>
+                <span aria-hidden="true">↪</span>
+                <span>Iniciar sesión</span>
+              </button>
+              <button type="button" className="nav-primary" onClick={() => openAuth('register')}>
+                <span aria-hidden="true">👤+</span>
+                <span>Registrarse</span>
+              </button>
+            </>
+          )}
+
           <button type="button" className="nav-chip nav-chip--cart">
             <span aria-hidden="true">🛒</span>
             <span>Carrito</span>
@@ -262,7 +304,7 @@ function AppShell({
 }
 
 function App() {
-  const [, setUser] = useState<{ nombre: string; apellidos: string; email: string } | null>(null)
+  const [user, setUser] = useState<{ nombre: string; apellidos: string; email: string } | null>(null)
   const [catalogItems, setCatalogItems] = useState<CatalogPremontado[]>([])
   const [catalogLoading, setCatalogLoading] = useState(true)
   const [catalogError, setCatalogError] = useState('')
@@ -389,6 +431,7 @@ function App() {
         setLoading={setLoading}
         setPasswordStrength={setPasswordStrength}
         setUser={setUser}
+        user={user}
       />
     </BrowserRouter>
   )
