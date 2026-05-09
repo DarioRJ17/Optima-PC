@@ -1,4 +1,5 @@
 import type { Dispatch, SetStateAction } from 'react'
+import { useNavigate } from 'react-router-dom'
 import heroImage from '../assets/hero.png'
 import { ProductCardView } from '../components/common'
 import { toProductCard, type CatalogSectionKey } from '../catalog-utils'
@@ -40,7 +41,6 @@ type HomePageProps = {
   selectedFilters: SelectedFilters
   setSelectedFilters: Dispatch<SetStateAction<SelectedFilters>>
   openAuth: (nextMode: AuthMode) => void
-  viewProductDetail: (product: CatalogPremontado) => void
 }
 
 export function HomePage({
@@ -50,8 +50,8 @@ export function HomePage({
   selectedFilters,
   setSelectedFilters,
   openAuth,
-  viewProductDetail,
 }: HomePageProps) {
+  const navigate = useNavigate()
   const bestSellers = [...catalogItems]
     .sort(
       (left, right) =>
@@ -233,7 +233,7 @@ export function HomePage({
                     <ProductCardView
                       key={item.id}
                       product={productCard}
-                      onViewDetails={() => viewProductDetail(item)}
+                      onViewDetails={() => navigate(`/productos/${item.id}`)}
                     />
                   )
                 })}

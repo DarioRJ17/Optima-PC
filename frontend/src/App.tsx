@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom'
 import './App.css'
 import { AppLogo } from './components/common'
 import { AuthPage } from './pages/AuthPage.tsx'
@@ -12,19 +13,133 @@ import type {
   LoginData,
   RegisterData,
   SelectedFilters,
-  ViewMode,
 } from './types'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.trim() || 'http://localhost:8080'
 
+type AppShellProps = {
+  mode: AuthMode
+  catalogItems: CatalogPremontado[]
+  catalogLoading: boolean
+  catalogError: string
+  selectedFilters: SelectedFilters
+  setSelectedFilters: React.Dispatch<React.SetStateAction<SelectedFilters>>
+  switchMode: (newMode: AuthMode) => void
+  loginData: LoginData
+  setLoginData: React.Dispatch<React.SetStateAction<LoginData>>
+  registerData: RegisterData
+  setRegisterData: React.Dispatch<React.SetStateAction<RegisterData>>
+  passwordStrength: string | null
+  fieldErrors: Record<string, string>
+  globalError: string
+  successMessage: string
+  loading: boolean
+  onLoginSubmit: (event: FormEvent<HTMLFormElement>) => Promise<void>
+  onRegisterSubmit: (event: FormEvent<HTMLFormElement>) => Promise<void>
+}
+
+function AppShell({
+  mode,
+  catalogItems,
+  catalogLoading,
+  catalogError,
+  selectedFilters,
+  setSelectedFilters,
+  switchMode,
+  loginData,
+  setLoginData,
+  registerData,
+  setRegisterData,
+  passwordStrength,
+  fieldErrors,
+  globalError,
+  successMessage,
+  loading,
+  onLoginSubmit,
+  onRegisterSubmit,
+}: AppShellProps) {
+  const navigate = useNavigate()
+
+  const openAuth = (nextMode: AuthMode) => {
+    switchMode(nextMode)
+    navigate('/auth')
+  }
+
+  return (
+    <div className="app-root">
+      <header className="topbar">
+        <button className="brand-button" type="button" onClick={() => navigate('/')}>
+          <AppLogo />
+        </button>
+
+        <nav className="topbar-actions" aria-label="Navegación principal">
+          <button type="button" className="nav-chip nav-chip--menu">
+            <span aria-hidden="true">☰</span>
+            <span>Menú</span>
+            <span aria-hidden="true">⌄</span>
+          </button>
+          <button type="button" className="nav-link" onClick={() => openAuth('login')}>
+            <span aria-hidden="true">↪</span>
+            <span>Iniciar sesión</span>
+          </button>
+          <button type="button" className="nav-primary" onClick={() => openAuth('register')}>
+            <span aria-hidden="true">👤+</span>
+            <span>Registrarse</span>
+          </button>
+          <button type="button" className="nav-chip nav-chip--cart">
+            <span aria-hidden="true">🛒</span>
+            <span>Carrito</span>
+          </button>
+        </nav>
+      </header>
+
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <HomePage
+              catalogItems={catalogItems}
+              catalogLoading={catalogLoading}
+              catalogError={catalogError}
+              selectedFilters={selectedFilters}
+              setSelectedFilters={setSelectedFilters}
+              openAuth={(nextMode) => openAuth(nextMode)}
+            />
+          }
+        />
+        <Route path="/productos/:id" element={<ProductDetailPage onBack={() => navigate('/')} />} />
+        <Route
+          path="/auth"
+          element={
+            <AuthPage
+              mode={mode}
+              switchMode={switchMode}
+              loginData={loginData}
+              setLoginData={setLoginData}
+              registerData={registerData}
+              setRegisterData={setRegisterData}
+              passwordStrength={passwordStrength}
+              fieldErrors={fieldErrors}
+              globalError={globalError}
+              successMessage={successMessage}
+              loading={loading}
+              onLoginSubmit={onLoginSubmit}
+              onRegisterSubmit={onRegisterSubmit}
+              goHome={() => navigate('/')}
+            />
+          }
+        />
+      </Routes>
+    </div>
+  )
+}
+
 function App() {
-  const [view, setView] = useState<ViewMode>('home')
   const [mode, setMode] = useState<AuthMode>('login')
 
   const [catalogItems, setCatalogItems] = useState<CatalogPremontado[]>([])
   const [catalogLoading, setCatalogLoading] = useState(true)
   const [catalogError, setCatalogError] = useState('')
-  const [selectedProduct, setSelectedProduct] = useState<CatalogPremontado | null>(null)
 
   const [selectedFilters, setSelectedFilters] = useState<SelectedFilters>({
     priceRange: null,
@@ -134,26 +249,6 @@ function App() {
     setPasswordStrength(null)
   }
 
-  const viewProductDetail = (product: CatalogPremontado) => {
-    setSelectedProduct(product)
-    setView('product-detail')
-  }
-
-  const goHome = () => {
-    setView('home')
-    setSelectedProduct(null)
-  }
-
-  const backFromDetail = () => {
-    setView('home')
-    setSelectedProduct(null)
-  }
-
-  const openAuth = (nextMode: AuthMode) => {
-    setView('auth')
-    switchMode(nextMode)
-  }
-
   const parseError = async (response: Response) => {
     try {
       const data = (await response.json()) as ApiError
@@ -247,64 +342,28 @@ function App() {
   }
 
   return (
-    <div className="app-root">
-      <header className="topbar">
-        <button className="brand-button" type="button" onClick={goHome}>
-          <AppLogo />
-        </button>
-
-        <nav className="topbar-actions" aria-label="Navegación principal">
-          <button type="button" className="nav-chip nav-chip--menu">
-            <span aria-hidden="true">☰</span>
-            <span>Menú</span>
-            <span aria-hidden="true">⌄</span>
-          </button>
-          <button type="button" className="nav-link" onClick={() => openAuth('login')}>
-            <span aria-hidden="true">↪</span>
-            <span>Iniciar sesión</span>
-          </button>
-          <button type="button" className="nav-primary" onClick={() => openAuth('register')}>
-            <span aria-hidden="true">👤+</span>
-            <span>Registrarse</span>
-          </button>
-          <button type="button" className="nav-chip nav-chip--cart">
-            <span aria-hidden="true">🛒</span>
-            <span>Carrito</span>
-          </button>
-        </nav>
-      </header>
-
-      {view === 'home' ? (
-        <HomePage
-          catalogItems={catalogItems}
-          catalogLoading={catalogLoading}
-          catalogError={catalogError}
-          selectedFilters={selectedFilters}
-          setSelectedFilters={setSelectedFilters}
-          openAuth={openAuth}
-          viewProductDetail={viewProductDetail}
-        />
-      ) : view === 'product-detail' && selectedProduct ? (
-        <ProductDetailPage product={selectedProduct} onBack={backFromDetail} />
-      ) : (
-        <AuthPage
-          mode={mode}
-          switchMode={switchMode}
-          loginData={loginData}
-          setLoginData={setLoginData}
-          registerData={registerData}
-          setRegisterData={setRegisterData}
-          passwordStrength={passwordStrength}
-          fieldErrors={fieldErrors}
-          globalError={globalError}
-          successMessage={successMessage}
-          loading={loading}
-          onLoginSubmit={onLoginSubmit}
-          onRegisterSubmit={onRegisterSubmit}
-          goHome={goHome}
-        />
-      )}
-    </div>
+    <BrowserRouter>
+      <AppShell
+        mode={mode}
+        catalogItems={catalogItems}
+        catalogLoading={catalogLoading}
+        catalogError={catalogError}
+        selectedFilters={selectedFilters}
+        setSelectedFilters={setSelectedFilters}
+        switchMode={switchMode}
+        loginData={loginData}
+        setLoginData={setLoginData}
+        registerData={registerData}
+        setRegisterData={setRegisterData}
+        passwordStrength={passwordStrength}
+        fieldErrors={fieldErrors}
+        globalError={globalError}
+        successMessage={successMessage}
+        loading={loading}
+        onLoginSubmit={onLoginSubmit}
+        onRegisterSubmit={onRegisterSubmit}
+      />
+    </BrowserRouter>
   )
 }
 

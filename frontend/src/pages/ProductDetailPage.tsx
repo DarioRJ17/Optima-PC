@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
 import heroImage from '../assets/hero.png'
 import { PCComponentItem, RatingSummary, StarRating, UserReviewItem } from '../components/common'
 import { buildBadge, formatEuro } from '../catalog-utils'
@@ -7,24 +8,54 @@ import type { CatalogPremontado, UserReview } from '../types'
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.trim() || 'http://localhost:8080'
 
 type ProductDetailPageProps = {
-  product: CatalogPremontado
+  productId?: number
   onBack: () => void
 }
 
-export function ProductDetailPage({ product, onBack }: ProductDetailPageProps) {
-  const rating = Math.max(1, Math.min(5, Math.round(product.valoracionMedia || 0)))
-  const price = product.precioReducido ?? product.precio
+export function ProductDetailPage({ productId: propProductId, onBack }: ProductDetailPageProps) {
+  const params = useParams()
+  const productId = propProductId ?? (params.id ? Number(params.id) : undefined)
+  const [product, setProduct] = useState<CatalogPremontado | null>(null)
+  const [productLoading, setProductLoading] = useState(true)
+  const [productError, setProductError] = useState('')
 
   const [reviews, setReviews] = useState<UserReview[]>([])
   const [reviewsLoading, setReviewsLoading] = useState(true)
 
   useEffect(() => {
-    const loadReviews = async () => {
+    const loadProduct = async () => {
+      setProductLoading(true)
+      setProductError('')
       try {
-        const response = await fetch(`${API_BASE_URL}/api/catalogo/premontados/${product.id}/valoraciones`)
+        const resp = await fetch(`${API_BASE_URL}/api/catalogo/premontados/${productId}`)
+        if (!resp.ok) {
+          setProductError('No se encontró el producto')
+          setProduct(null)
+          return
+        }
+        const data = (await resp.json()) as CatalogPremontado
+        setProduct(data)
+      } catch {
+        setProductError('Error al cargar el producto')
+        setProduct(null)
+      } finally {
+        setProductLoading(false)
+      }
+    }
+
+    void loadProduct()
+  }, [productId])
+
+  useEffect(() => {
+    const loadReviews = async () => {
+      setReviewsLoading(true)
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/catalogo/premontados/${productId}/valoraciones`)
         if (response.ok) {
           const data = await response.json()
           setReviews(data)
+        } else {
+          setReviews([])
         }
       } catch {
         setReviews([])
@@ -34,7 +65,29 @@ export function ProductDetailPage({ product, onBack }: ProductDetailPageProps) {
     }
 
     void loadReviews()
-  }, [product.id])
+  }, [productId])
+
+  if (productLoading) {
+    return (
+      <main className="product-detail-page">
+        <p>Cargando producto…</p>
+      </main>
+    )
+  }
+
+  if (!product) {
+    return (
+      <main className="product-detail-page">
+        <button type="button" className="back-link" onClick={onBack}>
+          &larr; Volver a productos
+        </button>
+        <p>{productError || 'Producto no disponible'}</p>
+      </main>
+    )
+  }
+
+  const rating = Math.max(1, Math.min(5, Math.round(product.valoracionMedia || 0)))
+  const price = product.precioReducido ?? product.precio
 
   return (
     <main className="product-detail-page">

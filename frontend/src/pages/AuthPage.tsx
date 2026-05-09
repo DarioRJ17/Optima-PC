@@ -59,12 +59,13 @@ export function AuthPage({
                   type="email"
                   placeholder="ejemplo@correo.com"
                   value={loginData.email}
-                  onChange={(event) =>
+                  onChange={(event) => {
+                    const value = event.currentTarget.value
                     setLoginData((previous) => ({
                       ...previous,
-                      email: event.target.value,
+                      email: value,
                     }))
-                  }
+                  }}
                 />
                 {fieldErrors.email ? <p className="field-error">{fieldErrors.email}</p> : null}
 
@@ -74,12 +75,13 @@ export function AuthPage({
                   type="password"
                   placeholder="********"
                   value={loginData.password}
-                  onChange={(event) =>
+                  onChange={(event) => {
+                    const value = event.currentTarget.value
                     setLoginData((previous) => ({
                       ...previous,
-                      password: event.target.value,
+                      password: value,
                     }))
-                  }
+                  }}
                 />
                 {fieldErrors.password ? <p className="field-error">{fieldErrors.password}</p> : null}
 
@@ -111,12 +113,13 @@ export function AuthPage({
                   type="text"
                   placeholder="Tu nombre"
                   value={registerData.nombre}
-                  onChange={(event) =>
+                  onChange={(event) => {
+                    const value = event.currentTarget.value
                     setRegisterData((previous) => ({
                       ...previous,
-                      nombre: event.target.value,
+                      nombre: value,
                     }))
-                  }
+                  }}
                 />
                 {fieldErrors.nombre ? <p className="field-error">{fieldErrors.nombre}</p> : null}
 
@@ -126,12 +129,13 @@ export function AuthPage({
                   type="text"
                   placeholder="Tus apellidos"
                   value={registerData.apellidos}
-                  onChange={(event) =>
+                  onChange={(event) => {
+                    const value = event.currentTarget.value
                     setRegisterData((previous) => ({
                       ...previous,
-                      apellidos: event.target.value,
+                      apellidos: value,
                     }))
-                  }
+                  }}
                 />
                 {fieldErrors.apellidos ? <p className="field-error">{fieldErrors.apellidos}</p> : null}
 
@@ -141,12 +145,13 @@ export function AuthPage({
                   type="email"
                   placeholder="ejemplo@correo.com"
                   value={registerData.email}
-                  onChange={(event) =>
+                  onChange={(event) => {
+                    const value = event.currentTarget.value
                     setRegisterData((previous) => ({
                       ...previous,
-                      email: event.target.value,
+                      email: value,
                     }))
-                  }
+                  }}
                 />
                 {fieldErrors.email ? <p className="field-error">{fieldErrors.email}</p> : null}
 
@@ -156,12 +161,13 @@ export function AuthPage({
                   type="password"
                   placeholder="Mínimo 8 caracteres"
                   value={registerData.password}
-                  onChange={(event) =>
+                  onChange={(event) => {
+                    const value = event.currentTarget.value
                     setRegisterData((previous) => ({
                       ...previous,
-                      password: event.target.value,
+                      password: value,
                     }))
-                  }
+                  }}
                 />
                 {passwordStrength ? <PasswordStrengthMeter strength={passwordStrength} /> : null}
                 {fieldErrors.password ? <p className="field-error">{fieldErrors.password}</p> : null}
@@ -172,12 +178,13 @@ export function AuthPage({
                   type="password"
                   placeholder="Repite tu contraseña"
                   value={registerData.confirmPassword}
-                  onChange={(event) =>
+                  onChange={(event) => {
+                    const value = event.currentTarget.value
                     setRegisterData((previous) => ({
                       ...previous,
-                      confirmPassword: event.target.value,
+                      confirmPassword: value,
                     }))
-                  }
+                  }}
                 />
                 {fieldErrors.confirmPassword ? <p className="field-error">{fieldErrors.confirmPassword}</p> : null}
 
