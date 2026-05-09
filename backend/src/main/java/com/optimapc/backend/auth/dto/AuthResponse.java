@@ -8,5 +8,6 @@ public record AuthResponse(
         String nombre,
         String apellidos,
         String email,
-        LocalDateTime fechaRegistro) {
+        LocalDateTime fechaRegistro,
+        String token) {
 }

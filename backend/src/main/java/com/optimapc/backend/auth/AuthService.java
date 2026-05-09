@@ -19,10 +19,12 @@ public class AuthService {
 
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
-    public AuthService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
+    public AuthService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     public AuthResponse register(RegisterRequest request) {
@@ -39,6 +41,7 @@ public class AuthService {
         usuario.setPassword(passwordEncoder.encode(request.password()));
 
         Usuario guardado = usuarioRepository.save(usuario);
+        String token = jwtService.generateToken(guardado.getId(), guardado.getEmail());
 
         return new AuthResponse(
                 "Usuario registrado correctamente",
@@ -46,7 +49,8 @@ public class AuthService {
                 guardado.getNombre(),
                 guardado.getApellidos(),
                 guardado.getEmail(),
-                guardado.getFechaRegistro());
+                guardado.getFechaRegistro(),
+                token);
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -59,13 +63,16 @@ public class AuthService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Credenciales incorrectas");
         }
 
+        String token = jwtService.generateToken(usuario.getId(), usuario.getEmail());
+
         return new AuthResponse(
                 "Inicio de sesion correcto",
-            usuario.getId(),
-            usuario.getNombre(),
-            usuario.getApellidos(),
-            usuario.getEmail(),
-            usuario.getFechaRegistro());
+                usuario.getId(),
+                usuario.getNombre(),
+                usuario.getApellidos(),
+                usuario.getEmail(),
+                usuario.getFechaRegistro(),
+                token);
     }
 
     public PasswordStrength evaluate(String password) {
