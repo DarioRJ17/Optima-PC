@@ -29,7 +29,6 @@ export function AuthPage({
   passwordStrength,
   fieldErrors,
   globalError,
-  successMessage,
   loading,
   onLoginSubmit,
   onRegisterSubmit,
@@ -203,7 +202,6 @@ export function AuthPage({
           )}
 
           {globalError ? <p className="global-error">{globalError}</p> : null}
-          {successMessage ? <p className="success-message">{successMessage}</p> : null}
         </section>
       </section>
     </main>
