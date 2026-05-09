@@ -3,6 +3,7 @@ package com.optimapc.backend.catalogo;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -147,5 +148,10 @@ public class PremontadoCatalogoService {
                         v.getComentario(),
                         v.getFecha()))
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<PremontadoCatalogoDto> obtenerPorId(Long id) {
+        return premontadoRepository.findById(id).map(this::toDto);
     }
 }
