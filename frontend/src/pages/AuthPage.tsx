@@ -1,4 +1,6 @@
 import type { Dispatch, FormEvent, SetStateAction } from 'react'
+import { useState } from 'react'
+import { Eye, EyeOff } from 'lucide-react'
 import { AppLogo, PasswordStrengthMeter } from '../components/common'
 import type { AuthMode, LoginData, RegisterData } from '../types'
 
@@ -34,6 +36,10 @@ export function AuthPage({
   onRegisterSubmit,
   goHome,
 }: AuthPageProps) {
+  const [showLoginPassword, setShowLoginPassword] = useState(false)
+  const [showRegisterPassword, setShowRegisterPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
   return (
     <main className="auth-page">
       <section className="auth-shell">
@@ -69,19 +75,29 @@ export function AuthPage({
                 {fieldErrors.email ? <p className="field-error">{fieldErrors.email}</p> : null}
 
                 <label htmlFor="login-password">Contraseña</label>
-                <input
-                  id="login-password"
-                  type="password"
-                  placeholder="********"
-                  value={loginData.password}
-                  onChange={(event) => {
-                    const value = event.currentTarget.value
-                    setLoginData((previous) => ({
-                      ...previous,
-                      password: value,
-                    }))
-                  }}
-                />
+                <div className="password-wrapper">
+                  <input
+                    id="login-password"
+                    type={showLoginPassword ? 'text' : 'password'}
+                    placeholder="********"
+                    value={loginData.password}
+                    onChange={(event) => {
+                      const value = event.currentTarget.value
+                      setLoginData((previous) => ({
+                        ...previous,
+                        password: value,
+                      }))
+                    }}
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle"
+                    onClick={() => setShowLoginPassword((p) => !p)}
+                    aria-label={showLoginPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                  >
+                    {showLoginPassword ? <EyeOff /> : <Eye />}
+                  </button>
+                </div>
                 {fieldErrors.password ? <p className="field-error">{fieldErrors.password}</p> : null}
 
                 <a className="inline-link" href="#">
@@ -155,36 +171,56 @@ export function AuthPage({
                 {fieldErrors.email ? <p className="field-error">{fieldErrors.email}</p> : null}
 
                 <label htmlFor="register-password">Contraseña</label>
-                <input
-                  id="register-password"
-                  type="password"
-                  placeholder="Mínimo 8 caracteres"
-                  value={registerData.password}
-                  onChange={(event) => {
-                    const value = event.currentTarget.value
-                    setRegisterData((previous) => ({
-                      ...previous,
-                      password: value,
-                    }))
-                  }}
-                />
+                <div className="password-wrapper">
+                  <input
+                    id="register-password"
+                    type={showRegisterPassword ? 'text' : 'password'}
+                    placeholder="Mínimo 8 caracteres"
+                    value={registerData.password}
+                    onChange={(event) => {
+                      const value = event.currentTarget.value
+                      setRegisterData((previous) => ({
+                        ...previous,
+                        password: value,
+                      }))
+                    }}
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle"
+                    onClick={() => setShowRegisterPassword((p) => !p)}
+                    aria-label={showRegisterPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                  >
+                    {showRegisterPassword ? <EyeOff /> : <Eye />}
+                  </button>
+                </div>
                 {passwordStrength ? <PasswordStrengthMeter strength={passwordStrength} /> : null}
                 {fieldErrors.password ? <p className="field-error">{fieldErrors.password}</p> : null}
 
                 <label htmlFor="register-confirm-password">Confirmar contraseña</label>
-                <input
-                  id="register-confirm-password"
-                  type="password"
-                  placeholder="Repite tu contraseña"
-                  value={registerData.confirmPassword}
-                  onChange={(event) => {
-                    const value = event.currentTarget.value
-                    setRegisterData((previous) => ({
-                      ...previous,
-                      confirmPassword: value,
-                    }))
-                  }}
-                />
+                <div className="password-wrapper">
+                  <input
+                    id="register-confirm-password"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    placeholder="Repite tu contraseña"
+                    value={registerData.confirmPassword}
+                    onChange={(event) => {
+                      const value = event.currentTarget.value
+                      setRegisterData((previous) => ({
+                        ...previous,
+                        confirmPassword: value,
+                      }))
+                    }}
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle"
+                    onClick={() => setShowConfirmPassword((p) => !p)}
+                    aria-label={showConfirmPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                  >
+                    {showConfirmPassword ? <EyeOff /> : <Eye />}
+                  </button>
+                </div>
                 {fieldErrors.confirmPassword ? <p className="field-error">{fieldErrors.confirmPassword}</p> : null}
 
                 <button type="submit" disabled={loading}>

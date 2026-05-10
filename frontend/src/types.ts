@@ -14,6 +14,7 @@ export type AuthResponse = {
   apellidos: string
   email: string
   fechaRegistro: string
+  token: string
 }
 
 export type CatalogPremontado = {
