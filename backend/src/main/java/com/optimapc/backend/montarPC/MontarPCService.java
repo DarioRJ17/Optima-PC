@@ -2,11 +2,15 @@ package com.optimapc.backend.montarPC;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
 import com.optimapc.backend.catalogo.ComponenteDto;
 import com.optimapc.backend.montarPC.dto.CompatibleComponenteDto;
+import com.optimapc.backend.montarPC.dto.ComponenteDetalleDto;
 import com.optimapc.backend.montarPC.dto.CompatibilityWarningDto;
 import com.optimapc.backend.modelo.Componente;
 import com.optimapc.backend.modelo.Almacenamiento;
@@ -205,6 +209,108 @@ public class MontarPCService {
             case "refrigerador-cpu" -> componente.getNombre();
             default -> componente.getNombre();
         };
+    }
+
+    public Optional<ComponenteDetalleDto> getComponenteDetalle(Long id) {
+        return componenteRepository.findById(id).map(this::mapToComponenteDetalleDto);
+    }
+
+    private ComponenteDetalleDto mapToComponenteDetalleDto(Componente c) {
+        String tipo = toTypeLabel(c);
+        String especificacion = buildSpecification(c);
+        Map<String, Object> detalles = buildComponenteDetalles(c);
+
+        return new ComponenteDetalleDto(
+                c.getId(),
+                tipo,
+                c.getNombre(),
+                especificacion,
+                c.getPrecio(),
+                1,
+                c.getConsumoWatts(),
+                detalles);
+    }
+
+    private Map<String, Object> buildComponenteDetalles(Componente componente) {
+        Map<String, Object> detalles = new HashMap<>();
+        String tipo = toTypeLabel(componente);
+
+        detalles.put("nombre", componente.getNombre());
+        detalles.put("precio", componente.getPrecio());
+        if (componente.getConsumoWatts() != null) {
+            detalles.put("consumoWatts", componente.getConsumoWatts());
+        }
+
+        switch (tipo) {
+            case "procesador" -> {
+                Procesador procesador = (Procesador) componente;
+                detalles.put("socket", procesador.getSocket());
+                detalles.put("microarquitectura", procesador.getMicroarquitectura());
+                detalles.put("nucleos", procesador.getNucleos());
+                detalles.put("frecuenciaBase", procesador.getFrecuenciaBase());
+                detalles.put("frecuenciaBoost", procesador.getFrecuenciaBoost());
+                detalles.put("tdp", procesador.getTdp());
+                detalles.put("graficaIntegrada", procesador.getGraficaIntegrada());
+            }
+            case "placa-base" -> {
+                PlacaBase placaBase = (PlacaBase) componente;
+                detalles.put("socket", placaBase.getSocket());
+                detalles.put("factorForma", placaBase.getFactorForma());
+                detalles.put("tipoDDR", placaBase.getTipoDDR());
+                detalles.put("memoriaMaxima", placaBase.getMemoriaMaxima());
+                detalles.put("ranurasMemoria", placaBase.getRanurasMemoria());
+                detalles.put("color", placaBase.getColor());
+            }
+            case "memoria-ram" -> {
+                MemoriaRAM memoriaRAM = (MemoriaRAM) componente;
+                detalles.put("tipoDDR", memoriaRAM.getTipoDDR());
+                detalles.put("velocidad", memoriaRAM.getVelocidad());
+                detalles.put("gbPorModulo", memoriaRAM.getGbPorModulo());
+                detalles.put("numModulos", memoriaRAM.getNumModulos());
+                detalles.put("latenciaCAS", memoriaRAM.getLatenciaCAS());
+                detalles.put("color", memoriaRAM.getColor());
+                detalles.put("totalGB", memoriaRAM.getGbPorModulo() * memoriaRAM.getNumModulos());
+            }
+            case "tarjeta-grafica" -> {
+                TarjetaGrafica tarjetaGrafica = (TarjetaGrafica) componente;
+                detalles.put("chipset", tarjetaGrafica.getChipset());
+                detalles.put("memoria", tarjetaGrafica.getMemoria());
+                detalles.put("frecuenciaBase", tarjetaGrafica.getFrecuenciaBase());
+                detalles.put("frecuenciaBoost", tarjetaGrafica.getFrecuenciaBoost());
+                detalles.put("color", tarjetaGrafica.getColor());
+                detalles.put("longitud", tarjetaGrafica.getLongitud());
+            }
+            case "almacenamiento" -> {
+                Almacenamiento almacenamiento = (Almacenamiento) componente;
+                detalles.put("tipo", almacenamiento.getTipo());
+                detalles.put("capacidad", almacenamiento.getCapacidad());
+                detalles.put("interfaz", almacenamiento.getInterfaz());
+                detalles.put("factorForma", almacenamiento.getFactorForma());
+            }
+            case "fuente-alimentacion" -> {
+                FuenteAlimentacion fuente = (FuenteAlimentacion) componente;
+                detalles.put("potencia", fuente.getPotencia());
+                detalles.put("eficiencia", fuente.getEficiencia());
+                detalles.put("tipo", fuente.getTipo());
+                detalles.put("modular", fuente.getModular());
+                detalles.put("color", fuente.getColor());
+            }
+            case "caja" -> {
+                Caja caja = (Caja) componente;
+                detalles.put("tipo", caja.getTipo());
+                detalles.put("color", caja.getColor());
+                detalles.put("panelLateral", caja.getPanelLateral());
+            }
+            case "refrigerador-cpu" -> {
+                RefrigeradorCPU refrigerador = (RefrigeradorCPU) componente;
+                detalles.put("rpm", refrigerador.getRpm());
+                detalles.put("nivelRuido", refrigerador.getNivelRuido());
+                detalles.put("tamano", refrigerador.getTamano());
+                detalles.put("color", refrigerador.getColor());
+            }
+        }
+
+        return detalles;
     }
 
     private String normalizeType(String tipo) {
