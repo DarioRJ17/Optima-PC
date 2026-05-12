@@ -338,6 +338,11 @@ public class CsvDataLoader implements ApplicationRunner {
 			procesador.setMicroarquitectura(texto(record, "microarchitecture"));
 			procesador.setTdp(parseInteger(record, "tdp"));
 			procesador.setGraficaIntegrada(texto(record, "graphics"));
+			procesador.setSocket(texto(record, "socket"));
+			// Ensure consumoWatts is populated: prefer explicit CSV `consumo`, otherwise fall back to TDP
+			if (procesador.getConsumoWatts() == null && procesador.getTdp() != null) {
+				procesador.setConsumoWatts(procesador.getTdp());
+			}
 			entityManager.persist(procesador);
 		}
 	}
@@ -374,9 +379,12 @@ public class CsvDataLoader implements ApplicationRunner {
 		for (CSVRecord record : leerCsv("data/memory.csv")) {
 			MemoriaRAM memoriaRAM = new MemoriaRAM();
 			mapearBase(memoriaRAM, record);
-			memoriaRAM.setVelocidad(texto(record, "speed").split(",")[0].trim());
-			memoriaRAM.setTipoDDR("DDR" + texto(record, "speed").split(",")[1].trim());
-			memoriaRAM.setModulos(texto(record, "modules"));
+			String velocidadStr = texto(record, "speed");
+			memoriaRAM.setTipoDDR("DDR" + velocidadStr.split(",")[0].trim());
+			memoriaRAM.setVelocidad(Integer.parseInt(velocidadStr.split(",")[1].trim()));
+			String modulosStr = texto(record, "modules");
+			memoriaRAM.setNumModulos(Integer.parseInt(modulosStr.split(",")[0].trim()));
+			memoriaRAM.setGbPorModulo(Integer.parseInt(modulosStr.split(",")[1].trim()));
 			memoriaRAM.setColor(texto(record, "color"));
 			memoriaRAM.setLatenciaCAS(parseInteger(record, "cas_latency"));
 			entityManager.persist(memoriaRAM);
@@ -416,6 +424,8 @@ public class CsvDataLoader implements ApplicationRunner {
 			fuente.setPotencia(parseInteger(record, "wattage"));
 			fuente.setModular(texto(record, "modular"));
 			fuente.setColor(texto(record, "color"));
+			// Do not treat PSU as a consumer; consumoWatts stays null
+			fuente.setConsumoWatts(null);
 			entityManager.persist(fuente);
 		}
 	}
@@ -435,6 +445,13 @@ public class CsvDataLoader implements ApplicationRunner {
 	private void mapearBase(Componente componente, CSVRecord record) {
 		componente.setNombre(texto(record, "name"));
 		componente.setPrecio(parseDouble(record, "price"));
+		// Map optional normalized consumption column if present (skip for PSU)
+		if (!(componente instanceof FuenteAlimentacion) && record.isMapped("consumo")) {
+			Integer consumo = parseInteger(record, "consumo");
+			if (consumo != null) {
+				componente.setConsumoWatts(consumo);
+			}
+		}
 	}
 
 	private List<CSVRecord> leerCsv(String classpathLocation) throws IOException {
