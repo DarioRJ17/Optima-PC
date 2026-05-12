@@ -7,6 +7,7 @@ import { HomePage } from './pages/HomePage'
 import { ProductDetailPage } from './pages/ProductDetailPage'
 import { AuthProvider } from './auth/AuthContext'
 import { useAuth } from './auth/useAuth'
+import { MontarPCPage } from './pages/MontarPCPage'
 import type {
   ApiError,
   AuthMode,
@@ -23,6 +24,7 @@ function AppShell() {
   const navigate = useNavigate()
   const { user, setAuth, logout, token } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
 
   // Estados que antes estaban en App()
   const [catalogItems, setCatalogItems] = useState<CatalogPremontado[]>([])
@@ -263,15 +265,15 @@ function AppShell() {
               <button
                 type="button"
                 className="nav-chip nav-chip--menu"
-                onClick={() => setMenuOpen((s) => !s)}
+                onClick={() => setUserMenuOpen((s) => !s)}
                 aria-haspopup="true"
-                aria-expanded={menuOpen}
+                aria-expanded={userMenuOpen}
               >
                 <span aria-hidden="true">👤</span>
                 <span>{user.nombre}</span>
                 <span aria-hidden="true">⌄</span>
               </button>
-              {menuOpen ? (
+              {userMenuOpen ? (
                 <div className="nav-user__menu" role="menu">
                   <button
                     type="button"
@@ -279,7 +281,7 @@ function AppShell() {
                     onClick={() => {
                       logout()
                       navigate('/')
-                      setMenuOpen(false)
+                      setUserMenuOpen(false)
                     }}
                   >
                     Cerrar sesión
@@ -289,11 +291,33 @@ function AppShell() {
             </div>
           ) : (
             <>
-              <button type="button" className="nav-chip nav-chip--menu">
-                <span aria-hidden="true">☰</span>
-                <span>Menú</span>
-                <span aria-hidden="true">⌄</span>
-              </button>
+              <div className="nav-user">
+                <button 
+                  type="button"
+                  className="nav-chip nav-chip--menu"
+                  onClick={() => setMenuOpen((s) => !s)}
+                  aria-haspopup="true"
+                  aria-expanded={menuOpen}
+                >
+                  <span aria-hidden="true">☰</span>
+                  <span>Menú</span>
+                  <span aria-hidden="true">⌄</span>
+                </button>
+                {menuOpen ? (
+                  <div className="nav-user__menu" role="menu">
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={() => {
+                        navigate('/montar-pc')
+                        setMenuOpen(false)
+                      }}
+                    >
+                      Montar tu propio PC
+                    </button>
+                  </div>
+                ) : null}
+              </div>
               <button type="button" className="nav-link" onClick={() => openAuth('login')}>
                 <span aria-hidden="true">↪</span>
                 <span>Iniciar sesión</span>
@@ -369,6 +393,7 @@ function AppShell() {
             />
           }
         />
+        <Route path="/montar-pc" element={<MontarPCPage onBack={() => navigate('/')} />} />
         <Route path="/auth" element={<Navigate to="/login" replace />} />
       </Routes>
     </div>

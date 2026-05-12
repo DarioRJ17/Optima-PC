@@ -46,12 +46,26 @@ export type PCComponent = {
   cantidad: number
 }
 
+export type CompatibilityWarning = {
+  code: 'ram_frequency_mismatch' | 'ram_latency_mismatch' | 'ram_capacity_mismatch'
+  message: string
+}
+
+export type CompatiblePCComponent = PCComponent & {
+  warnings: CompatibilityWarning[]
+}
+
 export type UserReview = {
   id: number
   usuarioNombre: string
   calificacion: number
   comentario: string
   fecha: string
+}
+
+export type ComponenteDetalle = PCComponent & {
+  consumoWatts?: number
+  detalles: Record<string, unknown>
 }
 
 export type ProductCard = {
