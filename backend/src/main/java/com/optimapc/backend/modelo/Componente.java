@@ -27,4 +27,7 @@ public abstract class Componente {
 
     @Column(nullable = false)
     private Double precio;
+    
+    @Column(name = "consumo_watts")
+    private Integer consumoWatts;
 }

@@ -17,4 +17,5 @@ public class Procesador extends Componente {
     private String microarquitectura;
     private Integer tdp;
     private String graficaIntegrada;
+    private String socket;
 }
