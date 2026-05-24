@@ -52,13 +52,23 @@ Definir estas variables de entorno en el sistema (Windows / Linux / macOS):
 
 - `DB_USERNAME` → usuario de PostgreSQL  
 - `DB_PASSWORD` → contraseña de ese usuario  
+- `MAIL_USERNAME` → cuenta Gmail que enviará los correos  
+- `MAIL_PASSWORD` → contraseña de aplicación de Gmail, no la contraseña normal  
+- `MAIL_FROM_ADDRESS` → dirección visible como remitente, normalmente la misma cuenta de Gmail  
+- `FRONTEND_BASE_URL` → URL del frontend, por ejemplo `http://localhost:5173`  
 
 Ejemplo en Windows (PowerShell):
 
 ```powershell
 setx DB_USERNAME "postgres"
 setx DB_PASSWORD "tu_contraseña"
+setx MAIL_USERNAME "tu_correo@gmail.com"
+setx MAIL_PASSWORD "tu_contraseña_de_aplicacion"
+setx MAIL_FROM_ADDRESS "tu_correo@gmail.com"
+setx FRONTEND_BASE_URL "http://localhost:5173"
 ```
+
+Si vas a usar Gmail, debes activar la verificación en dos pasos en la cuenta y generar una contraseña de aplicación. Gmail no permite el envío SMTP con la contraseña normal en la mayoría de cuentas.
 
 ### 3.2. Archivo `backend/src/main/resources/application.properties`
 
@@ -73,6 +83,14 @@ spring.datasource.password=${DB_PASSWORD}
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=${MAIL_USERNAME}
+spring.mail.password=${MAIL_PASSWORD}
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+spring.mail.properties.mail.smtp.starttls.required=true
 ```
 
 Si se usa otro nombre de base de datos, puerto u host, adaptar la URL.
