@@ -7,6 +7,7 @@ import type { AuthMode, LoginData, RegisterData } from '../types'
 type AuthPageProps = {
   mode: AuthMode
   switchMode: (newMode: AuthMode) => void
+  onForgotPassword: () => void
   loginData: LoginData
   setLoginData: Dispatch<SetStateAction<LoginData>>
   registerData: RegisterData
@@ -24,6 +25,7 @@ type AuthPageProps = {
 export function AuthPage({
   mode,
   switchMode,
+  onForgotPassword,
   loginData,
   setLoginData,
   registerData,
@@ -31,6 +33,7 @@ export function AuthPage({
   passwordStrength,
   fieldErrors,
   globalError,
+  successMessage,
   loading,
   onLoginSubmit,
   onRegisterSubmit,
@@ -100,9 +103,9 @@ export function AuthPage({
                 </div>
                 {fieldErrors.password ? <p className="field-error">{fieldErrors.password}</p> : null}
 
-                <a className="inline-link" href="#">
+                <button type="button" className="inline-link" onClick={onForgotPassword}>
                   ¿Olvidaste tu contraseña?
-                </a>
+                </button>
 
                 <button type="submit" disabled={loading}>
                   {loading ? 'Validando...' : 'Iniciar sesión'}
@@ -238,6 +241,7 @@ export function AuthPage({
           )}
 
           {globalError ? <p className="global-error">{globalError}</p> : null}
+          {successMessage ? <p className="success-message">{successMessage}</p> : null}
         </section>
       </section>
     </main>

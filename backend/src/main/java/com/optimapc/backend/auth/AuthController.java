@@ -10,8 +10,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.optimapc.backend.auth.dto.AuthResponse;
 import com.optimapc.backend.auth.dto.LoginRequest;
+import com.optimapc.backend.auth.dto.MessageResponse;
+import com.optimapc.backend.auth.dto.PasswordResetRequest;
 import com.optimapc.backend.auth.dto.PasswordStrength;
 import com.optimapc.backend.auth.dto.RegisterRequest;
+import com.optimapc.backend.auth.dto.ResetPasswordRequest;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -35,6 +38,19 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
+    }
+
+    @PostMapping("/password-reset/request")
+    public ResponseEntity<MessageResponse> requestPasswordReset(@Valid @RequestBody PasswordResetRequest request) {
+        authService.requestPasswordReset(request);
+        return ResponseEntity.ok(new MessageResponse(
+                "Si el correo existe, recibirás un enlace para restablecer tu contraseña"));
+    }
+
+    @PostMapping("/password-reset/confirm")
+    public ResponseEntity<MessageResponse> confirmPasswordReset(@Valid @RequestBody ResetPasswordRequest request) {
+        authService.resetPassword(request);
+        return ResponseEntity.ok(new MessageResponse("La contraseña se ha actualizado correctamente"));
     }
 
     @PostMapping("/password-strength")

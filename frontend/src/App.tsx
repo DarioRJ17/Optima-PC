@@ -5,6 +5,8 @@ import { AppLogo } from './components/common'
 import { AuthPage } from './pages/AuthPage.tsx'
 import { HomePage } from './pages/HomePage'
 import { ProductDetailPage } from './pages/ProductDetailPage'
+import { PasswordRecoveryPage } from './pages/PasswordRecoveryPage'
+import { PasswordResetPage } from './pages/PasswordResetPage'
 import { AuthProvider } from './auth/AuthContext'
 import { useAuth } from './auth/useAuth'
 import { MontarPCPage } from './pages/MontarPCPage'
@@ -357,6 +359,7 @@ function AppShell() {
             <AuthPage
               mode="login"
               switchMode={() => openAuth('register')}
+              onForgotPassword={() => navigate('/forgot-password')}
               loginData={loginData}
               setLoginData={setLoginData}
               registerData={registerData}
@@ -378,6 +381,7 @@ function AppShell() {
             <AuthPage
               mode="register"
               switchMode={() => openAuth('login')}
+              onForgotPassword={() => navigate('/forgot-password')}
               loginData={loginData}
               setLoginData={setLoginData}
               registerData={registerData}
@@ -393,6 +397,8 @@ function AppShell() {
             />
           }
         />
+        <Route path="/forgot-password" element={<PasswordRecoveryPage onBack={() => navigate('/login')} />} />
+        <Route path="/reset-password" element={<PasswordResetPage onBack={() => navigate('/login')} />} />
         <Route path="/montar-pc" element={<MontarPCPage onBack={() => navigate('/')} />} />
         <Route path="/auth" element={<Navigate to="/login" replace />} />
       </Routes>
