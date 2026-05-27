@@ -38,6 +38,10 @@ type HomePageProps = {
   catalogItems: CatalogPremontado[]
   catalogLoading: boolean
   catalogError: string
+  recommendationItems: CatalogPremontado[]
+  recommendationsLoading: boolean
+  recommendationsError: string
+  showRecommendations: boolean
   selectedFilters: SelectedFilters
   setSelectedFilters: Dispatch<SetStateAction<SelectedFilters>>
   openAuth: (nextMode: AuthMode) => void
@@ -47,6 +51,10 @@ export function HomePage({
   catalogItems,
   catalogLoading,
   catalogError,
+  recommendationItems,
+  recommendationsLoading,
+  recommendationsError,
+  showRecommendations,
   selectedFilters,
   setSelectedFilters,
   openAuth,
@@ -99,6 +107,15 @@ export function HomePage({
       products: refurbished.length > 0 ? refurbished : fallbackProducts,
     },
   ]
+
+  if (showRecommendations) {
+    sections.unshift({
+      title: 'Recomendados para ti',
+      icon: '✨',
+      key: 'recommended',
+      products: recommendationItems.slice(0, 3),
+    })
+  }
 
   return (
     <main className="home-page">
@@ -225,6 +242,21 @@ export function HomePage({
                 </span>
                 <h2>{section.title}</h2>
               </div>
+
+              {section.key === 'recommended' && recommendationsLoading ? (
+                <p className="catalog-message">Cargando recomendaciones personalizadas...</p>
+              ) : null}
+
+              {section.key === 'recommended' && recommendationsError ? (
+                <p className="catalog-message catalog-message--error">{recommendationsError}</p>
+              ) : null}
+
+              {section.key === 'recommended' &&
+              !recommendationsLoading &&
+              !recommendationsError &&
+              section.products.length === 0 ? (
+                <p className="catalog-message">Aún no hay recomendaciones para tu perfil.</p>
+              ) : null}
 
               <div className="product-grid">
                 {section.products.map((item) => {

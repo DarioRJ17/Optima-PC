@@ -1,6 +1,6 @@
 import type { CatalogPremontado, ProductCard } from './types'
 
-export type CatalogSectionKey = 'featured' | 'offers' | 'refurbished'
+export type CatalogSectionKey = 'featured' | 'offers' | 'refurbished' | 'recommended'
 
 export function formatEuro(value: number) {
   return new Intl.NumberFormat('es-ES', {
@@ -39,6 +39,10 @@ export function buildTone(item: CatalogPremontado): ProductCard['tone'] {
 }
 
 export function buildRibbon(item: CatalogPremontado, section: CatalogSectionKey) {
+  if (section === 'recommended') {
+    return 'Para ti'
+  }
+
   if (section === 'offers' && item.descuento) {
     return `-${item.descuento}%`
   }

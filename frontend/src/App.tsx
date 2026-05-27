@@ -32,6 +32,9 @@ function AppShell() {
   const [catalogItems, setCatalogItems] = useState<CatalogPremontado[]>([])
   const [catalogLoading, setCatalogLoading] = useState(true)
   const [catalogError, setCatalogError] = useState('')
+  const [recommendationItems, setRecommendationItems] = useState<CatalogPremontado[]>([])
+  const [recommendationsLoading, setRecommendationsLoading] = useState(false)
+  const [recommendationsError, setRecommendationsError] = useState('')
 
   const [selectedFilters, setSelectedFilters] = useState<SelectedFilters>({
     priceRange: null,
@@ -109,6 +112,53 @@ function AppShell() {
 
     return () => controller.abort()
   }, [selectedFilters, token])
+
+  /**
+   * Efecto para cargar recomendaciones personalizadas (solo usuario autenticado)
+   */
+  useEffect(() => {
+    const controller = new AbortController()
+
+    if (!user || !token) {
+      setRecommendationItems([])
+      setRecommendationsError('')
+      setRecommendationsLoading(false)
+      return () => controller.abort()
+    }
+
+    const loadRecommendations = async () => {
+      setRecommendationsLoading(true)
+      setRecommendationsError('')
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/catalogo/premontados/recomendaciones`, {
+          signal: controller.signal,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+
+        if (!response.ok) {
+          throw new Error('No se pudieron cargar las recomendaciones')
+        }
+
+        const data = (await response.json()) as CatalogPremontado[]
+        setRecommendationItems(Array.isArray(data) ? data : [])
+      } catch (error) {
+        if (!(error instanceof DOMException && error.name === 'AbortError')) {
+          setRecommendationsError('No se pudieron cargar tus recomendaciones')
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setRecommendationsLoading(false)
+        }
+      }
+    }
+
+    void loadRecommendations()
+
+    return () => controller.abort()
+  }, [user, token])
 
   /**
    * Efecto para validar fortaleza de contraseña
@@ -346,6 +396,10 @@ function AppShell() {
               catalogItems={catalogItems}
               catalogLoading={catalogLoading}
               catalogError={catalogError}
+              recommendationItems={recommendationItems}
+              recommendationsLoading={recommendationsLoading}
+              recommendationsError={recommendationsError}
+              showRecommendations={Boolean(user)}
               selectedFilters={selectedFilters}
               setSelectedFilters={setSelectedFilters}
               openAuth={openAuth}
