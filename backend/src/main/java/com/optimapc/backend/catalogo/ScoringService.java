@@ -13,7 +13,6 @@ import com.optimapc.backend.modelo.TipoUso;
 public class ScoringService {
 
     private static final double SCORE_MINIMO = 0.0;
-    private static final double SCORE_MAXIMO = 1.0;
 
     private static final double TOLERANCIA_PRESUPUESTO = 500.0;
     private static final double UMBRAL_PRIORIZAR_REACONDICIONADO = 0.5;

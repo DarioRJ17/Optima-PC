@@ -28,6 +28,11 @@ public class PremontadoCatalogoService {
     }
 
     @Transactional(readOnly = true)
+    public List<Premontado> obtenerTodosLosPremontados() {
+        return premontadoRepository.findAllByOrderByMarcaAscIdAsc();
+    }
+
+    @Transactional(readOnly = true)
     public List<PremontadoCatalogoDto> listar(
             Double minPrice,
             Double maxPrice,
@@ -59,7 +64,7 @@ public class PremontadoCatalogoService {
         return precioReducido != null ? precioReducido : premontado.getPrecio();
     }
 
-    private PremontadoCatalogoDto toDto(Premontado premontado) {
+    public PremontadoCatalogoDto toDto(Premontado premontado) {
         List<Valoracion> valoraciones = premontado.getValoraciones();
         double valoracionMedia = valoraciones.isEmpty()
                 ? 0.0
