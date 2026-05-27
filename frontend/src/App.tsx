@@ -4,6 +4,7 @@ import './App.css'
 import { AppLogo } from './components/common'
 import { AuthPage } from './pages/AuthPage.tsx'
 import { HomePage } from './pages/HomePage'
+import { InitialSurveyPage } from './pages/InitialSurveyPage'
 import { ProductDetailPage } from './pages/ProductDetailPage'
 import { PasswordRecoveryPage } from './pages/PasswordRecoveryPage'
 import { PasswordResetPage } from './pages/PasswordResetPage'
@@ -27,6 +28,7 @@ function AppShell() {
   const { user, setAuth, logout, token } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const [recommendationsRefreshKey, setRecommendationsRefreshKey] = useState(0)
 
   // Estados que antes estaban en App()
   const [catalogItems, setCatalogItems] = useState<CatalogPremontado[]>([])
@@ -158,7 +160,11 @@ function AppShell() {
     void loadRecommendations()
 
     return () => controller.abort()
-  }, [user, token])
+  }, [user, token, recommendationsRefreshKey])
+
+  const refreshRecommendations = () => {
+    setRecommendationsRefreshKey((current) => current + 1)
+  }
 
   /**
    * Efecto para validar fortaleza de contraseña
@@ -296,7 +302,7 @@ function AppShell() {
         password: '',
         confirmPassword: '',
       })
-      navigate('/')
+      navigate('/perfil-inicial', { replace: true })
     } catch {
       setGlobalError('No se pudo conectar con el backend')
     } finally {
@@ -453,6 +459,10 @@ function AppShell() {
         />
         <Route path="/forgot-password" element={<PasswordRecoveryPage onBack={() => navigate('/login')} />} />
         <Route path="/reset-password" element={<PasswordResetPage onBack={() => navigate('/login')} />} />
+        <Route
+          path="/perfil-inicial"
+          element={<InitialSurveyPage onBack={() => navigate('/')} onSurveySaved={refreshRecommendations} />}
+        />
         <Route path="/montar-pc" element={<MontarPCPage onBack={() => navigate('/')} />} />
         <Route path="/auth" element={<Navigate to="/login" replace />} />
       </Routes>

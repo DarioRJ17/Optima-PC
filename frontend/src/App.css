@@ -921,6 +921,225 @@
   margin-top: -0.1rem;
 }
 
+.onboarding-shell {
+  width: min(100%, 860px);
+}
+
+.onboarding-card {
+  padding: 1.75rem 1.6rem 1.55rem;
+}
+
+.onboarding-header {
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
+  margin-bottom: 1.35rem;
+}
+
+.onboarding-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #1560ef, #7c3aed);
+  color: #ffffff;
+  box-shadow: 0 12px 24px rgba(21, 96, 239, 0.24);
+}
+
+.onboarding-header h1 {
+  margin: 0;
+  text-align: center;
+  font-size: clamp(1.9rem, 3.6vw, 2.4rem);
+  letter-spacing: -0.05em;
+  color: #15253e;
+}
+
+.onboarding-section {
+  margin-top: 1.35rem;
+}
+
+.onboarding-section__header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.8rem;
+  color: #15253e;
+}
+
+.onboarding-section__header h2 {
+  margin: 0;
+  font-size: 1.08rem;
+  letter-spacing: -0.03em;
+}
+
+.onboarding-grid,
+.budget-grid,
+.toggle-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.survey-option,
+.budget-option,
+.toggle-option,
+.chip-option,
+.onboarding-skip,
+.onboarding-continue {
+  border: 0;
+  font: inherit;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease, border-color 0.18s ease,
+    color 0.18s ease;
+}
+
+.survey-option {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  text-align: left;
+  min-height: 70px;
+  padding: 0.85rem 0.95rem;
+  border-radius: 14px;
+  border: 1px solid #dde5ef;
+  background: #ffffff;
+  color: #16243c;
+  box-shadow: 0 1px 0 rgba(21, 36, 60, 0.02);
+}
+
+.budget-option,
+.toggle-option,
+.chip-option {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  min-height: 70px;
+  padding: 0.85rem 0.95rem;
+  border-radius: 14px;
+  border: 1px solid #dde5ef;
+  background: #ffffff;
+  color: #16243c;
+  box-shadow: 0 1px 0 rgba(21, 36, 60, 0.02);
+}
+
+.survey-option:hover,
+.budget-option:hover,
+.toggle-option:hover,
+.chip-option:hover,
+.onboarding-skip:hover,
+.onboarding-continue:hover:enabled {
+  transform: translateY(-1px);
+}
+
+.survey-option--selected,
+.budget-option--selected,
+.toggle-option--selected,
+.chip-option--selected {
+  border-color: #236dff;
+  background: linear-gradient(180deg, #f7faff, #eef4ff);
+  box-shadow: 0 12px 24px rgba(21, 96, 239, 0.12);
+}
+
+.budget-option svg {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  flex: 0 0 auto;
+  padding: 0.45rem;
+  background: #f4f7fb;
+  color: #243654;
+}
+
+.survey-option__icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: #f4f7fb;
+  color: #243654;
+  flex: 0 0 auto;
+}
+
+.survey-option__content {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.survey-option__content strong,
+.toggle-option strong {
+  font-size: 0.98rem;
+}
+
+.survey-option__content span,
+.toggle-option span,
+.survey-helper {
+  color: #5b6a80;
+  font-size: 0.92rem;
+  line-height: 1.35;
+}
+
+.budget-option {
+  font-weight: 700;
+}
+
+.toggle-option {
+  text-align: left;
+}
+
+.chip-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.chip-option {
+  font-weight: 700;
+}
+
+.survey-helper {
+  margin: 0.75rem 0 0;
+}
+
+.onboarding-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem;
+  margin-top: 1.4rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(206, 216, 231, 0.9);
+}
+
+.onboarding-skip {
+  border: 0;
+  background: transparent;
+  color: #506077;
+  font-weight: 700;
+  padding: 0;
+}
+
+.onboarding-continue {
+  min-height: 52px;
+  padding: 0 1.15rem;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #1560ef, #236dff);
+  color: #ffffff;
+  font-weight: 800;
+  box-shadow: 0 14px 28px rgba(21, 96, 239, 0.28);
+}
+
+.onboarding-continue:disabled,
+.onboarding-skip:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
 .strength-bars {
   display: flex;
   gap: 0.38rem;
@@ -997,6 +1216,22 @@
 
   .auth-card {
     padding: 1.2rem 1rem 1rem;
+  }
+
+  .onboarding-grid,
+  .budget-grid,
+  .toggle-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .onboarding-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .onboarding-skip,
+  .onboarding-continue {
+    width: 100%;
   }
 }
 
