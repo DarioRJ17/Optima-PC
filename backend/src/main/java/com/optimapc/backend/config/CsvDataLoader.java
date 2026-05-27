@@ -5,8 +5,10 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -135,7 +137,11 @@ public class CsvDataLoader implements ApplicationRunner {
 	}
 
 	private void sembrarPremontadosSiNecesario() {
-		if (tieneFilas(Premontado.class)) {
+		List<Premontado> existingPremontados = listar(Premontado.class);
+		int objetivo = 28; // objetivo de premontados en la BD
+		int existentes = existingPremontados == null ? 0 : existingPremontados.size();
+		int aCrear = objetivo - existentes;
+		if (aCrear <= 0) {
 			return;
 		}
 
@@ -148,105 +154,222 @@ public class CsvDataLoader implements ApplicationRunner {
 		Caja caja = primer(Caja.class);
 		RefrigeradorCPU refrigeradorCPU = primer(RefrigeradorCPU.class);
 
-		Premontado starter = new Premontado();
-		starter.setTipoUsoPrevisto("Entrada para gaming ligero");
-		starter.setFavorita(Boolean.TRUE);
-		starter.setDescripcion("Equipo equilibrado para jugar en 1080p y uso diario.");
-		starter.setMarca("OptimaPC");
-		starter.setDescuento(10);
-		starter.setSistemaOperativo(TipoSO.WINDOWS);
-		starter.setStock(5);
-		starter.setEsReacondicionado(Boolean.FALSE);
-		starter.setUsosPrevistos(Set.of(TipoUso.GAMING, TipoUso.EDICION));
-		agregarComponente(starter, "CPU", procesador, 1);
-		agregarComponente(starter, "GPU", tarjetaGrafica, 1);
-		agregarComponente(starter, "Placa base", placaBase, 1);
-		agregarComponente(starter, "RAM", memoriaRAM, 2);
-		agregarComponente(starter, "Almacenamiento", almacenamiento, 1);
-		agregarComponente(starter, "Fuente", fuenteAlimentacion, 1);
-		agregarComponente(starter, "Caja", caja, 1);
-		agregarComponente(starter, "Refrigeración", refrigeradorCPU, 1);
-		entityManager.persist(starter);
+		// Crear algunos premontados base ya conocidos (si no existen)
+		if (existentes == 0) {
+			Premontado starter = new Premontado();
+			starter.setTipoUsoPrevisto("Entrada para gaming ligero");
+			starter.setFavorita(Boolean.TRUE);
+			starter.setDescripcion("Equipo equilibrado para jugar en 1080p y uso diario.");
+			starter.setMarca("OptimaPC");
+			starter.setDescuento(10);
+			starter.setSistemaOperativo(TipoSO.WINDOWS);
+			starter.setStock(5);
+			starter.setEsReacondicionado(Boolean.FALSE);
+			starter.setUsosPrevistos(Set.of(TipoUso.GAMING, TipoUso.EDICION));
+			agregarComponente(starter, "CPU", procesador, 1);
+			agregarComponente(starter, "GPU", tarjetaGrafica, 1);
+			agregarComponente(starter, "Placa base", placaBase, 1);
+			agregarComponente(starter, "RAM", memoriaRAM, 2);
+			agregarComponente(starter, "Almacenamiento", almacenamiento, 1);
+			agregarComponente(starter, "Fuente", fuenteAlimentacion, 1);
+			agregarComponente(starter, "Caja", caja, 1);
+			agregarComponente(starter, "Refrigeración", refrigeradorCPU, 1);
+			entityManager.persist(starter);
+			existentes++;
+			aCrear = objetivo - existentes;
+		}
 
-		Premontado office = new Premontado();
-		office.setTipoUsoPrevisto("Trabajo y estudio");
-		office.setFavorita(Boolean.FALSE);
-		office.setDescripcion("Premontado compacto y silencioso para productividad.");
-		office.setMarca("OptimaPC");
-		office.setDescuento(5);
-		office.setSistemaOperativo(TipoSO.LINUX);
-		office.setStock(8);
-		office.setEsReacondicionado(Boolean.TRUE);
-		office.setUsosPrevistos(Set.of(TipoUso.OFIMATICA, TipoUso.PROGRAMACION));
-		agregarComponente(office, "CPU", procesador, 1);
-		agregarComponente(office, "Placa base", placaBase, 1);
-		agregarComponente(office, "RAM", memoriaRAM, 1);
-		agregarComponente(office, "Almacenamiento", almacenamiento, 1);
-		agregarComponente(office, "Fuente", fuenteAlimentacion, 1);
-		agregarComponente(office, "Caja", caja, 1);
-		entityManager.persist(office);
+		asegurarPremontadoAhorroEsencial();
+		asegurarPremontadoEquilibradoEconomico();
+		asegurarPremontadoGamingEconomico();
 
-		Premontado creator = new Premontado();
-		creator.setTipoUsoPrevisto("Edición profesional");
-		creator.setFavorita(Boolean.FALSE);
-		creator.setDescripcion("Configuración pensada para edición de foto y vídeo.");
-		creator.setMarca("OptimaPC");
-		creator.setDescuento(15);
-		creator.setSistemaOperativo(TipoSO.WINDOWS);
-		creator.setStock(3);
-		creator.setEsReacondicionado(Boolean.FALSE);
-		creator.setUsosPrevistos(Set.of(TipoUso.EDICION, TipoUso.STREAMING, TipoUso.PROGRAMACION));
-		agregarComponente(creator, "CPU", procesador, 1);
-		agregarComponente(creator, "GPU", tarjetaGrafica, 1);
-		agregarComponente(creator, "Placa base", placaBase, 1);
-		agregarComponente(creator, "RAM", memoriaRAM, 2);
-		agregarComponente(creator, "Almacenamiento", almacenamiento, 2);
-		agregarComponente(creator, "Fuente", fuenteAlimentacion, 1);
-		agregarComponente(creator, "Caja", caja, 1);
-		agregarComponente(creator, "Refrigeración", refrigeradorCPU, 1);
-		entityManager.persist(creator);
+		// Plantilla para generar premontados adicionales con variación
+		TipoUso[] usosDisponibles = TipoUso.values();
+		TipoSO[] sos = TipoSO.values();
+
+		for (int i = 0; i < aCrear; i++) {
+			Premontado p = new Premontado();
+			int idx = existentes + i + 1;
+			String nombre = "Premontado " + idx;
+			p.setTipoUsoPrevisto(nombre + " - Configuración genérica");
+			p.setFavorita(Boolean.FALSE);
+			p.setDescripcion("Premontado de prueba número " + idx + ".");
+			p.setMarca(idx % 3 == 0 ? "OptimaWork" : "OptimaPC");
+			p.setDescuento((idx % 5) * 5);
+			p.setSistemaOperativo(sos[idx % sos.length]);
+			p.setStock(1 + (idx % 10));
+			p.setEsReacondicionado((idx % 7) == 0);
+
+			// seleccionar entre 1 y 3 usos previstos
+			Set<TipoUso> usos = Set.of(usosDisponibles[idx % usosDisponibles.length]);
+			if (idx % 2 == 0) {
+				usos = Set.of(usosDisponibles[idx % usosDisponibles.length], usosDisponibles[(idx + 1) % usosDisponibles.length]);
+			}
+			if (idx % 5 == 0) {
+				usos = Set.of(usosDisponibles[(idx) % usosDisponibles.length], usosDisponibles[(idx + 2) % usosDisponibles.length], usosDisponibles[(idx + 3) % usosDisponibles.length]);
+			}
+			p.setUsosPrevistos(usos);
+
+			// agregar componentes básicos (cantidad variable)
+			agregarComponente(p, "CPU", procesador, 1);
+			if (idx % 3 != 0) {
+				agregarComponente(p, "GPU", tarjetaGrafica, 1);
+			}
+			agregarComponente(p, "Placa base", placaBase, 1);
+			agregarComponente(p, "RAM", memoriaRAM, 1 + (idx % 3));
+			agregarComponente(p, "Almacenamiento", almacenamiento, 1 + ((idx + 1) % 2));
+			agregarComponente(p, "Fuente", fuenteAlimentacion, 1);
+			agregarComponente(p, "Caja", caja, 1);
+			if (idx % 4 == 0) {
+				agregarComponente(p, "Refrigeración", refrigeradorCPU, 1);
+			}
+
+			entityManager.persist(p);
+		}
+	}
+
+	private void asegurarPremontadoAhorroEsencial() {
+		if (existePremontadoConTipoUsoPrevisto("Ahorro esencial")) {
+			return;
+		}
+
+		Procesador procesador = componenteMasBarato(Procesador.class,
+				cpu -> "AM4".equals(cpu.getSocket()) && cpu.getGraficaIntegrada() != null && !cpu.getGraficaIntegrada().isBlank());
+		PlacaBase placaBase = componenteMasBarato(PlacaBase.class,
+				placa -> "AM4".equals(placa.getSocket()) && "DDR4".equalsIgnoreCase(placa.getTipoDDR()));
+		MemoriaRAM memoriaRAM = componenteMasBarato(MemoriaRAM.class,
+				ram -> "DDR4".equalsIgnoreCase(ram.getTipoDDR()) && ram.getGbPorModulo() != null && ram.getGbPorModulo() <= 8);
+		Almacenamiento almacenamiento = componenteMasBarato(Almacenamiento.class,
+				ssd -> "SSD".equalsIgnoreCase(ssd.getTipo()) && ssd.getCapacidad() != null && ssd.getCapacidad() <= 500);
+		FuenteAlimentacion fuenteAlimentacion = componenteMasBarato(FuenteAlimentacion.class,
+				fuente -> fuente.getPotencia() != null && fuente.getPotencia() >= 500);
+		Caja caja = componenteMasBarato(Caja.class,
+				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("MICROATX"));
+
+		Premontado premontado = new Premontado();
+		premontado.setTipoUsoPrevisto("Ahorro esencial");
+		premontado.setFavorita(Boolean.FALSE);
+		premontado.setDescripcion("Equipo de entrada para ofimática, navegación y tareas básicas con un presupuesto contenido.");
+		premontado.setMarca("OptimaPC");
+		premontado.setDescuento(0);
+		premontado.setSistemaOperativo(TipoSO.LINUX);
+		premontado.setStock(12);
+		premontado.setEsReacondicionado(Boolean.FALSE);
+		premontado.setUsosPrevistos(Set.of(TipoUso.OFIMATICA, TipoUso.PROGRAMACION));
+		agregarComponente(premontado, "CPU", procesador, 1);
+		agregarComponente(premontado, "Placa base", placaBase, 1);
+		agregarComponente(premontado, "RAM", memoriaRAM, 2);
+		agregarComponente(premontado, "Almacenamiento", almacenamiento, 1);
+		agregarComponente(premontado, "Fuente", fuenteAlimentacion, 1);
+		agregarComponente(premontado, "Caja", caja, 1);
+		entityManager.persist(premontado);
+	}
+
+	private void asegurarPremontadoEquilibradoEconomico() {
+		if (existePremontadoConTipoUsoPrevisto("Equilibrado económico")) {
+			return;
+		}
+
+		Procesador procesador = componenteMasBarato(Procesador.class,
+				cpu -> "AM4".equals(cpu.getSocket()) && cpu.getGraficaIntegrada() != null && !cpu.getGraficaIntegrada().isBlank());
+		PlacaBase placaBase = componenteMasBarato(PlacaBase.class,
+				placa -> "AM4".equals(placa.getSocket()) && "DDR4".equalsIgnoreCase(placa.getTipoDDR()));
+		MemoriaRAM memoriaRAM = componenteMasBarato(MemoriaRAM.class,
+				ram -> "DDR4".equalsIgnoreCase(ram.getTipoDDR()) && ram.getNumModulos() != null && ram.getNumModulos() == 2 && ram.getGbPorModulo() != null && ram.getGbPorModulo() == 16);
+		Almacenamiento almacenamiento = componenteMasBarato(Almacenamiento.class,
+				ssd -> "SSD".equalsIgnoreCase(ssd.getTipo()) && ssd.getCapacidad() != null && ssd.getCapacidad() >= 1000);
+		FuenteAlimentacion fuenteAlimentacion = componenteMasBarato(FuenteAlimentacion.class,
+				fuente -> fuente.getPotencia() != null && fuente.getPotencia() >= 600);
+		Caja caja = componenteMasBarato(Caja.class,
+				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("MICROATX"));
+
+		Premontado premontado = new Premontado();
+		premontado.setTipoUsoPrevisto("Equilibrado económico");
+		premontado.setFavorita(Boolean.FALSE);
+		premontado.setDescripcion("Configuración equilibrada para subir de nivel respecto a la gama de entrada sin disparar el presupuesto.");
+		premontado.setMarca("OptimaPC");
+		premontado.setDescuento(0);
+		premontado.setSistemaOperativo(TipoSO.WINDOWS);
+		premontado.setStock(10);
+		premontado.setEsReacondicionado(Boolean.FALSE);
+		premontado.setUsosPrevistos(Set.of(TipoUso.OFIMATICA, TipoUso.PROGRAMACION, TipoUso.EDICION));
+		agregarComponente(premontado, "CPU", procesador, 1);
+		agregarComponente(premontado, "Placa base", placaBase, 1);
+		agregarComponente(premontado, "RAM", memoriaRAM, 2);
+		agregarComponente(premontado, "Almacenamiento", almacenamiento, 1);
+		agregarComponente(premontado, "Fuente", fuenteAlimentacion, 1);
+		agregarComponente(premontado, "Caja", caja, 1);
+		entityManager.persist(premontado);
+	}
+
+	private void asegurarPremontadoGamingEconomico() {
+		if (existePremontadoConTipoUsoPrevisto("Gaming económico")) {
+			return;
+		}
+
+		Procesador procesador = componenteMasBarato(Procesador.class,
+				cpu -> "AM4".equals(cpu.getSocket()) && cpu.getGraficaIntegrada() == null);
+		TarjetaGrafica tarjetaGrafica = componenteMasBarato(TarjetaGrafica.class,
+				gpu -> gpu.getPrecio() != null && gpu.getPrecio() <= 250.0);
+		PlacaBase placaBase = componenteMasBarato(PlacaBase.class,
+				placa -> "AM4".equals(placa.getSocket()) && "DDR4".equalsIgnoreCase(placa.getTipoDDR()));
+		MemoriaRAM memoriaRAM = componenteMasBarato(MemoriaRAM.class,
+				ram -> "DDR4".equalsIgnoreCase(ram.getTipoDDR()) && ram.getNumModulos() != null && ram.getNumModulos() == 2 && ram.getGbPorModulo() != null && ram.getGbPorModulo() == 16);
+		Almacenamiento almacenamiento = componenteMasBarato(Almacenamiento.class,
+				ssd -> "SSD".equalsIgnoreCase(ssd.getTipo()) && ssd.getCapacidad() != null && ssd.getCapacidad() >= 1000);
+		FuenteAlimentacion fuenteAlimentacion = componenteMasBarato(FuenteAlimentacion.class,
+				fuente -> fuente.getPotencia() != null && fuente.getPotencia() >= 600);
+		Caja caja = componenteMasBarato(Caja.class,
+				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
+
+		Premontado premontado = new Premontado();
+		premontado.setTipoUsoPrevisto("Gaming económico");
+		premontado.setFavorita(Boolean.TRUE);
+		premontado.setDescripcion("Equipo gaming económico por debajo de los mil euros para jugar en 1080p con una GPU de entrada.");
+		premontado.setMarca("OptimaPC");
+		premontado.setDescuento(5);
+		premontado.setSistemaOperativo(TipoSO.WINDOWS);
+		premontado.setStock(8);
+		premontado.setEsReacondicionado(Boolean.FALSE);
+		premontado.setUsosPrevistos(Set.of(TipoUso.GAMING, TipoUso.STREAMING));
+		agregarComponente(premontado, "CPU", procesador, 1);
+		agregarComponente(premontado, "GPU", tarjetaGrafica, 1);
+		agregarComponente(premontado, "Placa base", placaBase, 1);
+		agregarComponente(premontado, "RAM", memoriaRAM, 2);
+		agregarComponente(premontado, "Almacenamiento", almacenamiento, 1);
+		agregarComponente(premontado, "Fuente", fuenteAlimentacion, 1);
+		agregarComponente(premontado, "Caja", caja, 1);
+		entityManager.persist(premontado);
 	}
 
 	private void sembrarValoracionesSiNecesario() {
-		if (tieneFilas(Valoracion.class)) {
-			return;
-		}
-
 		List<Usuario> usuarios = listar(Usuario.class);
 		List<Premontado> premontados = listar(Premontado.class);
-		if (usuarios.size() < 5 || premontados.size() < 3) {
+		if (usuarios.size() < 3 || premontados.size() < 1) {
 			return;
 		}
 
-		// Valoraciones para el primer premontado
-		crearValoracion(usuarios.get(0), premontados.get(0), 5, 
-			"Excelente ordenador, lleva funcionando perfectamente más de 6 meses. Muy recomendado para gaming.",
-			LocalDateTime.of(2025, 4, 20, 14, 30));
-		crearValoracion(usuarios.get(1), premontados.get(0), 4,
-			"Muy bueno en general. El único inconveniente es el ruido del ventilador bajo carga, pero es tolerable.",
-			LocalDateTime.of(2025, 4, 15, 10, 15));
-		crearValoracion(usuarios.get(2), premontados.get(0), 5,
-			"Perfectamente empaquetado y llegó sin problemas. El rendimiento es espectacular en los juegos más exigentes.",
-			LocalDateTime.of(2025, 4, 10, 9, 0));
+		// Añadir valoraciones para premontados que no tengan
+		int userCount = usuarios.size();
+		for (int i = 0; i < premontados.size(); i++) {
+			Premontado p = premontados.get(i);
+			if (p.getValoraciones() != null && !p.getValoraciones().isEmpty()) {
+				continue;
+			}
 
-		// Valoraciones para el segundo premontado
-		crearValoracion(usuarios.get(0), premontados.get(1), 4,
-			"Muy buen PC para el precio. La refrigeración podría ser mejor pero funciona bien.",
-			LocalDateTime.of(2025, 4, 5, 16, 45));
-		crearValoracion(usuarios.get(3), premontados.get(1), 3,
-			"Cumple lo que promete pero nada excepcional. Esperaba un poco más por este precio.",
-			LocalDateTime.of(2025, 3, 28, 11, 20));
-
-		// Valoraciones para el tercer premontado
-		crearValoracion(usuarios.get(1), premontados.get(2), 5,
-			"¡Increíble! La mejor compra que he hecho. Funciona perfectamente para edición de vídeo.",
-			LocalDateTime.of(2025, 4, 8, 13, 10));
-		crearValoracion(usuarios.get(2), premontados.get(2), 4,
-			"Muy satisfecho con la compra. Buen rendimiento y servicio de atención muy rápido.",
-			LocalDateTime.of(2025, 4, 1, 15, 30));
-		crearValoracion(usuarios.get(4), premontados.get(2), 5,
-			"Ordenador de gran calidad. Recomendado 100%. Embalaje y entrega impecables.",
-			LocalDateTime.of(2025, 3, 25, 10, 0));
+			int numValoraciones = 1 + (i % 3); // entre 1 y 3 valoraciones
+			for (int v = 0; v < numValoraciones; v++) {
+				Usuario u = usuarios.get((i + v) % userCount);
+				int puntuacion = 3 + ((i + v) % 3); // 3,4,5
+				String comentario = switch (puntuacion) {
+					case 5 -> "Excelente, muy contento con el rendimiento.";
+					case 4 -> "Buen equipo, cumple las expectativas.";
+					default -> "Cumple lo básico, relación calidad-precio aceptable.";
+				};
+				LocalDateTime fecha = LocalDateTime.now().minusDays((i + v) % 60);
+				crearValoracion(u, p, puntuacion, comentario, fecha);
+			}
+		}
 	}
 
 	private void persistirUsuario(String email, String nombre, String apellidos, String passwordPlano) {
@@ -309,6 +432,15 @@ public class CsvDataLoader implements ApplicationRunner {
 		return total != null && total > 0;
 	}
 
+	private boolean existePremontadoConTipoUsoPrevisto(String tipoUsoPrevisto) {
+		Long total = entityManager.createQuery(
+				"select count(p) from Premontado p where lower(p.tipoUsoPrevisto) = lower(:tipoUsoPrevisto)",
+				Long.class)
+				.setParameter("tipoUsoPrevisto", tipoUsoPrevisto)
+				.getSingleResult();
+		return total != null && total > 0;
+	}
+
 	private <T> List<T> listar(Class<T> entityClass) {
 		return entityManager.createQuery("select e from " + entityClass.getSimpleName() + " e order by e.id", entityClass)
 				.getResultList();
@@ -318,6 +450,13 @@ public class CsvDataLoader implements ApplicationRunner {
 		return listar(entityClass).stream()
 				.findFirst()
 				.orElseThrow(() -> new IllegalStateException("No hay datos semilla para " + entityClass.getSimpleName()));
+	}
+
+	private <T extends Componente> T componenteMasBarato(Class<T> entityClass, Predicate<T> filtro) {
+		return listar(entityClass).stream()
+				.filter(filtro)
+				.min(Comparator.comparingDouble(Componente::getPrecio))
+				.orElseThrow(() -> new IllegalStateException("No hay componentes compatibles para " + entityClass.getSimpleName()));
 	}
 
 	private void agregarComponente(ConfiguracionPC configuracion, String categoria, Componente componente, int cantidad) {

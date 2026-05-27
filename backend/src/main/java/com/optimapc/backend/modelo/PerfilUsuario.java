@@ -57,7 +57,7 @@ public class PerfilUsuario {
     @Enumerated(EnumType.STRING)
     @OrderColumn(name = "orden")
     @Column(name = "tipo_uso", nullable = false)
-    private List<TipoUso> usosSecundarios = new ArrayList<>();
+    private List<TipoUso> usosSecundarios = new ArrayList<>(); // se guarda en tabla separada, mantiene el orden de los usos secundarios
 
     @Column(nullable = false)
     private Double scoreUsosSecundarios = 0.0;
