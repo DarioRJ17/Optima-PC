@@ -91,6 +91,8 @@ export type PriceRange = {
 export type SelectedFilters = {
   priceRange: PriceRange | null
   tipos: Set<string>
+  marcas: Set<string>
+  sistemasOperativos: Set<string>
 }
 
 export type LoginData = {

@@ -41,6 +41,8 @@ function AppShell() {
   const [selectedFilters, setSelectedFilters] = useState<SelectedFilters>({
     priceRange: null,
     tipos: new Set(),
+    marcas: new Set(),
+    sistemasOperativos: new Set(),
   })
 
   const [loginData, setLoginData] = useState<LoginData>({ email: '', password: '' })
@@ -113,7 +115,7 @@ function AppShell() {
     void loadCatalog()
 
     return () => controller.abort()
-  }, [selectedFilters, token])
+  }, [selectedFilters.priceRange, selectedFilters.tipos, token])
 
   /**
    * Efecto para cargar recomendaciones personalizadas (solo usuario autenticado)
@@ -406,6 +408,7 @@ function AppShell() {
               recommendationsLoading={recommendationsLoading}
               recommendationsError={recommendationsError}
               showRecommendations={Boolean(user)}
+              isAuthenticated={Boolean(user)}
               selectedFilters={selectedFilters}
               setSelectedFilters={setSelectedFilters}
               openAuth={openAuth}
