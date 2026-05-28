@@ -321,34 +321,63 @@ function AppShell() {
 
         <nav className="topbar-actions" aria-label="Navegación principal">
           {user ? (
-            <div className="nav-user">
-              <button
-                type="button"
-                className="nav-chip nav-chip--menu"
-                onClick={() => setUserMenuOpen((s) => !s)}
-                aria-haspopup="true"
-                aria-expanded={userMenuOpen}
-              >
-                <span aria-hidden="true">👤</span>
-                <span>{user.nombre}</span>
-                <span aria-hidden="true">⌄</span>
-              </button>
-              {userMenuOpen ? (
-                <div className="nav-user__menu" role="menu">
-                  <button
-                    type="button"
-                    role="menuitem"
-                    onClick={() => {
-                      logout()
-                      navigate('/')
-                      setUserMenuOpen(false)
-                    }}
-                  >
-                    Cerrar sesión
-                  </button>
-                </div>
-              ) : null}
-            </div>
+            <>
+              <div className="nav-user">
+                <button
+                  type="button"
+                  className="nav-chip nav-chip--menu"
+                  onClick={() => setMenuOpen((s) => !s)}
+                  aria-haspopup="true"
+                  aria-expanded={menuOpen}
+                >
+                  <span aria-hidden="true">☰</span>
+                  <span>Menú</span>
+                  <span aria-hidden="true">⌄</span>
+                </button>
+                {menuOpen ? (
+                  <div className="nav-user__menu" role="menu">
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={() => {
+                        navigate('/montar-pc')
+                        setMenuOpen(false)
+                      }}
+                    >
+                      Montar tu propio PC
+                    </button>
+                  </div>
+                ) : null}
+              </div>
+              <div className="nav-user">
+                <button
+                  type="button"
+                  className="nav-chip nav-chip--menu"
+                  onClick={() => setUserMenuOpen((s) => !s)}
+                  aria-haspopup="true"
+                  aria-expanded={userMenuOpen}
+                >
+                  <span aria-hidden="true">👤</span>
+                  <span>{user.nombre}</span>
+                  <span aria-hidden="true">⌄</span>
+                </button>
+                {userMenuOpen ? (
+                  <div className="nav-user__menu" role="menu">
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={() => {
+                        logout()
+                        navigate('/')
+                        setUserMenuOpen(false)
+                      }}
+                    >
+                      Cerrar sesión
+                    </button>
+                  </div>
+                ) : null}
+              </div>
+            </>
           ) : (
             <>
               <div className="nav-user">
