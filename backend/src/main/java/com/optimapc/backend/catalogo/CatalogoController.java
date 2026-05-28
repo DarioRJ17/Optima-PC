@@ -6,6 +6,9 @@ import java.util.Set;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +19,9 @@ import com.optimapc.backend.modelo.TipoUso;
 import com.optimapc.backend.modelo.Premontado;
 import com.optimapc.backend.usuario.PerfilUsuarioService;
 
+import jakarta.validation.Valid;
+
+@Validated
 @RestController
 @RequestMapping("/api/catalogo/premontados")
 public class CatalogoController {
@@ -80,6 +86,17 @@ public class CatalogoController {
     @GetMapping("/{id}/valoraciones")
     public List<ValoracionDto> obtenerValoraciones(@PathVariable Long id) {
         return premontadoCatalogoService.obtenerValoracionesDelProducto(id);
+    }
+
+    @PostMapping("/{id}/valoraciones")
+    @Transactional
+    public ResponseEntity<ValoracionDto> crearValoracion(
+            Authentication authentication,
+            @PathVariable Long id,
+            @Valid @RequestBody ValoracionRequest request) {
+        Long usuarioId = (Long) authentication.getPrincipal();
+        ValoracionDto valoracion = premontadoCatalogoService.crearValoracion(id, usuarioId, request);
+        return ResponseEntity.status(201).body(valoracion);
     }
 
     @GetMapping("/{id}")

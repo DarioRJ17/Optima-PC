@@ -1,25 +1,37 @@
 package com.optimapc.backend.catalogo;
 
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.optimapc.backend.modelo.Premontado;
 import com.optimapc.backend.modelo.TipoUso;
 import com.optimapc.backend.modelo.Valoracion;
+import com.optimapc.backend.usuario.Usuario;
+import com.optimapc.backend.usuario.UsuarioRepository;
 
 @Service
 public class PremontadoCatalogoService {
 
     private final PremontadoRepository premontadoRepository;
+    private final ValoracionRepository valoracionRepository;
+    private final UsuarioRepository usuarioRepository;
 
-    public PremontadoCatalogoService(PremontadoRepository premontadoRepository) {
+    public PremontadoCatalogoService(
+            PremontadoRepository premontadoRepository,
+            ValoracionRepository valoracionRepository,
+            UsuarioRepository usuarioRepository) {
         this.premontadoRepository = premontadoRepository;
+        this.valoracionRepository = valoracionRepository;
+        this.usuarioRepository = usuarioRepository;
     }
 
     @Transactional(readOnly = true)
@@ -158,5 +170,49 @@ public class PremontadoCatalogoService {
     @Transactional(readOnly = true)
     public Optional<PremontadoCatalogoDto> obtenerPorId(Long id) {
         return premontadoRepository.findById(id).map(this::toDto);
+    }
+
+    @Transactional
+    public ValoracionDto crearValoracion(Long premontadoId, Long usuarioId, ValoracionRequest request) {
+        if (usuarioId == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario no autenticado");
+        }
+
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+
+        Premontado premontado = premontadoRepository.findById(premontadoId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Premontado no encontrado"));
+
+        if (valoracionRepository.existsByUsuario_IdAndPremontado_Id(usuarioId, premontadoId)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Ya has valorado este premontado");
+        }
+
+        Valoracion valoracion = new Valoracion();
+        valoracion.setUsuario(usuario);
+        valoracion.setPremontado(premontado);
+        valoracion.setPuntuacion(request.puntuacion());
+        valoracion.setComentario(normalizarComentario(request.comentario()));
+        valoracion.setFecha(LocalDateTime.now());
+
+        Valoracion guardada = valoracionRepository.save(valoracion);
+        usuario.getValoraciones().add(guardada);
+        premontado.getValoraciones().add(guardada);
+
+        return new ValoracionDto(
+                guardada.getId(),
+                usuario.getNombre() + " " + usuario.getApellidos(),
+                guardada.getPuntuacion(),
+                guardada.getComentario(),
+                guardada.getFecha());
+    }
+
+    private String normalizarComentario(String comentario) {
+        if (comentario == null) {
+            return null;
+        }
+
+        String trimmed = comentario.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 }
