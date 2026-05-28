@@ -1553,6 +1553,141 @@
   border: 2px solid rgba(23, 102, 229, 0.1);
 }
 
+.review-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.review-cta {
+  align-self: flex-start;
+}
+
+.review-help {
+  margin: 0;
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.review-feedback {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.review-feedback--success {
+  color: #166534;
+}
+
+.review-feedback--error {
+  color: #b91c1c;
+}
+
+.review-form {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: #f8fafc;
+  border: 1px solid rgba(203, 213, 225, 0.5);
+  border-radius: 16px;
+}
+
+.review-form__header {
+  margin-bottom: 1rem;
+}
+
+.review-form__header h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #16243c;
+}
+
+.review-form__header p {
+  margin: 0;
+  color: #666;
+  font-size: 0.92rem;
+}
+
+.review-rating-picker {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.review-rating-option {
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(203, 213, 225, 0.9);
+  border-radius: 12px;
+  background: #fff;
+  color: #cbd5e1;
+  font-size: 1.4rem;
+  font-weight: 900;
+  transition: all 0.2s ease;
+}
+
+.review-rating-option:hover {
+  border-color: #1766e5;
+  color: #1766e5;
+}
+
+.review-rating-option--active {
+  background: linear-gradient(135deg, #1766e5, #22c55e);
+  border-color: transparent;
+  color: #fff;
+}
+
+.review-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.review-form__field span {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #16243c;
+}
+
+.review-form__field textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 110px;
+  padding: 0.9rem 1rem;
+  border-radius: 14px;
+  border: 1px solid rgba(203, 213, 225, 0.9);
+  background: #fff;
+  color: #16243c;
+  font: inherit;
+}
+
+.review-form__field textarea:focus {
+  outline: none;
+  border-color: #1766e5;
+  box-shadow: 0 0 0 3px rgba(23, 102, 229, 0.12);
+}
+
+.review-form__actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.review-secondary-button {
+  border: 1px solid rgba(203, 213, 225, 0.9);
+  background: #fff;
+  color: #16243c;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0.9rem 1.2rem;
+}
+
+.review-secondary-button:hover {
+  background: #f8fafc;
+}
+
 .rating-summary__score {
   display: flex;
   flex-direction: column;
@@ -1641,6 +1776,18 @@
   .features-grid,
   .ports-grid {
     grid-template-columns: 1fr;
+  }
+
+  .review-rating-picker {
+    flex-wrap: wrap;
+  }
+
+  .review-form__actions {
+    flex-direction: column;
+  }
+
+  .review-cta {
+    align-self: stretch;
   }
 
   .rating-summary__number {
