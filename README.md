@@ -4,37 +4,70 @@ Proyecto de TFG: plataforma web para la recomendación y gestión de componentes
 
 ---
 
-## 1. Requisitos previos
+## Ejecución rápida con Docker (recomendado para evaluadores)
 
-Instalar en este orden:
+Este es el método más sencillo para poner en marcha el proyecto sin instalar dependencias manualmente.
 
-### Herramientas comunes
+### Requisito único
+
+- **Docker Desktop** → https://www.docker.com/products/docker-desktop/
+
+### Pasos
+
+```bash
+git clone https://github.com/TU_USUARIO/optima-pc.git
+cd optima-pc
+docker-compose up --build
+```
+
+Docker descargará y construirá automáticamente todos los servicios:
+
+| Servicio | URL |
+|---|---|
+| Frontend (React) | http://localhost:5173 |
+| Backend (Spring Boot) | http://localhost:8080 |
+
+> **Primera ejecución:** el asistente de chat usa el modelo `qwen2.5:7b` (~4,5 GB). La descarga se hace automáticamente al arrancar y puede tardar varios minutos según la conexión. Las siguientes ejecuciones lo cargan desde el volumen local sin volver a descargar.
+
+Para detener todos los servicios:
+
+```bash
+docker-compose down
+```
+
+Para eliminar también los datos persistidos (base de datos y modelos):
+
+```bash
+docker-compose down -v
+```
+
+---
+
+## Desarrollo local (configuración manual)
+
+Esta sección es para desarrolladores que prefieren ejecutar los servicios directamente en su máquina.
+
+### 1. Requisitos previos
 
 - **Git**
 - **Java JDK 21**
 - **Node.js (LTS) + npm**
-- **Visual Studio Code** (opcional, pero recomendado)
+- **PostgreSQL 16.x / 17.x**
+  - Crear una base de datos: `optimapc_db`
+- **Ollama** → https://ollama.com/download
+  - Una vez instalado, descargar el modelo:
+    ```bash
+    ollama pull qwen2.5:7b
+    ```
 
-### Backend
-
-- **PostgreSQL 17.x** (o 16.x)  
-  - Crear una base de datos local, por ejemplo: `optimapc_db`
-  - Usuario y contraseña configurados en PostgreSQL (por defecto suele ser `postgres`)
-
-### Frontend
-
-- Ningún requisito extra aparte de Node.js y npm.
-
----
-
-## 2. Clonar el repositorio
+### 2. Clonar el repositorio
 
 ```bash
 git clone https://github.com/TU_USUARIO/optima-pc.git
 cd optima-pc
 ```
 
-La estructura del proyecto es:
+Estructura del proyecto:
 
 ```text
 optima-pc/
@@ -42,135 +75,74 @@ optima-pc/
   frontend/
 ```
 
----
+### 3. Configuración del backend
 
-## 3. Configuración del backend (Spring Boot)
-
-### 3.1. Variables de entorno (recomendado)
-
-Definir estas variables de entorno en el sistema (Windows / Linux / macOS):
-
-- `DB_USERNAME` → usuario de PostgreSQL  
-- `DB_PASSWORD` → contraseña de ese usuario  
-- `MAIL_USERNAME` → cuenta Gmail que enviará los correos  
-- `MAIL_PASSWORD` → contraseña de aplicación de Gmail, no la contraseña normal  
-- `MAIL_FROM_ADDRESS` → dirección visible como remitente, normalmente la misma cuenta de Gmail  
-- `FRONTEND_BASE_URL` → URL del frontend, por ejemplo `http://localhost:5173`  
-
-Ejemplo en Windows (PowerShell):
-
-```powershell
-setx DB_USERNAME "postgres"
-setx DB_PASSWORD "tu_contraseña"
-setx MAIL_USERNAME "tu_correo@gmail.com"
-setx MAIL_PASSWORD "tu_contraseña_de_aplicacion"
-setx MAIL_FROM_ADDRESS "tu_correo@gmail.com"
-setx FRONTEND_BASE_URL "http://localhost:5173"
-```
-
-Si vas a usar Gmail, debes activar la verificación en dos pasos en la cuenta y generar una contraseña de aplicación. Gmail no permite el envío SMTP con la contraseña normal en la mayoría de cuentas.
-
-### 3.2. Archivo `backend/src/main/resources/application.properties`
-
-El backend está configurado para una base de datos local PostgreSQL:
+Crear el archivo `backend/.env` con las siguientes variables (o definirlas como variables de entorno del sistema):
 
 ```properties
-spring.application.name=backend
-
-spring.datasource.url=jdbc:postgresql://localhost:5432/optimapc_db
-spring.datasource.username=${DB_USERNAME}
-spring.datasource.password=${DB_PASSWORD}
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
-
-spring.mail.host=smtp.gmail.com
-spring.mail.port=587
-spring.mail.username=${MAIL_USERNAME}
-spring.mail.password=${MAIL_PASSWORD}
-spring.mail.properties.mail.smtp.auth=true
-spring.mail.properties.mail.smtp.starttls.enable=true
-spring.mail.properties.mail.smtp.starttls.required=true
+DB_USERNAME=postgres
+DB_PASSWORD=tu_contraseña
+JWT_SECRET=una-clave-larga-de-al-menos-32-caracteres
+MAIL_USERNAME=tu_correo@gmail.com
+MAIL_PASSWORD=tu_contraseña_de_aplicacion
+MAIL_FROM_ADDRESS=tu_correo@gmail.com
+FRONTEND_BASE_URL=http://localhost:5173
+OLLAMA_URL=http://localhost:11434/api/chat
+OLLAMA_MODEL=qwen2.5:7b
 ```
 
-Si se usa otro nombre de base de datos, puerto u host, adaptar la URL.
+> Para la funcionalidad de recuperación de contraseña se necesita una cuenta Gmail con verificación en dos pasos y una contraseña de aplicación generada desde la configuración de Google. El resto de funcionalidades no requieren configuración de correo.
 
----
+### 4. Arrancar Ollama
 
-## 4. Arrancar el backend
+Asegúrate de que Ollama está en ejecución antes de arrancar el backend:
+
+```bash
+ollama serve
+```
+
+### 5. Arrancar el backend
 
 Desde la carpeta `backend`:
 
 ```bash
-cd backend
-./mvnw spring-boot:run      # Linux / macOS
-```
+# Linux / macOS
+./mvnw spring-boot:run
 
-En Windows (PowerShell o CMD):
-
-```bash
-cd backend
+# Windows
 mvnw.cmd spring-boot:run
 ```
 
-El backend se expone por defecto en:
+El backend se expone en: `http://localhost:8080`
 
-```text
-http://localhost:8080
-```
-
----
-
-## 5. Arrancar el frontend (React + Vite)
+### 6. Arrancar el frontend
 
 Desde la carpeta `frontend`:
 
-### 5.1. Instalar dependencias
-
 ```bash
-cd frontend
 npm install
-```
-
-### 5.2. Iniciar el servidor de desarrollo
-
-```bash
 npm run dev
 ```
 
-Por defecto Vite arranca en una URL similar a:
-
-```text
-http://localhost:5173
-```
+El frontend se expone en: `http://localhost:5173`
 
 ---
 
-## 6. Flujo básico de desarrollo
+## Notas adicionales
 
-1. Abrir dos terminales:
-   - Terminal 1 → `backend` → `mvnw spring-boot:run`
-   - Terminal 2 → `frontend` → `npm run dev`
-2. Acceder al frontend en el navegador (`http://localhost:5173`).
-3. El frontend se comunica con el backend en `http://localhost:8080` (endpoints REST).
+- Stack del proyecto:
+  - **Backend:** Spring Boot 4, Spring Data JPA, Spring Security, PostgreSQL, Lombok, Validation
+  - **Frontend:** React + TypeScript + Vite
+  - **Chat:** Ollama con modelo `qwen2.5:7b` (local)
 
----
+- Ejecutar tests del backend:
+  ```bash
+  cd backend
+  ./mvnw test     # o mvnw.cmd test en Windows
+  ```
 
-## 7. Notas adicionales
-
-- El proyecto usa:
-  - **Spring Web, Spring Data JPA, Spring Security, PostgreSQL Driver, Lombok, Validation y Spring Boot DevTools** en el backend.
-  - **React + TypeScript + Vite** en el frontend.
-- Para ejecutar los tests del backend:
-
-```bash
-cd backend
-./mvnw test     # o mvnw.cmd test en Windows
-```
-
-- Para construir el frontend para producción:
-
-```bash
-cd frontend
-npm run build
-```
+- Construir el frontend para producción:
+  ```bash
+  cd frontend
+  npm run build
+  ```
