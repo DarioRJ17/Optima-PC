@@ -38,6 +38,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/catalogo/premontados/chat").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/premontados/chat").permitAll()
                 .requestMatchers("/api/catalogo/premontados/recomendaciones").authenticated()
                 .requestMatchers(HttpMethod.POST, "/api/catalogo/premontados/*/valoraciones").authenticated()
                 .requestMatchers("/api/catalogo/**").permitAll()

@@ -29,14 +29,17 @@ public class CatalogoController {
     private final PremontadoCatalogoService premontadoCatalogoService;
     private final PerfilUsuarioService perfilUsuarioService;
     private final ScoringService scoringService;
+    private final ChatService chatService;
 
     public CatalogoController(
             PremontadoCatalogoService premontadoCatalogoService,
             PerfilUsuarioService perfilUsuarioService,
-            ScoringService scoringService) {
+            ScoringService scoringService,
+            ChatService chatService) {
         this.premontadoCatalogoService = premontadoCatalogoService;
         this.perfilUsuarioService = perfilUsuarioService;
         this.scoringService = scoringService;
+        this.chatService = chatService;
     }
 
     @GetMapping
@@ -104,5 +107,11 @@ public class CatalogoController {
         return premontadoCatalogoService.obtenerPorId(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/chat")
+    public ResponseEntity<ChatResponse> chatCatalogo(@Valid @RequestBody ChatRequest request) {
+        String respuesta = chatService.generarRespuestaChat(request.mensaje(), request.historial());
+        return ResponseEntity.ok(new ChatResponse(respuesta));
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.optimapc.backend.modelo.ConfiguracionComponente;
 import com.optimapc.backend.modelo.Premontado;
 import com.optimapc.backend.modelo.TipoUso;
 import com.optimapc.backend.modelo.Valoracion;
@@ -34,6 +35,10 @@ public class PremontadoCatalogoService {
         this.usuarioRepository = usuarioRepository;
     }
 
+    // -------------------------------------------------------------------------
+    // Catálogo
+    // -------------------------------------------------------------------------
+
     @Transactional(readOnly = true)
     public List<PremontadoCatalogoDto> listar() {
         return listar(null, null, null, null, null);
@@ -41,7 +46,9 @@ public class PremontadoCatalogoService {
 
     @Transactional(readOnly = true)
     public List<Premontado> obtenerTodosLosPremontados() {
-        return premontadoRepository.findAllByOrderByMarcaAscIdAsc();
+        List<Premontado> premontados = premontadoRepository.findAllByOrderByMarcaAscIdAsc();
+        inicializarColecciones(premontados);
+        return premontados;
     }
 
     @Transactional(readOnly = true)
@@ -51,15 +58,12 @@ public class PremontadoCatalogoService {
             List<TipoUso> tipos,
             String marca,
             Boolean reacondicionado) {
-        return premontadoRepository.findAllByOrderByMarcaAscIdAsc().stream()
-                .filter(p -> {
-                    Double precioEfectivo = getPrecioEfectivo(p);
-                    return minPrice == null || precioEfectivo >= minPrice;
-                })
-                .filter(p -> {
-                    Double precioEfectivo = getPrecioEfectivo(p);
-                    return maxPrice == null || precioEfectivo <= maxPrice;
-                })
+        List<Premontado> premontados = premontadoRepository.findAllByOrderByMarcaAscIdAsc();
+        inicializarColecciones(premontados);
+
+        return premontados.stream()
+                .filter(p -> minPrice == null || getPrecioEfectivo(p) >= minPrice)
+                .filter(p -> maxPrice == null || getPrecioEfectivo(p) <= maxPrice)
                 .filter(p -> marca == null || p.getMarca().equalsIgnoreCase(marca))
                 .filter(p -> reacondicionado == null || p.getEsReacondicionado().equals(reacondicionado))
                 .filter(p -> tipos == null || tipos.isEmpty() ||
@@ -77,6 +81,8 @@ public class PremontadoCatalogoService {
     }
 
     public PremontadoCatalogoDto toDto(Premontado premontado) {
+        inicializarColecciones(premontado);
+
         List<Valoracion> valoraciones = premontado.getValoraciones();
         double valoracionMedia = valoraciones.isEmpty()
                 ? 0.0
@@ -87,7 +93,7 @@ public class PremontadoCatalogoService {
                         cfg.getComponente().getId(),
                         cfg.getCategoria(),
                         cfg.getComponente().getNombre(),
-                        obtenerEspecificacion(cfg.getComponente()),
+                        cfg.getComponente().getNombre(),
                         cfg.getComponente().getPrecio(),
                         cfg.getCantidad()))
                 .collect(Collectors.toList());
@@ -112,42 +118,22 @@ public class PremontadoCatalogoService {
                 componentesDto);
     }
 
-    private String obtenerEspecificacion(com.optimapc.backend.modelo.Componente componente) {
-        // Obtener especificaciones específicas según el tipo de componente
-        String className = componente.getClass().getSimpleName();
-        switch (className) {
-            case "Procesador":
-                return componente.getNombre();
-            case "MemoriaRAM":
-                return componente.getNombre();
-            case "DiscoAlmacenamiento":
-                return componente.getNombre();
-            case "TarjetaGrafica":
-                return componente.getNombre();
-            case "PlacaBase":
-                return componente.getNombre();
-            case "FuenteAlimentacion":
-                return componente.getNombre();
-            case "Caja":
-                return componente.getNombre();
-            default:
-                return componente.getNombre();
-        }
-    }
-
     private String construirTitulo(Premontado premontado) {
         String tipoUso = premontado.getTipoUsoPrevisto();
         String marca = premontado.getMarca();
         if (tipoUso == null || tipoUso.isBlank()) {
             return marca;
         }
-
         return String.format(Locale.ROOT, "%s %s", marca, tipoUso).trim();
     }
 
     private double redondear(double value) {
         return Math.round(value * 10.0) / 10.0;
     }
+
+    // -------------------------------------------------------------------------
+    // Valoraciones
+    // -------------------------------------------------------------------------
 
     @Transactional(readOnly = true)
     public List<ValoracionDto> obtenerValoracionesDelProducto(Long premontadoId) {
@@ -211,8 +197,26 @@ public class PremontadoCatalogoService {
         if (comentario == null) {
             return null;
         }
-
         String trimmed = comentario.trim();
         return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    // -------------------------------------------------------------------------
+    // Helpers
+    // -------------------------------------------------------------------------
+
+    private void inicializarColecciones(List<Premontado> premontados) {
+        premontados.forEach(this::inicializarColecciones);
+    }
+
+    private void inicializarColecciones(Premontado premontado) {
+        premontado.getValoraciones().size();
+        premontado.getUsosPrevistos().size();
+        premontado.getComponentes().forEach(cfg -> {
+            if (cfg.getComponente() != null) {
+                cfg.getComponente().getNombre();
+                cfg.getComponente().getPrecio();
+            }
+        });
     }
 }
