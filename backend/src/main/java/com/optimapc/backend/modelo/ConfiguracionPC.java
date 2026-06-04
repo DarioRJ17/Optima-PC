@@ -32,14 +32,13 @@ public class ConfiguracionPC {
     private Boolean favorita;
 
     @Transient
-    private Double indicadorEquilibrio; // TODO: Calcular este valor en base a los componentes
+    private Double indicadorEquilibrio; // se basará en rendimientoScore para mostrar un "equilibrio" entre componentes, que no estén descompensados (ej: CPU muy potente y GPU muy floja).
 
     @Transient
-    public Double getRendimientoPorEuro() {
-        // TODO: Implementar cálculo basado en benchmarks de componentes
-        // Fórmula: (benchmark_total / precio_total_euros)
-        return 0.0;
-    }
+    private Double rendimientoScore; // se calcula en el servicio de rendimiento basado en una serie de reglas entre componentes
+
+    @Transient
+    private Double rendimientoPorEuro; // se normaliza el rendimientoScore dividiéndolo por el precio y comparándolo con maximo y mínimo
 
     @Transient
     public Double getPrecio() {
@@ -47,6 +46,13 @@ public class ConfiguracionPC {
                 .filter(c -> c.getComponente() != null)
                 .mapToDouble(c -> c.getComponente().getPrecio() * c.getCantidad())
                 .sum();
+    }
+
+    // Precio real para el cálculo de rendimiento/€. Las subclases pueden sobreescribirlo
+    // para aplicar descuentos u otros ajustes (ej. Premontado con precioReducido).
+    @Transient
+    public Double getPrecioEfectivo() {
+        return getPrecio();
     }
 
     @OneToMany(mappedBy = "configuracion", cascade = CascadeType.ALL, orphanRemoval = true)

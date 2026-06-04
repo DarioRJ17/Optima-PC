@@ -72,4 +72,13 @@ public class Premontado extends ConfiguracionPC {
         if (descuento == null || descuento == 0) return null;
         return this.getPrecio() * (1 - descuento / 100.0);
     }
+
+    // Usa el precio con descuento si existe, para que la métrica rendimiento/€
+    // refleje el precio real que paga el usuario, no el precio base de componentes.
+    @Override
+    @Transient
+    public Double getPrecioEfectivo() {
+        Double reducido = getPrecioReducido();
+        return reducido != null ? reducido : getPrecio();
+    }
 }

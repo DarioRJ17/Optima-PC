@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.optimapc.backend.modelo.TipoUso;
 import com.optimapc.backend.modelo.Premontado;
+import com.optimapc.backend.montarPC.RendimientoService;
 import com.optimapc.backend.usuario.PerfilUsuarioService;
 
 import jakarta.validation.Valid;
@@ -30,16 +31,19 @@ public class CatalogoController {
     private final PerfilUsuarioService perfilUsuarioService;
     private final ScoringService scoringService;
     private final ChatService chatService;
+    private final RendimientoService rendimientoService;
 
     public CatalogoController(
             PremontadoCatalogoService premontadoCatalogoService,
             PerfilUsuarioService perfilUsuarioService,
             ScoringService scoringService,
-            ChatService chatService) {
+            ChatService chatService,
+            RendimientoService rendimientoService) {
         this.premontadoCatalogoService = premontadoCatalogoService;
         this.perfilUsuarioService = perfilUsuarioService;
         this.scoringService = scoringService;
         this.chatService = chatService;
+        this.rendimientoService = rendimientoService;
     }
 
     @GetMapping
@@ -76,8 +80,9 @@ public class CatalogoController {
         return perfilUsuarioService.obtenerPorUsuarioId(usuarioId)
                 .map(perfil -> {
                     List<Premontado> premontados = premontadoCatalogoService.obtenerTodosLosPremontados();
-                    List<PremontadoCatalogoDto> recomendaciones = scoringService.recomendarPremontados(perfil, premontados)
-                            .stream()
+                    List<Premontado> recomendados = scoringService.recomendarPremontados(perfil, premontados);
+                    rendimientoService.normalizarLista(recomendados, perfil.getTipoUsoFrecuente());
+                    List<PremontadoCatalogoDto> recomendaciones = recomendados.stream()
                             .map(premontadoCatalogoService::toDto)
                             .toList();
 

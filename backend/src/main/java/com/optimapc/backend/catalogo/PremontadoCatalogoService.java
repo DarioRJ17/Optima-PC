@@ -16,6 +16,7 @@ import com.optimapc.backend.modelo.ConfiguracionComponente;
 import com.optimapc.backend.modelo.Premontado;
 import com.optimapc.backend.modelo.TipoUso;
 import com.optimapc.backend.modelo.Valoracion;
+import com.optimapc.backend.montarPC.RendimientoService;
 import com.optimapc.backend.usuario.Usuario;
 import com.optimapc.backend.usuario.UsuarioRepository;
 
@@ -25,14 +26,17 @@ public class PremontadoCatalogoService {
     private final PremontadoRepository premontadoRepository;
     private final ValoracionRepository valoracionRepository;
     private final UsuarioRepository usuarioRepository;
+    private final RendimientoService rendimientoService;
 
     public PremontadoCatalogoService(
             PremontadoRepository premontadoRepository,
             ValoracionRepository valoracionRepository,
-            UsuarioRepository usuarioRepository) {
+            UsuarioRepository usuarioRepository,
+            RendimientoService rendimientoService) {
         this.premontadoRepository = premontadoRepository;
         this.valoracionRepository = valoracionRepository;
         this.usuarioRepository = usuarioRepository;
+        this.rendimientoService = rendimientoService;
     }
 
     // -------------------------------------------------------------------------
@@ -60,6 +64,7 @@ public class PremontadoCatalogoService {
             Boolean reacondicionado) {
         List<Premontado> premontados = premontadoRepository.findAllByOrderByMarcaAscIdAsc();
         inicializarColecciones(premontados);
+        rendimientoService.normalizarLista(premontados);
 
         return premontados.stream()
                 .filter(p -> minPrice == null || getPrecioEfectivo(p) >= minPrice)
