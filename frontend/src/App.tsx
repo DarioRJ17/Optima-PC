@@ -11,6 +11,7 @@ import { PasswordResetPage } from './pages/PasswordResetPage'
 import { AuthProvider } from './auth/AuthContext'
 import { useAuth } from './auth/useAuth'
 import { MontarPCPage } from './pages/MontarPCPage'
+import { ChatbotPage } from './pages/ChatbotPage'
 import type {
   ApiError,
   AuthMode,
@@ -346,6 +347,16 @@ function AppShell() {
                     >
                       Montar tu propio PC
                     </button>
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={() => {
+                        navigate('/chat')
+                        setMenuOpen(false)
+                      }}
+                    >
+                      🤖 Asistente IA
+                    </button>
                   </div>
                 ) : null}
               </div>
@@ -403,6 +414,16 @@ function AppShell() {
                       }}
                     >
                       Montar tu propio PC
+                    </button>
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={() => {
+                        navigate('/chat')
+                        setMenuOpen(false)
+                      }}
+                    >
+                      🤖 Asistente IA
                     </button>
                   </div>
                 ) : null}
@@ -496,6 +517,7 @@ function AppShell() {
           element={<InitialSurveyPage onBack={() => navigate('/')} onSurveySaved={refreshRecommendations} />}
         />
         <Route path="/montar-pc" element={<MontarPCPage onBack={() => navigate('/')} />} />
+        <Route path="/chat" element={<ChatbotPage />} />
         <Route path="/auth" element={<Navigate to="/login" replace />} />
       </Routes>
     </div>
