@@ -584,11 +584,53 @@
 }
 
 .performance-meter {
+  position: relative;
   margin-top: 0.85rem;
   padding: 0.75rem 0.85rem;
   border-radius: 12px;
   background: rgba(22, 180, 90, 0.08);
   border: 1px solid rgba(22, 180, 90, 0.18);
+}
+
+.performance-meter__info {
+  position: relative;
+  cursor: help;
+  line-height: 1;
+}
+
+.performance-meter__tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  width: 210px;
+  background: #0f172a;
+  color: #e2e8f0;
+  border-radius: 10px;
+  padding: 0.7rem 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 400;
+  line-height: 1.5;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  z-index: 20;
+  pointer-events: none;
+}
+
+.performance-meter__tooltip strong {
+  display: block;
+  font-size: 0.83rem;
+  color: #f8fafc;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.performance-meter__tooltip p {
+  margin: 0;
+  color: #94a3b8;
+}
+
+.performance-meter__info:hover .performance-meter__tooltip {
+  display: block;
 }
 
 .product-card--gaming .performance-meter {

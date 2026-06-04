@@ -18,7 +18,17 @@ export function PerformanceMeter({ value }: { value: number }) {
     <div className="performance-meter" aria-label={`Rendimiento ${value} sobre 100`}>
       <div className="performance-meter__header">
         <span>⚡ Rendimiento/€</span>
-        <span>ⓘ</span>
+        <span className="performance-meter__info">
+          ⓘ
+          <div className="performance-meter__tooltip" role="tooltip">
+            <strong>Métrica de Rendimiento/€</strong>
+            <p>
+              Evalúa la relación calidad-precio calculando el rendimiento de los componentes
+              principales (CPU, GPU, RAM y almacenamiento) dividido entre el precio. Un valor
+              más alto indica mejor rendimiento por cada euro invertido.
+            </p>
+          </div>
+        </span>
       </div>
       <div className="performance-meter__value">
         <strong>{value}</strong>
