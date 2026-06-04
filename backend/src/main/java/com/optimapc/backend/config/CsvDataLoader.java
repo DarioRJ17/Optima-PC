@@ -137,209 +137,1106 @@ public class CsvDataLoader implements ApplicationRunner {
 	}
 
 	private void sembrarPremontadosSiNecesario() {
-		List<Premontado> existingPremontados = listar(Premontado.class);
-		int objetivo = 28; // objetivo de premontados en la BD
-		int existentes = existingPremontados == null ? 0 : existingPremontados.size();
-		int aCrear = objetivo - existentes;
-		if (aCrear <= 0) {
-			return;
-		}
-
-		Procesador procesador = primer(Procesador.class);
-		TarjetaGrafica tarjetaGrafica = primer(TarjetaGrafica.class);
-		PlacaBase placaBase = primer(PlacaBase.class);
-		MemoriaRAM memoriaRAM = primer(MemoriaRAM.class);
-		Almacenamiento almacenamiento = primer(Almacenamiento.class);
-		FuenteAlimentacion fuenteAlimentacion = primer(FuenteAlimentacion.class);
-		Caja caja = primer(Caja.class);
-		RefrigeradorCPU refrigeradorCPU = primer(RefrigeradorCPU.class);
-
-		// Crear algunos premontados base ya conocidos (si no existen)
-		if (existentes == 0) {
-			Premontado starter = new Premontado();
-			starter.setTipoUsoPrevisto("Entrada para gaming ligero");
-			starter.setFavorita(Boolean.TRUE);
-			starter.setDescripcion("Equipo equilibrado para jugar en 1080p y uso diario.");
-			starter.setMarca("OptimaPC");
-			starter.setDescuento(10);
-			starter.setSistemaOperativo(TipoSO.WINDOWS);
-			starter.setStock(5);
-			starter.setEsReacondicionado(Boolean.FALSE);
-			starter.setUsosPrevistos(Set.of(TipoUso.GAMING, TipoUso.EDICION));
-			agregarComponente(starter, "CPU", procesador, 1);
-			agregarComponente(starter, "GPU", tarjetaGrafica, 1);
-			agregarComponente(starter, "Placa base", placaBase, 1);
-			agregarComponente(starter, "RAM", memoriaRAM, 2);
-			agregarComponente(starter, "Almacenamiento", almacenamiento, 1);
-			agregarComponente(starter, "Fuente", fuenteAlimentacion, 1);
-			agregarComponente(starter, "Caja", caja, 1);
-			agregarComponente(starter, "Refrigeración", refrigeradorCPU, 1);
-			entityManager.persist(starter);
-			existentes++;
-			aCrear = objetivo - existentes;
-		}
-
-		asegurarPremontadoAhorroEsencial();
-		asegurarPremontadoEquilibradoEconomico();
+		// OFIMÁTICA
+		asegurarPremontadoOfimaticaBasica();
+		asegurarPremontadoOfimaticaProductiva();
+		asegurarPremontadoOfimaticaAM5();
+		asegurarPremontadoOficinaProfesional();
+		// PROGRAMACIÓN
+		asegurarPremontadoProgramacionWeb();
+		asegurarPremontadoProgramacionFullStack();
+		asegurarPremontadoDevOps();
+		asegurarPremontadoDataScience();
+		// GAMING
+		asegurarPremontadoGamingEntrada1080p();
 		asegurarPremontadoGamingEconomico();
-
-		// Plantilla para generar premontados adicionales con variación
-		TipoUso[] usosDisponibles = TipoUso.values();
-		TipoSO[] sos = TipoSO.values();
-
-		for (int i = 0; i < aCrear; i++) {
-			Premontado p = new Premontado();
-			int idx = existentes + i + 1;
-			String nombre = "Premontado " + idx;
-			p.setTipoUsoPrevisto(nombre + " - Configuración genérica");
-			p.setFavorita(Boolean.FALSE);
-			p.setDescripcion("Premontado de prueba número " + idx + ".");
-			p.setMarca(idx % 3 == 0 ? "OptimaWork" : "OptimaPC");
-			p.setDescuento((idx % 5) * 5);
-			p.setSistemaOperativo(sos[idx % sos.length]);
-			p.setStock(1 + (idx % 10));
-			p.setEsReacondicionado((idx % 7) == 0);
-
-			// seleccionar entre 1 y 3 usos previstos
-			Set<TipoUso> usos = Set.of(usosDisponibles[idx % usosDisponibles.length]);
-			if (idx % 2 == 0) {
-				usos = Set.of(usosDisponibles[idx % usosDisponibles.length], usosDisponibles[(idx + 1) % usosDisponibles.length]);
-			}
-			if (idx % 5 == 0) {
-				usos = Set.of(usosDisponibles[(idx) % usosDisponibles.length], usosDisponibles[(idx + 2) % usosDisponibles.length], usosDisponibles[(idx + 3) % usosDisponibles.length]);
-			}
-			p.setUsosPrevistos(usos);
-
-			// agregar componentes básicos (cantidad variable)
-			agregarComponente(p, "CPU", procesador, 1);
-			if (idx % 3 != 0) {
-				agregarComponente(p, "GPU", tarjetaGrafica, 1);
-			}
-			agregarComponente(p, "Placa base", placaBase, 1);
-			agregarComponente(p, "RAM", memoriaRAM, 1 + (idx % 3));
-			agregarComponente(p, "Almacenamiento", almacenamiento, 1 + ((idx + 1) % 2));
-			agregarComponente(p, "Fuente", fuenteAlimentacion, 1);
-			agregarComponente(p, "Caja", caja, 1);
-			if (idx % 4 == 0) {
-				agregarComponente(p, "Refrigeración", refrigeradorCPU, 1);
-			}
-
-			entityManager.persist(p);
-		}
+		asegurarPremontadoGamingEquilibrado1080p();
+		asegurarPremontadoGamingAlto1080p();
+		asegurarPremontadoGaming1440pEntrada();
+		asegurarPremontadoGaming1440p();
+		asegurarPremontadoGaming1440pAlto();
+		asegurarPremontadoGaming4K();
+		asegurarPremontadoGamingExtremo();
+		asegurarPremontadoGamingYStreaming();
+		// EDICIÓN
+		asegurarPremontadoEdicionFotografica();
+		asegurarPremontadoEdicionVideo1080p();
+		asegurarPremontadoEdicionVideo4K();
+		asegurarPremontadoEdicionProfesional();
+		asegurarPremontadoMotionGraphics3D();
+		// STREAMING
+		asegurarPremontadoStreamingEconomico();
+		asegurarPremontadoStreamingProfesional();
+		asegurarPremontadoCreadorContenido();
+		// VERSÁTILES
+		asegurarPremontadoTodoEnUnoVersatil();
+		asegurarPremontadoWorkstationVersatil();
 	}
 
-	private void asegurarPremontadoAhorroEsencial() {
-		if (existePremontadoConTipoUsoPrevisto("Ahorro esencial")) {
-			return;
-		}
+	// ── OFIMÁTICA ────────────────────────────────────────────────────────────
 
-		Procesador procesador = componenteMasBarato(Procesador.class,
-				cpu -> "AM4".equals(cpu.getSocket()) && cpu.getGraficaIntegrada() != null && !cpu.getGraficaIntegrada().isBlank());
-		PlacaBase placaBase = componenteMasBarato(PlacaBase.class,
-				placa -> "AM4".equals(placa.getSocket()) && "DDR4".equalsIgnoreCase(placa.getTipoDDR()));
-		MemoriaRAM memoriaRAM = componenteMasBarato(MemoriaRAM.class,
-				ram -> "DDR4".equalsIgnoreCase(ram.getTipoDDR()) && ram.getGbPorModulo() != null && ram.getGbPorModulo() <= 8);
-		Almacenamiento almacenamiento = componenteMasBarato(Almacenamiento.class,
-				ssd -> "SSD".equalsIgnoreCase(ssd.getTipo()) && ssd.getCapacidad() != null && ssd.getCapacidad() <= 500);
-		FuenteAlimentacion fuenteAlimentacion = componenteMasBarato(FuenteAlimentacion.class,
-				fuente -> fuente.getPotencia() != null && fuente.getPotencia() >= 500);
+	private void asegurarPremontadoOfimaticaBasica() {
+		if (existePremontadoConTipoUsoPrevisto("Ofimática básica")) return;
+		Procesador cpu = componenteMasBarato(Procesador.class,
+				c -> "AM4".equals(c.getSocket()) && c.getGraficaIntegrada() != null && !c.getGraficaIntegrada().isBlank() && c.getNucleos() != null && c.getNucleos() >= 6);
+		PlacaBase placa = componenteMasBarato(PlacaBase.class,
+				p -> "AM4".equals(p.getSocket()) && "DDR4".equalsIgnoreCase(p.getTipoDDR()) && p.getFactorForma() != null && p.getFactorForma().toUpperCase().contains("MICRO"));
+		MemoriaRAM ram = componenteMasBarato(MemoriaRAM.class,
+				r -> "DDR4".equalsIgnoreCase(r.getTipoDDR()) && r.getNumModulos() != null && r.getNumModulos() == 2 && r.getGbPorModulo() != null && r.getGbPorModulo() == 8);
+		Almacenamiento ssd = componenteMasBarato(Almacenamiento.class,
+				s -> "SSD".equalsIgnoreCase(s.getTipo()) && s.getCapacidad() != null && s.getCapacidad() <= 500);
+		FuenteAlimentacion psu = componenteMasBarato(FuenteAlimentacion.class,
+				f -> f.getPotencia() != null && f.getPotencia() >= 500);
 		Caja caja = componenteMasBarato(Caja.class,
 				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("MICROATX"));
-
-		Premontado premontado = new Premontado();
-		premontado.setTipoUsoPrevisto("Ahorro esencial");
-		premontado.setFavorita(Boolean.FALSE);
-		premontado.setDescripcion("Equipo de entrada para ofimática, navegación y tareas básicas con un presupuesto contenido.");
-		premontado.setMarca("OptimaPC");
-		premontado.setDescuento(0);
-		premontado.setSistemaOperativo(TipoSO.LINUX);
-		premontado.setStock(12);
-		premontado.setEsReacondicionado(Boolean.FALSE);
-		premontado.setUsosPrevistos(Set.of(TipoUso.OFIMATICA, TipoUso.PROGRAMACION));
-		agregarComponente(premontado, "CPU", procesador, 1);
-		agregarComponente(premontado, "Placa base", placaBase, 1);
-		agregarComponente(premontado, "RAM", memoriaRAM, 2);
-		agregarComponente(premontado, "Almacenamiento", almacenamiento, 1);
-		agregarComponente(premontado, "Fuente", fuenteAlimentacion, 1);
-		agregarComponente(premontado, "Caja", caja, 1);
-		entityManager.persist(premontado);
+		Premontado p = new Premontado();
+		p.setTipoUsoPrevisto("Ofimática básica");
+		p.setFavorita(Boolean.FALSE);
+		p.setDescripcion("Equipo de entrada para navegación, correo, Office y videollamadas. CPU con gráfica integrada; no necesita GPU dedicada.");
+		p.setMarca("OptimaPC");
+		p.setDescuento(0);
+		p.setSistemaOperativo(TipoSO.LINUX);
+		p.setStock(15);
+		p.setEsReacondicionado(Boolean.FALSE);
+		p.setUsosPrevistos(Set.of(TipoUso.OFIMATICA));
+		agregarComponente(p, "CPU", cpu, 1);
+		agregarComponente(p, "Placa base", placa, 1);
+		agregarComponente(p, "RAM", ram, 1);
+		agregarComponente(p, "Almacenamiento", ssd, 1);
+		agregarComponente(p, "Fuente", psu, 1);
+		agregarComponente(p, "Caja", caja, 1);
+		entityManager.persist(p);
 	}
 
-	private void asegurarPremontadoEquilibradoEconomico() {
-		if (existePremontadoConTipoUsoPrevisto("Equilibrado económico")) {
-			return;
-		}
+	private void asegurarPremontadoOfimaticaProductiva() {
+		if (existePremontadoConTipoUsoPrevisto("Ofimática productiva")) return;
+		Procesador cpu = componenteMasBarato(Procesador.class,
+				c -> "AM4".equals(c.getSocket()) && c.getGraficaIntegrada() != null && !c.getGraficaIntegrada().isBlank() && c.getNucleos() != null && c.getNucleos() >= 8);
+		PlacaBase placa = componenteMasBarato(PlacaBase.class,
+				p -> "AM4".equals(p.getSocket()) && "DDR4".equalsIgnoreCase(p.getTipoDDR()));
+		MemoriaRAM ram = componenteMasBarato(MemoriaRAM.class,
+				r -> "DDR4".equalsIgnoreCase(r.getTipoDDR()) && r.getNumModulos() != null && r.getNumModulos() == 2 && r.getGbPorModulo() != null && r.getGbPorModulo() == 16);
+		Almacenamiento ssd = componenteMasBarato(Almacenamiento.class,
+				s -> "SSD".equalsIgnoreCase(s.getTipo()) && s.getCapacidad() != null && s.getCapacidad() >= 1000 && s.getCapacidad() < 2000);
+		FuenteAlimentacion psu = componenteMasBarato(FuenteAlimentacion.class,
+				f -> f.getPotencia() != null && f.getPotencia() >= 600);
+		Caja caja = componenteMasBarato(Caja.class,
+				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
+		Premontado p = new Premontado();
+		p.setTipoUsoPrevisto("Ofimática productiva");
+		p.setFavorita(Boolean.FALSE);
+		p.setDescripcion("APU de 8 núcleos y 32 GB de RAM para multitarea fluida, hojas de cálculo complejas y reuniones online simultáneas sin GPU dedicada.");
+		p.setMarca("OptimaPC");
+		p.setDescuento(5);
+		p.setSistemaOperativo(TipoSO.WINDOWS);
+		p.setStock(12);
+		p.setEsReacondicionado(Boolean.FALSE);
+		p.setUsosPrevistos(Set.of(TipoUso.OFIMATICA));
+		agregarComponente(p, "CPU", cpu, 1);
+		agregarComponente(p, "Placa base", placa, 1);
+		agregarComponente(p, "RAM", ram, 1);
+		agregarComponente(p, "Almacenamiento", ssd, 1);
+		agregarComponente(p, "Fuente", psu, 1);
+		agregarComponente(p, "Caja", caja, 1);
+		entityManager.persist(p);
+	}
 
-		Procesador procesador = componenteMasBarato(Procesador.class,
-				cpu -> "AM4".equals(cpu.getSocket()) && cpu.getGraficaIntegrada() != null && !cpu.getGraficaIntegrada().isBlank());
-		PlacaBase placaBase = componenteMasBarato(PlacaBase.class,
-				placa -> "AM4".equals(placa.getSocket()) && "DDR4".equalsIgnoreCase(placa.getTipoDDR()));
-		MemoriaRAM memoriaRAM = componenteMasBarato(MemoriaRAM.class,
-				ram -> "DDR4".equalsIgnoreCase(ram.getTipoDDR()) && ram.getNumModulos() != null && ram.getNumModulos() == 2 && ram.getGbPorModulo() != null && ram.getGbPorModulo() == 16);
-		Almacenamiento almacenamiento = componenteMasBarato(Almacenamiento.class,
-				ssd -> "SSD".equalsIgnoreCase(ssd.getTipo()) && ssd.getCapacidad() != null && ssd.getCapacidad() >= 1000);
-		FuenteAlimentacion fuenteAlimentacion = componenteMasBarato(FuenteAlimentacion.class,
-				fuente -> fuente.getPotencia() != null && fuente.getPotencia() >= 600);
+	private void asegurarPremontadoOfimaticaAM5() {
+		if (existePremontadoConTipoUsoPrevisto("Ofimática AM5")) return;
+		// APU Zen 4 de nueva generación: el campo graphics contiene el modelo (ej. "Radeon 740M"), no solo "Radeon"
+		Procesador cpu = componenteMasBarato(Procesador.class,
+				c -> "AM5".equals(c.getSocket()) && c.getGraficaIntegrada() != null && c.getGraficaIntegrada().length() > "Radeon".length());
+		PlacaBase placa = componenteMasBarato(PlacaBase.class,
+				p -> "AM5".equals(p.getSocket()) && "DDR5".equalsIgnoreCase(p.getTipoDDR()) && p.getFactorForma() != null && p.getFactorForma().toUpperCase().contains("MICRO"));
+		MemoriaRAM ram = componenteMasBarato(MemoriaRAM.class,
+				r -> "DDR5".equalsIgnoreCase(r.getTipoDDR()) && r.getNumModulos() != null && r.getNumModulos() == 2 && r.getGbPorModulo() != null && r.getGbPorModulo() == 16);
+		Almacenamiento ssd = componenteMasBarato(Almacenamiento.class,
+				s -> "SSD".equalsIgnoreCase(s.getTipo()) && s.getCapacidad() != null && s.getCapacidad() >= 1000 && s.getCapacidad() < 2000);
+		FuenteAlimentacion psu = componenteMasBarato(FuenteAlimentacion.class,
+				f -> f.getPotencia() != null && f.getPotencia() >= 600);
 		Caja caja = componenteMasBarato(Caja.class,
 				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("MICROATX"));
+		Premontado p = new Premontado();
+		p.setTipoUsoPrevisto("Ofimática AM5");
+		p.setFavorita(Boolean.FALSE);
+		p.setDescripcion("APU Zen 4 en plataforma AM5 con DDR5. Gráfica integrada RDNA3 capaz de 4K, corrección de fotos básica y soporte multi-monitor sin GPU discreta.");
+		p.setMarca("OptimaPC");
+		p.setDescuento(0);
+		p.setSistemaOperativo(TipoSO.WINDOWS);
+		p.setStock(10);
+		p.setEsReacondicionado(Boolean.FALSE);
+		p.setUsosPrevistos(Set.of(TipoUso.OFIMATICA, TipoUso.PROGRAMACION));
+		agregarComponente(p, "CPU", cpu, 1);
+		agregarComponente(p, "Placa base", placa, 1);
+		agregarComponente(p, "RAM", ram, 1);
+		agregarComponente(p, "Almacenamiento", ssd, 1);
+		agregarComponente(p, "Fuente", psu, 1);
+		agregarComponente(p, "Caja", caja, 1);
+		entityManager.persist(p);
+	}
 
-		Premontado premontado = new Premontado();
-		premontado.setTipoUsoPrevisto("Equilibrado económico");
-		premontado.setFavorita(Boolean.FALSE);
-		premontado.setDescripcion("Configuración equilibrada para subir de nivel respecto a la gama de entrada sin disparar el presupuesto.");
-		premontado.setMarca("OptimaPC");
-		premontado.setDescuento(0);
-		premontado.setSistemaOperativo(TipoSO.WINDOWS);
-		premontado.setStock(10);
-		premontado.setEsReacondicionado(Boolean.FALSE);
-		premontado.setUsosPrevistos(Set.of(TipoUso.OFIMATICA, TipoUso.PROGRAMACION, TipoUso.EDICION));
-		agregarComponente(premontado, "CPU", procesador, 1);
-		agregarComponente(premontado, "Placa base", placaBase, 1);
-		agregarComponente(premontado, "RAM", memoriaRAM, 2);
-		agregarComponente(premontado, "Almacenamiento", almacenamiento, 1);
-		agregarComponente(premontado, "Fuente", fuenteAlimentacion, 1);
-		agregarComponente(premontado, "Caja", caja, 1);
-		entityManager.persist(premontado);
+	private void asegurarPremontadoOficinaProfesional() {
+		if (existePremontadoConTipoUsoPrevisto("Oficina profesional")) return;
+		// APU AM5 de alta gama (Radeon 780M): precio >= 250
+		Procesador cpu = componenteMasBarato(Procesador.class,
+				c -> "AM5".equals(c.getSocket()) && c.getGraficaIntegrada() != null && c.getGraficaIntegrada().length() > "Radeon".length() && c.getPrecio() != null && c.getPrecio() >= 250.0);
+		PlacaBase placa = componenteMasBarato(PlacaBase.class,
+				p -> "AM5".equals(p.getSocket()) && "DDR5".equalsIgnoreCase(p.getTipoDDR()));
+		MemoriaRAM ram = componenteMasBarato(MemoriaRAM.class,
+				r -> "DDR5".equalsIgnoreCase(r.getTipoDDR()) && r.getNumModulos() != null && r.getNumModulos() == 2 && r.getGbPorModulo() != null && r.getGbPorModulo() == 16);
+		Almacenamiento ssd = componenteMasBarato(Almacenamiento.class,
+				s -> "SSD".equalsIgnoreCase(s.getTipo()) && s.getCapacidad() != null && s.getCapacidad() >= 2000 && s.getCapacidad() < 4000);
+		FuenteAlimentacion psu = componenteMasBarato(FuenteAlimentacion.class,
+				f -> f.getPotencia() != null && f.getPotencia() >= 650);
+		Caja caja = componenteMasBarato(Caja.class,
+				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
+		Premontado p = new Premontado();
+		p.setTipoUsoPrevisto("Oficina profesional");
+		p.setFavorita(Boolean.FALSE);
+		p.setDescripcion("Workstation de oficina con APU Radeon 780M, 32 GB DDR5 y 2 TB. Ideal para PYMES, soporte multi-monitor y aplicaciones ERP sin GPU dedicada.");
+		p.setMarca("OptimaWork");
+		p.setDescuento(0);
+		p.setSistemaOperativo(TipoSO.WINDOWS);
+		p.setStock(8);
+		p.setEsReacondicionado(Boolean.FALSE);
+		p.setUsosPrevistos(Set.of(TipoUso.OFIMATICA, TipoUso.PROGRAMACION));
+		agregarComponente(p, "CPU", cpu, 1);
+		agregarComponente(p, "Placa base", placa, 1);
+		agregarComponente(p, "RAM", ram, 1);
+		agregarComponente(p, "Almacenamiento", ssd, 1);
+		agregarComponente(p, "Fuente", psu, 1);
+		agregarComponente(p, "Caja", caja, 1);
+		entityManager.persist(p);
+	}
+
+	// ── PROGRAMACIÓN ─────────────────────────────────────────────────────────
+
+	private void asegurarPremontadoProgramacionWeb() {
+		if (existePremontadoConTipoUsoPrevisto("Programación web")) return;
+		Procesador cpu = componenteMasBarato(Procesador.class,
+				c -> "AM4".equals(c.getSocket()) && c.getGraficaIntegrada() != null && !c.getGraficaIntegrada().isBlank() && c.getNucleos() != null && c.getNucleos() >= 6);
+		PlacaBase placa = componenteMasBarato(PlacaBase.class,
+				p -> "AM4".equals(p.getSocket()) && "DDR4".equalsIgnoreCase(p.getTipoDDR()) && p.getFactorForma() != null && p.getFactorForma().toUpperCase().contains("MICRO"));
+		MemoriaRAM ram = componenteMasBarato(MemoriaRAM.class,
+				r -> "DDR4".equalsIgnoreCase(r.getTipoDDR()) && r.getNumModulos() != null && r.getNumModulos() == 2 && r.getGbPorModulo() != null && r.getGbPorModulo() == 8);
+		Almacenamiento ssd = componenteMasBarato(Almacenamiento.class,
+				s -> "SSD".equalsIgnoreCase(s.getTipo()) && s.getCapacidad() != null && s.getCapacidad() >= 1000 && s.getCapacidad() < 2000);
+		FuenteAlimentacion psu = componenteMasBarato(FuenteAlimentacion.class,
+				f -> f.getPotencia() != null && f.getPotencia() >= 500);
+		Caja caja = componenteMasBarato(Caja.class,
+				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("MICROATX"));
+		Premontado p = new Premontado();
+		p.setTipoUsoPrevisto("Programación web");
+		p.setFavorita(Boolean.FALSE);
+		p.setDescripcion("Equipo compacto y silencioso para desarrollo frontend/backend. APU con 16 GB de RAM para el IDE, el navegador y un servidor local simultáneamente.");
+		p.setMarca("OptimaPC");
+		p.setDescuento(0);
+		p.setSistemaOperativo(TipoSO.LINUX);
+		p.setStock(10);
+		p.setEsReacondicionado(Boolean.FALSE);
+		p.setUsosPrevistos(Set.of(TipoUso.PROGRAMACION));
+		agregarComponente(p, "CPU", cpu, 1);
+		agregarComponente(p, "Placa base", placa, 1);
+		agregarComponente(p, "RAM", ram, 1);
+		agregarComponente(p, "Almacenamiento", ssd, 1);
+		agregarComponente(p, "Fuente", psu, 1);
+		agregarComponente(p, "Caja", caja, 1);
+		entityManager.persist(p);
+	}
+
+	private void asegurarPremontadoProgramacionFullStack() {
+		if (existePremontadoConTipoUsoPrevisto("Programación full stack")) return;
+		Procesador cpu = componenteMasBarato(Procesador.class,
+				c -> "AM4".equals(c.getSocket()) && c.getGraficaIntegrada() != null && !c.getGraficaIntegrada().isBlank() && c.getNucleos() != null && c.getNucleos() >= 8);
+		PlacaBase placa = componenteMasBarato(PlacaBase.class,
+				p -> "AM4".equals(p.getSocket()) && "DDR4".equalsIgnoreCase(p.getTipoDDR()));
+		MemoriaRAM ram = componenteMasBarato(MemoriaRAM.class,
+				r -> "DDR4".equalsIgnoreCase(r.getTipoDDR()) && r.getNumModulos() != null && r.getNumModulos() == 2 && r.getGbPorModulo() != null && r.getGbPorModulo() == 16);
+		Almacenamiento ssd = componenteMasBarato(Almacenamiento.class,
+				s -> "SSD".equalsIgnoreCase(s.getTipo()) && s.getCapacidad() != null && s.getCapacidad() >= 2000 && s.getCapacidad() < 4000);
+		FuenteAlimentacion psu = componenteMasBarato(FuenteAlimentacion.class,
+				f -> f.getPotencia() != null && f.getPotencia() >= 600);
+		Caja caja = componenteMasBarato(Caja.class,
+				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
+		Premontado p = new Premontado();
+		p.setTipoUsoPrevisto("Programación full stack");
+		p.setFavorita(Boolean.FALSE);
+		p.setDescripcion("32 GB de RAM y 2 TB SSD para varios proyectos, bases de datos locales, máquinas virtuales ligeras e IDEs exigentes sin compromisos.");
+		p.setMarca("OptimaPC");
+		p.setDescuento(0);
+		p.setSistemaOperativo(TipoSO.LINUX);
+		p.setStock(8);
+		p.setEsReacondicionado(Boolean.FALSE);
+		p.setUsosPrevistos(Set.of(TipoUso.PROGRAMACION, TipoUso.OFIMATICA));
+		agregarComponente(p, "CPU", cpu, 1);
+		agregarComponente(p, "Placa base", placa, 1);
+		agregarComponente(p, "RAM", ram, 1);
+		agregarComponente(p, "Almacenamiento", ssd, 1);
+		agregarComponente(p, "Fuente", psu, 1);
+		agregarComponente(p, "Caja", caja, 1);
+		entityManager.persist(p);
+	}
+
+	private void asegurarPremontadoDevOps() {
+		if (existePremontadoConTipoUsoPrevisto("DevOps y contenedores")) return;
+		// 12 núcleos AM4 sin iGPU para compilaciones y contenedores + GPU de display básica
+		Procesador cpu = componenteMasBarato(Procesador.class,
+				c -> "AM4".equals(c.getSocket()) && (c.getGraficaIntegrada() == null || c.getGraficaIntegrada().isBlank()) && c.getNucleos() != null && c.getNucleos() >= 12);
+		TarjetaGrafica gpu = componenteMasBarato(TarjetaGrafica.class,
+				g -> g.getPrecio() != null && g.getPrecio() <= 130.0);
+		PlacaBase placa = componenteMasBarato(PlacaBase.class,
+				p -> "AM4".equals(p.getSocket()) && "DDR4".equalsIgnoreCase(p.getTipoDDR()));
+		MemoriaRAM ram = componenteMasBarato(MemoriaRAM.class,
+				r -> "DDR4".equalsIgnoreCase(r.getTipoDDR()) && r.getNumModulos() != null && r.getNumModulos() == 2 && r.getGbPorModulo() != null && r.getGbPorModulo() == 16);
+		Almacenamiento ssd = componenteMasBarato(Almacenamiento.class,
+				s -> "SSD".equalsIgnoreCase(s.getTipo()) && s.getCapacidad() != null && s.getCapacidad() >= 2000 && s.getCapacidad() < 4000);
+		FuenteAlimentacion psu = componenteMasBarato(FuenteAlimentacion.class,
+				f -> f.getPotencia() != null && f.getPotencia() >= 650);
+		Caja caja = componenteMasBarato(Caja.class,
+				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
+		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
+				r -> r.getPrecio() != null && r.getPrecio() >= 25.0);
+		Premontado p = new Premontado();
+		p.setTipoUsoPrevisto("DevOps y contenedores");
+		p.setFavorita(Boolean.FALSE);
+		p.setDescripcion("12 núcleos Zen 3 para compilaciones paralelas, stacks Docker y pipelines CI/CD locales. 32 GB RAM y 2 TB SSD para imágenes y volúmenes grandes.");
+		p.setMarca("OptimaWork");
+		p.setDescuento(0);
+		p.setSistemaOperativo(TipoSO.LINUX);
+		p.setStock(6);
+		p.setEsReacondicionado(Boolean.FALSE);
+		p.setUsosPrevistos(Set.of(TipoUso.PROGRAMACION));
+		agregarComponente(p, "CPU", cpu, 1);
+		agregarComponente(p, "GPU", gpu, 1);
+		agregarComponente(p, "Placa base", placa, 1);
+		agregarComponente(p, "RAM", ram, 1);
+		agregarComponente(p, "Almacenamiento", ssd, 1);
+		agregarComponente(p, "Fuente", psu, 1);
+		agregarComponente(p, "Caja", caja, 1);
+		agregarComponente(p, "Refrigeración", cooler, 1);
+		entityManager.persist(p);
+	}
+
+	private void asegurarPremontadoDataScience() {
+		if (existePremontadoConTipoUsoPrevisto("Data science")) return;
+		Procesador cpu = componenteMasBarato(Procesador.class,
+				c -> "AM5".equals(c.getSocket()) && c.getNucleos() != null && c.getNucleos() >= 12 && c.getPrecio() != null && c.getPrecio() >= 300.0);
+		TarjetaGrafica gpu = componenteMasBarato(TarjetaGrafica.class,
+				g -> g.getPrecio() != null && g.getPrecio() >= 380.0 && g.getPrecio() <= 540.0);
+		PlacaBase placa = componenteMasBarato(PlacaBase.class,
+				p -> "AM5".equals(p.getSocket()) && "DDR5".equalsIgnoreCase(p.getTipoDDR()));
+		MemoriaRAM ram = componenteMasBarato(MemoriaRAM.class,
+				r -> "DDR5".equalsIgnoreCase(r.getTipoDDR()) && r.getNumModulos() != null && r.getNumModulos() == 2 && r.getGbPorModulo() != null && r.getGbPorModulo() == 16);
+		Almacenamiento ssd = componenteMasBarato(Almacenamiento.class,
+				s -> "SSD".equalsIgnoreCase(s.getTipo()) && s.getCapacidad() != null && s.getCapacidad() >= 2000 && s.getCapacidad() < 4000);
+		FuenteAlimentacion psu = componenteMasBarato(FuenteAlimentacion.class,
+				f -> f.getPotencia() != null && f.getPotencia() >= 750);
+		Caja caja = componenteMasBarato(Caja.class,
+				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
+		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
+				r -> r.getTamano() != null && r.getTamano().contains("240"));
+		Premontado p = new Premontado();
+		p.setTipoUsoPrevisto("Data science");
+		p.setFavorita(Boolean.FALSE);
+		p.setDescripcion("Plataforma AM5 de 12 núcleos con GPU CUDA para acelerar notebooks de machine learning. 32 GB DDR5 y 2 TB NVMe para datasets locales y entornos conda.");
+		p.setMarca("OptimaWork");
+		p.setDescuento(0);
+		p.setSistemaOperativo(TipoSO.LINUX);
+		p.setStock(5);
+		p.setEsReacondicionado(Boolean.FALSE);
+		p.setUsosPrevistos(Set.of(TipoUso.PROGRAMACION, TipoUso.EDICION));
+		agregarComponente(p, "CPU", cpu, 1);
+		agregarComponente(p, "GPU", gpu, 1);
+		agregarComponente(p, "Placa base", placa, 1);
+		agregarComponente(p, "RAM", ram, 1);
+		agregarComponente(p, "Almacenamiento", ssd, 1);
+		agregarComponente(p, "Fuente", psu, 1);
+		agregarComponente(p, "Caja", caja, 1);
+		agregarComponente(p, "Refrigeración", cooler, 1);
+		entityManager.persist(p);
+	}
+
+	// ── GAMING ───────────────────────────────────────────────────────────────
+
+	private void asegurarPremontadoGamingEntrada1080p() {
+		if (existePremontadoConTipoUsoPrevisto("Gaming entrada 1080p")) return;
+		Procesador cpu = componenteMasBarato(Procesador.class,
+				c -> "AM4".equals(c.getSocket()) && (c.getGraficaIntegrada() == null || c.getGraficaIntegrada().isBlank()) && c.getNucleos() != null && c.getNucleos() >= 6);
+		TarjetaGrafica gpu = componenteMasBarato(TarjetaGrafica.class,
+				g -> g.getPrecio() != null && g.getPrecio() >= 220.0 && g.getPrecio() <= 285.0);
+		PlacaBase placa = componenteMasBarato(PlacaBase.class,
+				p -> "AM4".equals(p.getSocket()) && "DDR4".equalsIgnoreCase(p.getTipoDDR()));
+		MemoriaRAM ram = componenteMasBarato(MemoriaRAM.class,
+				r -> "DDR4".equalsIgnoreCase(r.getTipoDDR()) && r.getNumModulos() != null && r.getNumModulos() == 2 && r.getGbPorModulo() != null && r.getGbPorModulo() == 8);
+		Almacenamiento ssd = componenteMasBarato(Almacenamiento.class,
+				s -> "SSD".equalsIgnoreCase(s.getTipo()) && s.getCapacidad() != null && s.getCapacidad() >= 1000 && s.getCapacidad() < 2000);
+		FuenteAlimentacion psu = componenteMasBarato(FuenteAlimentacion.class,
+				f -> f.getPotencia() != null && f.getPotencia() >= 600);
+		Caja caja = componenteMasBarato(Caja.class,
+				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
+		Premontado p = new Premontado();
+		p.setTipoUsoPrevisto("Gaming entrada 1080p");
+		p.setFavorita(Boolean.FALSE);
+		p.setDescripcion("Primera PC gaming a precio mínimo. GPU de entrada para jugar títulos competitivos en 1080p a más de 60 FPS con ajustes medios-altos.");
+		p.setMarca("OptimaPC");
+		p.setDescuento(10);
+		p.setSistemaOperativo(TipoSO.WINDOWS);
+		p.setStock(12);
+		p.setEsReacondicionado(Boolean.FALSE);
+		p.setUsosPrevistos(Set.of(TipoUso.GAMING));
+		agregarComponente(p, "CPU", cpu, 1);
+		agregarComponente(p, "GPU", gpu, 1);
+		agregarComponente(p, "Placa base", placa, 1);
+		agregarComponente(p, "RAM", ram, 1);
+		agregarComponente(p, "Almacenamiento", ssd, 1);
+		agregarComponente(p, "Fuente", psu, 1);
+		agregarComponente(p, "Caja", caja, 1);
+		entityManager.persist(p);
 	}
 
 	private void asegurarPremontadoGamingEconomico() {
-		if (existePremontadoConTipoUsoPrevisto("Gaming económico")) {
-			return;
-		}
-
-		Procesador procesador = componenteMasBarato(Procesador.class,
-				cpu -> "AM4".equals(cpu.getSocket()) && cpu.getGraficaIntegrada() == null);
-		TarjetaGrafica tarjetaGrafica = componenteMasBarato(TarjetaGrafica.class,
-				gpu -> gpu.getPrecio() != null && gpu.getPrecio() <= 250.0);
-		PlacaBase placaBase = componenteMasBarato(PlacaBase.class,
-				placa -> "AM4".equals(placa.getSocket()) && "DDR4".equalsIgnoreCase(placa.getTipoDDR()));
-		MemoriaRAM memoriaRAM = componenteMasBarato(MemoriaRAM.class,
-				ram -> "DDR4".equalsIgnoreCase(ram.getTipoDDR()) && ram.getNumModulos() != null && ram.getNumModulos() == 2 && ram.getGbPorModulo() != null && ram.getGbPorModulo() == 16);
-		Almacenamiento almacenamiento = componenteMasBarato(Almacenamiento.class,
-				ssd -> "SSD".equalsIgnoreCase(ssd.getTipo()) && ssd.getCapacidad() != null && ssd.getCapacidad() >= 1000);
-		FuenteAlimentacion fuenteAlimentacion = componenteMasBarato(FuenteAlimentacion.class,
-				fuente -> fuente.getPotencia() != null && fuente.getPotencia() >= 600);
+		if (existePremontadoConTipoUsoPrevisto("Gaming económico")) return;
+		Procesador cpu = componenteMasBarato(Procesador.class,
+				c -> "AM4".equals(c.getSocket()) && (c.getGraficaIntegrada() == null || c.getGraficaIntegrada().isBlank()) && c.getNucleos() != null && c.getNucleos() >= 6 && c.getPrecio() != null && c.getPrecio() >= 140.0);
+		TarjetaGrafica gpu = componenteMasBarato(TarjetaGrafica.class,
+				g -> g.getPrecio() != null && g.getPrecio() >= 250.0 && g.getPrecio() <= 320.0);
+		PlacaBase placa = componenteMasBarato(PlacaBase.class,
+				p -> "AM4".equals(p.getSocket()) && "DDR4".equalsIgnoreCase(p.getTipoDDR()));
+		MemoriaRAM ram = componenteMasBarato(MemoriaRAM.class,
+				r -> "DDR4".equalsIgnoreCase(r.getTipoDDR()) && r.getNumModulos() != null && r.getNumModulos() == 2 && r.getGbPorModulo() != null && r.getGbPorModulo() == 8);
+		Almacenamiento ssd = componenteMasBarato(Almacenamiento.class,
+				s -> "SSD".equalsIgnoreCase(s.getTipo()) && s.getCapacidad() != null && s.getCapacidad() >= 1000 && s.getCapacidad() < 2000);
+		FuenteAlimentacion psu = componenteMasBarato(FuenteAlimentacion.class,
+				f -> f.getPotencia() != null && f.getPotencia() >= 600);
 		Caja caja = componenteMasBarato(Caja.class,
 				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
+		Premontado p = new Premontado();
+		p.setTipoUsoPrevisto("Gaming económico");
+		p.setFavorita(Boolean.TRUE);
+		p.setDescripcion("Equipo gaming por debajo de los 900 €. GPU de generación actual para 1080p a 60+ FPS en títulos AAA con ajustes altos. Excelente relación calidad-precio.");
+		p.setMarca("OptimaPC");
+		p.setDescuento(5);
+		p.setSistemaOperativo(TipoSO.WINDOWS);
+		p.setStock(10);
+		p.setEsReacondicionado(Boolean.FALSE);
+		p.setUsosPrevistos(Set.of(TipoUso.GAMING, TipoUso.STREAMING));
+		agregarComponente(p, "CPU", cpu, 1);
+		agregarComponente(p, "GPU", gpu, 1);
+		agregarComponente(p, "Placa base", placa, 1);
+		agregarComponente(p, "RAM", ram, 1);
+		agregarComponente(p, "Almacenamiento", ssd, 1);
+		agregarComponente(p, "Fuente", psu, 1);
+		agregarComponente(p, "Caja", caja, 1);
+		entityManager.persist(p);
+	}
 
-		Premontado premontado = new Premontado();
-		premontado.setTipoUsoPrevisto("Gaming económico");
-		premontado.setFavorita(Boolean.TRUE);
-		premontado.setDescripcion("Equipo gaming económico por debajo de los mil euros para jugar en 1080p con una GPU de entrada.");
-		premontado.setMarca("OptimaPC");
-		premontado.setDescuento(5);
-		premontado.setSistemaOperativo(TipoSO.WINDOWS);
-		premontado.setStock(8);
-		premontado.setEsReacondicionado(Boolean.FALSE);
-		premontado.setUsosPrevistos(Set.of(TipoUso.GAMING, TipoUso.STREAMING));
-		agregarComponente(premontado, "CPU", procesador, 1);
-		agregarComponente(premontado, "GPU", tarjetaGrafica, 1);
-		agregarComponente(premontado, "Placa base", placaBase, 1);
-		agregarComponente(premontado, "RAM", memoriaRAM, 2);
-		agregarComponente(premontado, "Almacenamiento", almacenamiento, 1);
-		agregarComponente(premontado, "Fuente", fuenteAlimentacion, 1);
-		agregarComponente(premontado, "Caja", caja, 1);
-		entityManager.persist(premontado);
+	private void asegurarPremontadoGamingEquilibrado1080p() {
+		if (existePremontadoConTipoUsoPrevisto("Gaming equilibrado 1080p")) return;
+		Procesador cpu = componenteMasBarato(Procesador.class,
+				c -> "AM5".equals(c.getSocket()) && c.getNucleos() != null && c.getNucleos() >= 6 && c.getPrecio() != null && c.getPrecio() >= 150.0 && c.getPrecio() <= 230.0);
+		TarjetaGrafica gpu = componenteMasBarato(TarjetaGrafica.class,
+				g -> g.getPrecio() != null && g.getPrecio() >= 360.0 && g.getPrecio() <= 520.0);
+		PlacaBase placa = componenteMasBarato(PlacaBase.class,
+				p -> "AM5".equals(p.getSocket()) && "DDR5".equalsIgnoreCase(p.getTipoDDR()));
+		MemoriaRAM ram = componenteMasBarato(MemoriaRAM.class,
+				r -> "DDR5".equalsIgnoreCase(r.getTipoDDR()) && r.getNumModulos() != null && r.getNumModulos() == 2 && r.getGbPorModulo() != null && r.getGbPorModulo() == 16);
+		Almacenamiento ssd = componenteMasBarato(Almacenamiento.class,
+				s -> "SSD".equalsIgnoreCase(s.getTipo()) && s.getCapacidad() != null && s.getCapacidad() >= 1000 && s.getCapacidad() < 2000);
+		FuenteAlimentacion psu = componenteMasBarato(FuenteAlimentacion.class,
+				f -> f.getPotencia() != null && f.getPotencia() >= 650);
+		Caja caja = componenteMasBarato(Caja.class,
+				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
+		Premontado p = new Premontado();
+		p.setTipoUsoPrevisto("Gaming equilibrado 1080p");
+		p.setFavorita(Boolean.FALSE);
+		p.setDescripcion("Plataforma AM5 moderna con GPU de gama media para 1080p máximos o 1440p en ajustes medios. 32 GB DDR5 y amplia vida útil gracias al socket AM5.");
+		p.setMarca("OptimaPC");
+		p.setDescuento(0);
+		p.setSistemaOperativo(TipoSO.WINDOWS);
+		p.setStock(8);
+		p.setEsReacondicionado(Boolean.FALSE);
+		p.setUsosPrevistos(Set.of(TipoUso.GAMING));
+		agregarComponente(p, "CPU", cpu, 1);
+		agregarComponente(p, "GPU", gpu, 1);
+		agregarComponente(p, "Placa base", placa, 1);
+		agregarComponente(p, "RAM", ram, 1);
+		agregarComponente(p, "Almacenamiento", ssd, 1);
+		agregarComponente(p, "Fuente", psu, 1);
+		agregarComponente(p, "Caja", caja, 1);
+		entityManager.persist(p);
+	}
+
+	private void asegurarPremontadoGamingAlto1080p() {
+		if (existePremontadoConTipoUsoPrevisto("Gaming alto 1080p")) return;
+		// Ryzen 7 5700X3D: AM4, 8 núcleos, ~313 €
+		Procesador cpu = componenteMasBarato(Procesador.class,
+				c -> "AM4".equals(c.getSocket()) && (c.getGraficaIntegrada() == null || c.getGraficaIntegrada().isBlank()) && c.getNucleos() != null && c.getNucleos() >= 8 && c.getPrecio() != null && c.getPrecio() >= 290.0);
+		TarjetaGrafica gpu = componenteMasBarato(TarjetaGrafica.class,
+				g -> g.getPrecio() != null && g.getPrecio() >= 420.0 && g.getPrecio() <= 650.0);
+		PlacaBase placa = componenteMasBarato(PlacaBase.class,
+				p -> "AM4".equals(p.getSocket()) && "DDR4".equalsIgnoreCase(p.getTipoDDR()));
+		MemoriaRAM ram = componenteMasBarato(MemoriaRAM.class,
+				r -> "DDR4".equalsIgnoreCase(r.getTipoDDR()) && r.getNumModulos() != null && r.getNumModulos() == 2 && r.getGbPorModulo() != null && r.getGbPorModulo() == 16);
+		Almacenamiento ssd = componenteMasBarato(Almacenamiento.class,
+				s -> "SSD".equalsIgnoreCase(s.getTipo()) && s.getCapacidad() != null && s.getCapacidad() >= 1000 && s.getCapacidad() < 2000);
+		FuenteAlimentacion psu = componenteMasBarato(FuenteAlimentacion.class,
+				f -> f.getPotencia() != null && f.getPotencia() >= 750);
+		Caja caja = componenteMasBarato(Caja.class,
+				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
+		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
+				r -> r.getPrecio() != null && r.getPrecio() >= 30.0 && (r.getTamano() == null || r.getTamano().isBlank()));
+		Premontado p = new Premontado();
+		p.setTipoUsoPrevisto("Gaming alto 1080p");
+		p.setFavorita(Boolean.FALSE);
+		p.setDescripcion("CPU con caché 3D para máximo FPS en juegos competitivos 1080p. GPU de gama media sólida que supera los 100 FPS en todos los títulos AAA actuales.");
+		p.setMarca("OptimaPC");
+		p.setDescuento(0);
+		p.setSistemaOperativo(TipoSO.WINDOWS);
+		p.setStock(7);
+		p.setEsReacondicionado(Boolean.FALSE);
+		p.setUsosPrevistos(Set.of(TipoUso.GAMING));
+		agregarComponente(p, "CPU", cpu, 1);
+		agregarComponente(p, "GPU", gpu, 1);
+		agregarComponente(p, "Placa base", placa, 1);
+		agregarComponente(p, "RAM", ram, 1);
+		agregarComponente(p, "Almacenamiento", ssd, 1);
+		agregarComponente(p, "Fuente", psu, 1);
+		agregarComponente(p, "Caja", caja, 1);
+		agregarComponente(p, "Refrigeración", cooler, 1);
+		entityManager.persist(p);
+	}
+
+	private void asegurarPremontadoGaming1440pEntrada() {
+		if (existePremontadoConTipoUsoPrevisto("Gaming 1440p entrada")) return;
+		Procesador cpu = componenteMasBarato(Procesador.class,
+				c -> "AM5".equals(c.getSocket()) && c.getNucleos() != null && c.getNucleos() >= 8 && c.getPrecio() != null && c.getPrecio() >= 220.0 && c.getPrecio() <= 310.0);
+		TarjetaGrafica gpu = componenteMasBarato(TarjetaGrafica.class,
+				g -> g.getPrecio() != null && g.getPrecio() >= 550.0 && g.getPrecio() <= 780.0);
+		PlacaBase placa = componenteMasBarato(PlacaBase.class,
+				p -> "AM5".equals(p.getSocket()) && "DDR5".equalsIgnoreCase(p.getTipoDDR()));
+		MemoriaRAM ram = componenteMasBarato(MemoriaRAM.class,
+				r -> "DDR5".equalsIgnoreCase(r.getTipoDDR()) && r.getNumModulos() != null && r.getNumModulos() == 2 && r.getGbPorModulo() != null && r.getGbPorModulo() == 16);
+		Almacenamiento ssd = componenteMasBarato(Almacenamiento.class,
+				s -> "SSD".equalsIgnoreCase(s.getTipo()) && s.getCapacidad() != null && s.getCapacidad() >= 1000 && s.getCapacidad() < 2000);
+		FuenteAlimentacion psu = componenteMasBarato(FuenteAlimentacion.class,
+				f -> f.getPotencia() != null && f.getPotencia() >= 750);
+		Caja caja = componenteMasBarato(Caja.class,
+				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
+		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
+				r -> r.getPrecio() != null && r.getPrecio() >= 30.0 && (r.getTamano() == null || r.getTamano().isBlank()));
+		Premontado p = new Premontado();
+		p.setTipoUsoPrevisto("Gaming 1440p entrada");
+		p.setFavorita(Boolean.FALSE);
+		p.setDescripcion("El salto a 1440p con GPU capaz de superar 60 FPS en títulos exigentes. Plataforma AM5 de 8 núcleos con DDR5 preparada para los próximos años.");
+		p.setMarca("OptimaPC");
+		p.setDescuento(5);
+		p.setSistemaOperativo(TipoSO.WINDOWS);
+		p.setStock(8);
+		p.setEsReacondicionado(Boolean.FALSE);
+		p.setUsosPrevistos(Set.of(TipoUso.GAMING));
+		agregarComponente(p, "CPU", cpu, 1);
+		agregarComponente(p, "GPU", gpu, 1);
+		agregarComponente(p, "Placa base", placa, 1);
+		agregarComponente(p, "RAM", ram, 1);
+		agregarComponente(p, "Almacenamiento", ssd, 1);
+		agregarComponente(p, "Fuente", psu, 1);
+		agregarComponente(p, "Caja", caja, 1);
+		agregarComponente(p, "Refrigeración", cooler, 1);
+		entityManager.persist(p);
+	}
+
+	private void asegurarPremontadoGaming1440p() {
+		if (existePremontadoConTipoUsoPrevisto("Gaming 1440p")) return;
+		// Ryzen 7 7800X3D: AM5, 8 núcleos, ~340 €
+		Procesador cpu = componenteMasBarato(Procesador.class,
+				c -> "AM5".equals(c.getSocket()) && c.getNucleos() != null && c.getNucleos() >= 8 && c.getPrecio() != null && c.getPrecio() >= 310.0 && c.getPrecio() <= 400.0);
+		TarjetaGrafica gpu = componenteMasBarato(TarjetaGrafica.class,
+				g -> g.getPrecio() != null && g.getPrecio() >= 700.0 && g.getPrecio() <= 1060.0);
+		PlacaBase placa = componenteMasBarato(PlacaBase.class,
+				p -> "AM5".equals(p.getSocket()) && "DDR5".equalsIgnoreCase(p.getTipoDDR()));
+		MemoriaRAM ram = componenteMasBarato(MemoriaRAM.class,
+				r -> "DDR5".equalsIgnoreCase(r.getTipoDDR()) && r.getNumModulos() != null && r.getNumModulos() == 2 && r.getGbPorModulo() != null && r.getGbPorModulo() == 16);
+		Almacenamiento ssd = componenteMasBarato(Almacenamiento.class,
+				s -> "SSD".equalsIgnoreCase(s.getTipo()) && s.getCapacidad() != null && s.getCapacidad() >= 2000 && s.getCapacidad() < 4000);
+		FuenteAlimentacion psu = componenteMasBarato(FuenteAlimentacion.class,
+				f -> f.getPotencia() != null && f.getPotencia() >= 850);
+		Caja caja = componenteMasBarato(Caja.class,
+				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
+		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
+				r -> r.getTamano() != null && r.getTamano().contains("240"));
+		Premontado p = new Premontado();
+		p.setTipoUsoPrevisto("Gaming 1440p");
+		p.setFavorita(Boolean.TRUE);
+		p.setDescripcion("El mejor punto dulce gaming del catálogo. CPU con caché 3D líder en FPS + GPU de gama alta para 1440p a más de 100 FPS en todos los juegos actuales con ajustes máximos.");
+		p.setMarca("OptimaPC");
+		p.setDescuento(0);
+		p.setSistemaOperativo(TipoSO.WINDOWS);
+		p.setStock(6);
+		p.setEsReacondicionado(Boolean.FALSE);
+		p.setUsosPrevistos(Set.of(TipoUso.GAMING, TipoUso.STREAMING));
+		agregarComponente(p, "CPU", cpu, 1);
+		agregarComponente(p, "GPU", gpu, 1);
+		agregarComponente(p, "Placa base", placa, 1);
+		agregarComponente(p, "RAM", ram, 1);
+		agregarComponente(p, "Almacenamiento", ssd, 1);
+		agregarComponente(p, "Fuente", psu, 1);
+		agregarComponente(p, "Caja", caja, 1);
+		agregarComponente(p, "Refrigeración", cooler, 1);
+		entityManager.persist(p);
+	}
+
+	private void asegurarPremontadoGaming1440pAlto() {
+		if (existePremontadoConTipoUsoPrevisto("Gaming 1440p alto")) return;
+		Procesador cpu = componenteMasBarato(Procesador.class,
+				c -> "AM5".equals(c.getSocket()) && c.getNucleos() != null && c.getNucleos() >= 12 && c.getPrecio() != null && c.getPrecio() >= 330.0 && c.getPrecio() <= 430.0);
+		TarjetaGrafica gpu = componenteMasBarato(TarjetaGrafica.class,
+				g -> g.getPrecio() != null && g.getPrecio() >= 950.0 && g.getPrecio() <= 1450.0);
+		PlacaBase placa = componenteMasBarato(PlacaBase.class,
+				p -> "AM5".equals(p.getSocket()) && "DDR5".equalsIgnoreCase(p.getTipoDDR()));
+		MemoriaRAM ram = componenteMasBarato(MemoriaRAM.class,
+				r -> "DDR5".equalsIgnoreCase(r.getTipoDDR()) && r.getNumModulos() != null && r.getNumModulos() == 2 && r.getGbPorModulo() != null && r.getGbPorModulo() == 16);
+		Almacenamiento ssd = componenteMasBarato(Almacenamiento.class,
+				s -> "SSD".equalsIgnoreCase(s.getTipo()) && s.getCapacidad() != null && s.getCapacidad() >= 2000 && s.getCapacidad() < 4000);
+		FuenteAlimentacion psu = componenteMasBarato(FuenteAlimentacion.class,
+				f -> f.getPotencia() != null && f.getPotencia() >= 850);
+		Caja caja = componenteMasBarato(Caja.class,
+				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
+		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
+				r -> r.getTamano() != null && r.getTamano().contains("360"));
+		Premontado p = new Premontado();
+		p.setTipoUsoPrevisto("Gaming 1440p alto");
+		p.setFavorita(Boolean.FALSE);
+		p.setDescripcion("Potencia de sobra para 1440p a alta tasa de refresco o 4K casual. CPU de 12 núcleos con margen para streaming simultáneo y GPU de primera línea.");
+		p.setMarca("OptimaPC");
+		p.setDescuento(0);
+		p.setSistemaOperativo(TipoSO.WINDOWS);
+		p.setStock(5);
+		p.setEsReacondicionado(Boolean.FALSE);
+		p.setUsosPrevistos(Set.of(TipoUso.GAMING, TipoUso.STREAMING));
+		agregarComponente(p, "CPU", cpu, 1);
+		agregarComponente(p, "GPU", gpu, 1);
+		agregarComponente(p, "Placa base", placa, 1);
+		agregarComponente(p, "RAM", ram, 1);
+		agregarComponente(p, "Almacenamiento", ssd, 1);
+		agregarComponente(p, "Fuente", psu, 1);
+		agregarComponente(p, "Caja", caja, 1);
+		agregarComponente(p, "Refrigeración", cooler, 1);
+		entityManager.persist(p);
+	}
+
+	private void asegurarPremontadoGaming4K() {
+		if (existePremontadoConTipoUsoPrevisto("Gaming 4K")) return;
+		// Ryzen 7 9800X3D: AM5, 8 núcleos, ~452 €
+		Procesador cpu = componenteMasBarato(Procesador.class,
+				c -> "AM5".equals(c.getSocket()) && c.getNucleos() != null && c.getNucleos() == 8 && c.getPrecio() != null && c.getPrecio() >= 430.0);
+		TarjetaGrafica gpu = componenteMasBarato(TarjetaGrafica.class,
+				g -> g.getPrecio() != null && g.getPrecio() >= 1300.0 && g.getPrecio() <= 2100.0);
+		PlacaBase placa = componenteMasBarato(PlacaBase.class,
+				p -> "AM5".equals(p.getSocket()) && "DDR5".equalsIgnoreCase(p.getTipoDDR()));
+		MemoriaRAM ram = componenteMasBarato(MemoriaRAM.class,
+				r -> "DDR5".equalsIgnoreCase(r.getTipoDDR()) && r.getNumModulos() != null && r.getNumModulos() == 2 && r.getGbPorModulo() != null && r.getGbPorModulo() == 16);
+		Almacenamiento ssd = componenteMasBarato(Almacenamiento.class,
+				s -> "SSD".equalsIgnoreCase(s.getTipo()) && s.getCapacidad() != null && s.getCapacidad() >= 2000 && s.getCapacidad() < 4000);
+		FuenteAlimentacion psu = componenteMasBarato(FuenteAlimentacion.class,
+				f -> f.getPotencia() != null && f.getPotencia() >= 1000);
+		Caja caja = componenteMasBarato(Caja.class,
+				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
+		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
+				r -> r.getTamano() != null && r.getTamano().contains("360"));
+		Premontado p = new Premontado();
+		p.setTipoUsoPrevisto("Gaming 4K");
+		p.setFavorita(Boolean.FALSE);
+		p.setDescripcion("La CPU gaming más rápida del mercado combinada con una GPU de élite. Juega en 4K a ajustes máximos o en 1440p a más de 165 FPS sin ninguna concesión.");
+		p.setMarca("OptimaPC");
+		p.setDescuento(0);
+		p.setSistemaOperativo(TipoSO.WINDOWS);
+		p.setStock(3);
+		p.setEsReacondicionado(Boolean.FALSE);
+		p.setUsosPrevistos(Set.of(TipoUso.GAMING));
+		agregarComponente(p, "CPU", cpu, 1);
+		agregarComponente(p, "GPU", gpu, 1);
+		agregarComponente(p, "Placa base", placa, 1);
+		agregarComponente(p, "RAM", ram, 1);
+		agregarComponente(p, "Almacenamiento", ssd, 1);
+		agregarComponente(p, "Fuente", psu, 1);
+		agregarComponente(p, "Caja", caja, 1);
+		agregarComponente(p, "Refrigeración", cooler, 1);
+		entityManager.persist(p);
+	}
+
+	private void asegurarPremontadoGamingExtremo() {
+		if (existePremontadoConTipoUsoPrevisto("Gaming extremo")) return;
+		// Ryzen 9 9950X3D: AM5, 16 núcleos, ~650 €
+		Procesador cpu = componenteMasBarato(Procesador.class,
+				c -> "AM5".equals(c.getSocket()) && c.getNucleos() != null && c.getNucleos() >= 16 && c.getPrecio() != null && c.getPrecio() >= 600.0);
+		TarjetaGrafica gpu = componenteMasBarato(TarjetaGrafica.class,
+				g -> g.getPrecio() != null && g.getPrecio() >= 2500.0);
+		PlacaBase placa = componenteMasBarato(PlacaBase.class,
+				p -> "AM5".equals(p.getSocket()) && "DDR5".equalsIgnoreCase(p.getTipoDDR()));
+		MemoriaRAM ram = componenteMasBarato(MemoriaRAM.class,
+				r -> "DDR5".equalsIgnoreCase(r.getTipoDDR()) && r.getNumModulos() != null && r.getNumModulos() == 2 && r.getGbPorModulo() != null && r.getGbPorModulo() == 32);
+		Almacenamiento ssd = componenteMasBarato(Almacenamiento.class,
+				s -> "SSD".equalsIgnoreCase(s.getTipo()) && s.getCapacidad() != null && s.getCapacidad() >= 2000 && s.getCapacidad() < 4000);
+		FuenteAlimentacion psu = componenteMasBarato(FuenteAlimentacion.class,
+				f -> f.getPotencia() != null && f.getPotencia() >= 1000);
+		Caja caja = componenteMasBarato(Caja.class,
+				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
+		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
+				r -> r.getTamano() != null && r.getTamano().contains("360"));
+		Premontado p = new Premontado();
+		p.setTipoUsoPrevisto("Gaming extremo");
+		p.setFavorita(Boolean.FALSE);
+		p.setDescripcion("Sin compromisos: 16 núcleos con 3D V-Cache y la GPU más potente del mercado. Diseñado para 4K a 120+ FPS en cualquier título presente y futuro.");
+		p.setMarca("OptimaPC");
+		p.setDescuento(0);
+		p.setSistemaOperativo(TipoSO.WINDOWS);
+		p.setStock(2);
+		p.setEsReacondicionado(Boolean.FALSE);
+		p.setUsosPrevistos(Set.of(TipoUso.GAMING));
+		agregarComponente(p, "CPU", cpu, 1);
+		agregarComponente(p, "GPU", gpu, 1);
+		agregarComponente(p, "Placa base", placa, 1);
+		agregarComponente(p, "RAM", ram, 1);
+		agregarComponente(p, "Almacenamiento", ssd, 1);
+		agregarComponente(p, "Fuente", psu, 1);
+		agregarComponente(p, "Caja", caja, 1);
+		agregarComponente(p, "Refrigeración", cooler, 1);
+		entityManager.persist(p);
+	}
+
+	private void asegurarPremontadoGamingYStreaming() {
+		if (existePremontadoConTipoUsoPrevisto("Gaming y streaming")) return;
+		Procesador cpu = componenteMasBarato(Procesador.class,
+				c -> "AM4".equals(c.getSocket()) && (c.getGraficaIntegrada() == null || c.getGraficaIntegrada().isBlank()) && c.getNucleos() != null && c.getNucleos() >= 8 && c.getPrecio() != null && c.getPrecio() >= 130.0 && c.getPrecio() <= 200.0);
+		TarjetaGrafica gpu = componenteMasBarato(TarjetaGrafica.class,
+				g -> g.getPrecio() != null && g.getPrecio() >= 400.0 && g.getPrecio() <= 570.0);
+		PlacaBase placa = componenteMasBarato(PlacaBase.class,
+				p -> "AM4".equals(p.getSocket()) && "DDR4".equalsIgnoreCase(p.getTipoDDR()));
+		MemoriaRAM ram = componenteMasBarato(MemoriaRAM.class,
+				r -> "DDR4".equalsIgnoreCase(r.getTipoDDR()) && r.getNumModulos() != null && r.getNumModulos() == 2 && r.getGbPorModulo() != null && r.getGbPorModulo() == 16);
+		Almacenamiento ssd = componenteMasBarato(Almacenamiento.class,
+				s -> "SSD".equalsIgnoreCase(s.getTipo()) && s.getCapacidad() != null && s.getCapacidad() >= 1000 && s.getCapacidad() < 2000);
+		Almacenamiento hdd = componenteMasBarato(Almacenamiento.class,
+				s -> !"SSD".equalsIgnoreCase(s.getTipo()) && s.getCapacidad() != null && s.getCapacidad() >= 2000);
+		FuenteAlimentacion psu = componenteMasBarato(FuenteAlimentacion.class,
+				f -> f.getPotencia() != null && f.getPotencia() >= 750);
+		Caja caja = componenteMasBarato(Caja.class,
+				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
+		Premontado p = new Premontado();
+		p.setTipoUsoPrevisto("Gaming y streaming");
+		p.setFavorita(Boolean.FALSE);
+		p.setDescripcion("8 núcleos para jugar y encodear en OBS sin caídas de FPS. NVENC/AMF de GPU actual para streams 1080p60. HDD de 2 TB para almacenar grabaciones largas.");
+		p.setMarca("OptimaPC");
+		p.setDescuento(5);
+		p.setSistemaOperativo(TipoSO.WINDOWS);
+		p.setStock(7);
+		p.setEsReacondicionado(Boolean.FALSE);
+		p.setUsosPrevistos(Set.of(TipoUso.GAMING, TipoUso.STREAMING));
+		agregarComponente(p, "CPU", cpu, 1);
+		agregarComponente(p, "GPU", gpu, 1);
+		agregarComponente(p, "Placa base", placa, 1);
+		agregarComponente(p, "RAM", ram, 1);
+		agregarComponente(p, "Almacenamiento", ssd, 1);
+		agregarComponente(p, "Almacenamiento", hdd, 1);
+		agregarComponente(p, "Fuente", psu, 1);
+		agregarComponente(p, "Caja", caja, 1);
+		entityManager.persist(p);
+	}
+
+	// ── EDICIÓN ──────────────────────────────────────────────────────────────
+
+	private void asegurarPremontadoEdicionFotografica() {
+		if (existePremontadoConTipoUsoPrevisto("Edición fotográfica")) return;
+		Procesador cpu = componenteMasBarato(Procesador.class,
+				c -> "AM4".equals(c.getSocket()) && (c.getGraficaIntegrada() == null || c.getGraficaIntegrada().isBlank()) && c.getNucleos() != null && c.getNucleos() >= 8 && c.getPrecio() != null && c.getPrecio() >= 130.0 && c.getPrecio() <= 200.0);
+		TarjetaGrafica gpu = componenteMasBarato(TarjetaGrafica.class,
+				g -> g.getPrecio() != null && g.getPrecio() >= 250.0 && g.getPrecio() <= 400.0);
+		PlacaBase placa = componenteMasBarato(PlacaBase.class,
+				p -> "AM4".equals(p.getSocket()) && "DDR4".equalsIgnoreCase(p.getTipoDDR()));
+		MemoriaRAM ram = componenteMasBarato(MemoriaRAM.class,
+				r -> "DDR4".equalsIgnoreCase(r.getTipoDDR()) && r.getNumModulos() != null && r.getNumModulos() == 2 && r.getGbPorModulo() != null && r.getGbPorModulo() == 16);
+		Almacenamiento ssd = componenteMasBarato(Almacenamiento.class,
+				s -> "SSD".equalsIgnoreCase(s.getTipo()) && s.getCapacidad() != null && s.getCapacidad() >= 2000 && s.getCapacidad() < 4000);
+		FuenteAlimentacion psu = componenteMasBarato(FuenteAlimentacion.class,
+				f -> f.getPotencia() != null && f.getPotencia() >= 650);
+		Caja caja = componenteMasBarato(Caja.class,
+				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
+		Premontado p = new Premontado();
+		p.setTipoUsoPrevisto("Edición fotográfica");
+		p.setFavorita(Boolean.FALSE);
+		p.setDescripcion("32 GB RAM y 2 TB NVMe para catálogos RAW en Lightroom y retoques en Photoshop sin tiempos de espera. GPU con aceleración para filtros y exportación.");
+		p.setMarca("OptimaPC");
+		p.setDescuento(0);
+		p.setSistemaOperativo(TipoSO.WINDOWS);
+		p.setStock(8);
+		p.setEsReacondicionado(Boolean.FALSE);
+		p.setUsosPrevistos(Set.of(TipoUso.EDICION));
+		agregarComponente(p, "CPU", cpu, 1);
+		agregarComponente(p, "GPU", gpu, 1);
+		agregarComponente(p, "Placa base", placa, 1);
+		agregarComponente(p, "RAM", ram, 1);
+		agregarComponente(p, "Almacenamiento", ssd, 1);
+		agregarComponente(p, "Fuente", psu, 1);
+		agregarComponente(p, "Caja", caja, 1);
+		entityManager.persist(p);
+	}
+
+	private void asegurarPremontadoEdicionVideo1080p() {
+		if (existePremontadoConTipoUsoPrevisto("Edición vídeo 1080p")) return;
+		Procesador cpu = componenteMasBarato(Procesador.class,
+				c -> "AM4".equals(c.getSocket()) && (c.getGraficaIntegrada() == null || c.getGraficaIntegrada().isBlank()) && c.getNucleos() != null && c.getNucleos() >= 12 && c.getPrecio() != null && c.getPrecio() >= 230.0);
+		TarjetaGrafica gpu = componenteMasBarato(TarjetaGrafica.class,
+				g -> g.getPrecio() != null && g.getPrecio() >= 400.0 && g.getPrecio() <= 650.0);
+		PlacaBase placa = componenteMasBarato(PlacaBase.class,
+				p -> "AM4".equals(p.getSocket()) && "DDR4".equalsIgnoreCase(p.getTipoDDR()));
+		MemoriaRAM ram = componenteMasBarato(MemoriaRAM.class,
+				r -> "DDR4".equalsIgnoreCase(r.getTipoDDR()) && r.getNumModulos() != null && r.getNumModulos() == 2 && r.getGbPorModulo() != null && r.getGbPorModulo() == 16);
+		Almacenamiento ssd = componenteMasBarato(Almacenamiento.class,
+				s -> "SSD".equalsIgnoreCase(s.getTipo()) && s.getCapacidad() != null && s.getCapacidad() >= 2000 && s.getCapacidad() < 4000);
+		FuenteAlimentacion psu = componenteMasBarato(FuenteAlimentacion.class,
+				f -> f.getPotencia() != null && f.getPotencia() >= 750);
+		Caja caja = componenteMasBarato(Caja.class,
+				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
+		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
+				r -> r.getPrecio() != null && r.getPrecio() >= 30.0 && (r.getTamano() == null || r.getTamano().isBlank()));
+		Premontado p = new Premontado();
+		p.setTipoUsoPrevisto("Edición vídeo 1080p");
+		p.setFavorita(Boolean.FALSE);
+		p.setDescripcion("12 núcleos para renderizar líneas de tiempo complejas en Premiere o Resolve. GPU acelera efectos y exportación H.265. Ideal para youtubers y videógrafos.");
+		p.setMarca("OptimaPC");
+		p.setDescuento(0);
+		p.setSistemaOperativo(TipoSO.WINDOWS);
+		p.setStock(6);
+		p.setEsReacondicionado(Boolean.FALSE);
+		p.setUsosPrevistos(Set.of(TipoUso.EDICION, TipoUso.STREAMING));
+		agregarComponente(p, "CPU", cpu, 1);
+		agregarComponente(p, "GPU", gpu, 1);
+		agregarComponente(p, "Placa base", placa, 1);
+		agregarComponente(p, "RAM", ram, 1);
+		agregarComponente(p, "Almacenamiento", ssd, 1);
+		agregarComponente(p, "Fuente", psu, 1);
+		agregarComponente(p, "Caja", caja, 1);
+		agregarComponente(p, "Refrigeración", cooler, 1);
+		entityManager.persist(p);
+	}
+
+	private void asegurarPremontadoEdicionVideo4K() {
+		if (existePremontadoConTipoUsoPrevisto("Edición vídeo 4K")) return;
+		Procesador cpu = componenteMasBarato(Procesador.class,
+				c -> "AM5".equals(c.getSocket()) && c.getNucleos() != null && c.getNucleos() >= 12 && c.getPrecio() != null && c.getPrecio() >= 300.0 && c.getPrecio() <= 380.0);
+		TarjetaGrafica gpu = componenteMasBarato(TarjetaGrafica.class,
+				g -> g.getPrecio() != null && g.getPrecio() >= 600.0 && g.getPrecio() <= 1060.0);
+		PlacaBase placa = componenteMasBarato(PlacaBase.class,
+				p -> "AM5".equals(p.getSocket()) && "DDR5".equalsIgnoreCase(p.getTipoDDR()));
+		MemoriaRAM ram = componenteMasBarato(MemoriaRAM.class,
+				r -> "DDR5".equalsIgnoreCase(r.getTipoDDR()) && r.getNumModulos() != null && r.getNumModulos() == 2 && r.getGbPorModulo() != null && r.getGbPorModulo() == 16);
+		Almacenamiento ssd = componenteMasBarato(Almacenamiento.class,
+				s -> "SSD".equalsIgnoreCase(s.getTipo()) && s.getCapacidad() != null && s.getCapacidad() >= 2000 && s.getCapacidad() < 4000);
+		Almacenamiento hdd = componenteMasBarato(Almacenamiento.class,
+				s -> !"SSD".equalsIgnoreCase(s.getTipo()) && s.getCapacidad() != null && s.getCapacidad() >= 2000);
+		FuenteAlimentacion psu = componenteMasBarato(FuenteAlimentacion.class,
+				f -> f.getPotencia() != null && f.getPotencia() >= 850);
+		Caja caja = componenteMasBarato(Caja.class,
+				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
+		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
+				r -> r.getTamano() != null && r.getTamano().contains("360"));
+		Premontado p = new Premontado();
+		p.setTipoUsoPrevisto("Edición vídeo 4K");
+		p.setFavorita(Boolean.FALSE);
+		p.setDescripcion("Edita vídeo 4K RAW sin proxies. 12 núcleos AM5 + GPU de gama alta + HDD de archivo para los proyectos terminados. Refrigeración AIO para sostenibilidad en renders largos.");
+		p.setMarca("OptimaWork");
+		p.setDescuento(0);
+		p.setSistemaOperativo(TipoSO.WINDOWS);
+		p.setStock(4);
+		p.setEsReacondicionado(Boolean.FALSE);
+		p.setUsosPrevistos(Set.of(TipoUso.EDICION, TipoUso.STREAMING));
+		agregarComponente(p, "CPU", cpu, 1);
+		agregarComponente(p, "GPU", gpu, 1);
+		agregarComponente(p, "Placa base", placa, 1);
+		agregarComponente(p, "RAM", ram, 1);
+		agregarComponente(p, "Almacenamiento", ssd, 1);
+		agregarComponente(p, "Almacenamiento", hdd, 1);
+		agregarComponente(p, "Fuente", psu, 1);
+		agregarComponente(p, "Caja", caja, 1);
+		agregarComponente(p, "Refrigeración", cooler, 1);
+		entityManager.persist(p);
+	}
+
+	private void asegurarPremontadoEdicionProfesional() {
+		if (existePremontadoConTipoUsoPrevisto("Edición profesional 4K")) return;
+		// Ryzen 9 9950X: AM5, 16 núcleos, ~534 €
+		Procesador cpu = componenteMasBarato(Procesador.class,
+				c -> "AM5".equals(c.getSocket()) && c.getNucleos() != null && c.getNucleos() >= 16 && c.getPrecio() != null && c.getPrecio() >= 500.0);
+		TarjetaGrafica gpu = componenteMasBarato(TarjetaGrafica.class,
+				g -> g.getPrecio() != null && g.getPrecio() >= 950.0 && g.getPrecio() <= 1450.0);
+		PlacaBase placa = componenteMasBarato(PlacaBase.class,
+				p -> "AM5".equals(p.getSocket()) && "DDR5".equalsIgnoreCase(p.getTipoDDR()));
+		MemoriaRAM ram = componenteMasBarato(MemoriaRAM.class,
+				r -> "DDR5".equalsIgnoreCase(r.getTipoDDR()) && r.getNumModulos() != null && r.getNumModulos() == 2 && r.getGbPorModulo() != null && r.getGbPorModulo() == 32);
+		Almacenamiento ssd = componenteMasBarato(Almacenamiento.class,
+				s -> "SSD".equalsIgnoreCase(s.getTipo()) && s.getCapacidad() != null && s.getCapacidad() >= 2000 && s.getCapacidad() < 4000);
+		FuenteAlimentacion psu = componenteMasBarato(FuenteAlimentacion.class,
+				f -> f.getPotencia() != null && f.getPotencia() >= 1000);
+		Caja caja = componenteMasBarato(Caja.class,
+				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
+		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
+				r -> r.getTamano() != null && r.getTamano().contains("360"));
+		Premontado p = new Premontado();
+		p.setTipoUsoPrevisto("Edición profesional 4K");
+		p.setFavorita(Boolean.FALSE);
+		p.setDescripcion("Workstation de alto nivel: 16 núcleos Zen 5 y 64 GB DDR5 para proyectos 4K/8K, composición multicapa y renders nocturnos en DaVinci Resolve Studio.");
+		p.setMarca("OptimaWork");
+		p.setDescuento(0);
+		p.setSistemaOperativo(TipoSO.WINDOWS);
+		p.setStock(3);
+		p.setEsReacondicionado(Boolean.FALSE);
+		p.setUsosPrevistos(Set.of(TipoUso.EDICION));
+		agregarComponente(p, "CPU", cpu, 1);
+		agregarComponente(p, "GPU", gpu, 1);
+		agregarComponente(p, "Placa base", placa, 1);
+		agregarComponente(p, "RAM", ram, 1);
+		agregarComponente(p, "Almacenamiento", ssd, 1);
+		agregarComponente(p, "Almacenamiento", ssd, 1);
+		agregarComponente(p, "Fuente", psu, 1);
+		agregarComponente(p, "Caja", caja, 1);
+		agregarComponente(p, "Refrigeración", cooler, 1);
+		entityManager.persist(p);
+	}
+
+	private void asegurarPremontadoMotionGraphics3D() {
+		if (existePremontadoConTipoUsoPrevisto("Motion graphics y 3D")) return;
+		Procesador cpu = componenteMasBarato(Procesador.class,
+				c -> "AM5".equals(c.getSocket()) && c.getNucleos() != null && c.getNucleos() >= 16 && c.getPrecio() != null && c.getPrecio() >= 500.0);
+		TarjetaGrafica gpu = componenteMasBarato(TarjetaGrafica.class,
+				g -> g.getPrecio() != null && g.getPrecio() >= 1300.0 && g.getPrecio() <= 2100.0);
+		PlacaBase placa = componenteMasBarato(PlacaBase.class,
+				p -> "AM5".equals(p.getSocket()) && "DDR5".equalsIgnoreCase(p.getTipoDDR()));
+		MemoriaRAM ram = componenteMasBarato(MemoriaRAM.class,
+				r -> "DDR5".equalsIgnoreCase(r.getTipoDDR()) && r.getNumModulos() != null && r.getNumModulos() == 2 && r.getGbPorModulo() != null && r.getGbPorModulo() == 32);
+		Almacenamiento ssd = componenteMasBarato(Almacenamiento.class,
+				s -> "SSD".equalsIgnoreCase(s.getTipo()) && s.getCapacidad() != null && s.getCapacidad() >= 2000 && s.getCapacidad() < 4000);
+		FuenteAlimentacion psu = componenteMasBarato(FuenteAlimentacion.class,
+				f -> f.getPotencia() != null && f.getPotencia() >= 1000);
+		Caja caja = componenteMasBarato(Caja.class,
+				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
+		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
+				r -> r.getTamano() != null && r.getTamano().contains("360"));
+		Premontado p = new Premontado();
+		p.setTipoUsoPrevisto("Motion graphics y 3D");
+		p.setFavorita(Boolean.FALSE);
+		p.setDescripcion("Render GPU de escenas 3D en Blender o motion graphics en After Effects acelerados por hardware. 64 GB RAM y GPU top de gama para tiempos de render mínimos.");
+		p.setMarca("OptimaWork");
+		p.setDescuento(0);
+		p.setSistemaOperativo(TipoSO.WINDOWS);
+		p.setStock(2);
+		p.setEsReacondicionado(Boolean.FALSE);
+		p.setUsosPrevistos(Set.of(TipoUso.EDICION));
+		agregarComponente(p, "CPU", cpu, 1);
+		agregarComponente(p, "GPU", gpu, 1);
+		agregarComponente(p, "Placa base", placa, 1);
+		agregarComponente(p, "RAM", ram, 1);
+		agregarComponente(p, "Almacenamiento", ssd, 1);
+		agregarComponente(p, "Almacenamiento", ssd, 1);
+		agregarComponente(p, "Fuente", psu, 1);
+		agregarComponente(p, "Caja", caja, 1);
+		agregarComponente(p, "Refrigeración", cooler, 1);
+		entityManager.persist(p);
+	}
+
+	// ── STREAMING ────────────────────────────────────────────────────────────
+
+	private void asegurarPremontadoStreamingEconomico() {
+		if (existePremontadoConTipoUsoPrevisto("Streaming económico")) return;
+		Procesador cpu = componenteMasBarato(Procesador.class,
+				c -> "AM4".equals(c.getSocket()) && (c.getGraficaIntegrada() == null || c.getGraficaIntegrada().isBlank()) && c.getNucleos() != null && c.getNucleos() >= 8 && c.getPrecio() != null && c.getPrecio() >= 130.0 && c.getPrecio() <= 200.0);
+		TarjetaGrafica gpu = componenteMasBarato(TarjetaGrafica.class,
+				g -> g.getPrecio() != null && g.getPrecio() >= 350.0 && g.getPrecio() <= 560.0);
+		PlacaBase placa = componenteMasBarato(PlacaBase.class,
+				p -> "AM4".equals(p.getSocket()) && "DDR4".equalsIgnoreCase(p.getTipoDDR()));
+		MemoriaRAM ram = componenteMasBarato(MemoriaRAM.class,
+				r -> "DDR4".equalsIgnoreCase(r.getTipoDDR()) && r.getNumModulos() != null && r.getNumModulos() == 2 && r.getGbPorModulo() != null && r.getGbPorModulo() == 16);
+		Almacenamiento ssd = componenteMasBarato(Almacenamiento.class,
+				s -> "SSD".equalsIgnoreCase(s.getTipo()) && s.getCapacidad() != null && s.getCapacidad() >= 1000 && s.getCapacidad() < 2000);
+		Almacenamiento hdd = componenteMasBarato(Almacenamiento.class,
+				s -> !"SSD".equalsIgnoreCase(s.getTipo()) && s.getCapacidad() != null && s.getCapacidad() >= 2000);
+		FuenteAlimentacion psu = componenteMasBarato(FuenteAlimentacion.class,
+				f -> f.getPotencia() != null && f.getPotencia() >= 750);
+		Caja caja = componenteMasBarato(Caja.class,
+				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
+		Premontado p = new Premontado();
+		p.setTipoUsoPrevisto("Streaming económico");
+		p.setFavorita(Boolean.FALSE);
+		p.setDescripcion("8 núcleos con margen para OBS + juego simultáneo. NVENC/AMF de GPU actual para streams 1080p60 sin impacto en FPS. HDD 2 TB para guardar VODs.");
+		p.setMarca("OptimaPC");
+		p.setDescuento(5);
+		p.setSistemaOperativo(TipoSO.WINDOWS);
+		p.setStock(7);
+		p.setEsReacondicionado(Boolean.FALSE);
+		p.setUsosPrevistos(Set.of(TipoUso.STREAMING, TipoUso.GAMING));
+		agregarComponente(p, "CPU", cpu, 1);
+		agregarComponente(p, "GPU", gpu, 1);
+		agregarComponente(p, "Placa base", placa, 1);
+		agregarComponente(p, "RAM", ram, 1);
+		agregarComponente(p, "Almacenamiento", ssd, 1);
+		agregarComponente(p, "Almacenamiento", hdd, 1);
+		agregarComponente(p, "Fuente", psu, 1);
+		agregarComponente(p, "Caja", caja, 1);
+		entityManager.persist(p);
+	}
+
+	private void asegurarPremontadoStreamingProfesional() {
+		if (existePremontadoConTipoUsoPrevisto("Streaming profesional")) return;
+		Procesador cpu = componenteMasBarato(Procesador.class,
+				c -> "AM5".equals(c.getSocket()) && c.getNucleos() != null && c.getNucleos() >= 12 && c.getPrecio() != null && c.getPrecio() >= 330.0 && c.getPrecio() <= 430.0);
+		TarjetaGrafica gpu = componenteMasBarato(TarjetaGrafica.class,
+				g -> g.getPrecio() != null && g.getPrecio() >= 750.0 && g.getPrecio() <= 1100.0);
+		PlacaBase placa = componenteMasBarato(PlacaBase.class,
+				p -> "AM5".equals(p.getSocket()) && "DDR5".equalsIgnoreCase(p.getTipoDDR()));
+		MemoriaRAM ram = componenteMasBarato(MemoriaRAM.class,
+				r -> "DDR5".equalsIgnoreCase(r.getTipoDDR()) && r.getNumModulos() != null && r.getNumModulos() == 2 && r.getGbPorModulo() != null && r.getGbPorModulo() == 16);
+		Almacenamiento ssd = componenteMasBarato(Almacenamiento.class,
+				s -> "SSD".equalsIgnoreCase(s.getTipo()) && s.getCapacidad() != null && s.getCapacidad() >= 2000 && s.getCapacidad() < 4000);
+		FuenteAlimentacion psu = componenteMasBarato(FuenteAlimentacion.class,
+				f -> f.getPotencia() != null && f.getPotencia() >= 850);
+		Caja caja = componenteMasBarato(Caja.class,
+				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
+		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
+				r -> r.getTamano() != null && r.getTamano().contains("240"));
+		Premontado p = new Premontado();
+		p.setTipoUsoPrevisto("Streaming profesional");
+		p.setFavorita(Boolean.FALSE);
+		p.setDescripcion("12 núcleos AM5 para streams 1440p con bitrate alto, editar los VODs y jugar sin cuellos de botella. GPU de élite con el mejor encoder de nueva generación.");
+		p.setMarca("OptimaPC");
+		p.setDescuento(0);
+		p.setSistemaOperativo(TipoSO.WINDOWS);
+		p.setStock(4);
+		p.setEsReacondicionado(Boolean.FALSE);
+		p.setUsosPrevistos(Set.of(TipoUso.STREAMING, TipoUso.GAMING));
+		agregarComponente(p, "CPU", cpu, 1);
+		agregarComponente(p, "GPU", gpu, 1);
+		agregarComponente(p, "Placa base", placa, 1);
+		agregarComponente(p, "RAM", ram, 1);
+		agregarComponente(p, "Almacenamiento", ssd, 1);
+		agregarComponente(p, "Fuente", psu, 1);
+		agregarComponente(p, "Caja", caja, 1);
+		agregarComponente(p, "Refrigeración", cooler, 1);
+		entityManager.persist(p);
+	}
+
+	private void asegurarPremontadoCreadorContenido() {
+		if (existePremontadoConTipoUsoPrevisto("Creador de contenido")) return;
+		Procesador cpu = componenteMasBarato(Procesador.class,
+				c -> "AM5".equals(c.getSocket()) && c.getNucleos() != null && c.getNucleos() >= 12 && c.getPrecio() != null && c.getPrecio() >= 300.0 && c.getPrecio() <= 370.0);
+		TarjetaGrafica gpu = componenteMasBarato(TarjetaGrafica.class,
+				g -> g.getPrecio() != null && g.getPrecio() >= 500.0 && g.getPrecio() <= 800.0);
+		PlacaBase placa = componenteMasBarato(PlacaBase.class,
+				p -> "AM5".equals(p.getSocket()) && "DDR5".equalsIgnoreCase(p.getTipoDDR()));
+		MemoriaRAM ram = componenteMasBarato(MemoriaRAM.class,
+				r -> "DDR5".equalsIgnoreCase(r.getTipoDDR()) && r.getNumModulos() != null && r.getNumModulos() == 2 && r.getGbPorModulo() != null && r.getGbPorModulo() == 16);
+		Almacenamiento ssd = componenteMasBarato(Almacenamiento.class,
+				s -> "SSD".equalsIgnoreCase(s.getTipo()) && s.getCapacidad() != null && s.getCapacidad() >= 2000 && s.getCapacidad() < 4000);
+		FuenteAlimentacion psu = componenteMasBarato(FuenteAlimentacion.class,
+				f -> f.getPotencia() != null && f.getPotencia() >= 850);
+		Caja caja = componenteMasBarato(Caja.class,
+				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
+		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
+				r -> r.getTamano() != null && r.getTamano().contains("240"));
+		Premontado p = new Premontado();
+		p.setTipoUsoPrevisto("Creador de contenido");
+		p.setFavorita(Boolean.FALSE);
+		p.setDescripcion("Equilibrio perfecto entre edición y streaming: 12 núcleos para renderizar vídeos mientras se emite en directo, GPU con buen encoder y 2 TB para proyectos.");
+		p.setMarca("OptimaPC");
+		p.setDescuento(5);
+		p.setSistemaOperativo(TipoSO.WINDOWS);
+		p.setStock(5);
+		p.setEsReacondicionado(Boolean.FALSE);
+		p.setUsosPrevistos(Set.of(TipoUso.EDICION, TipoUso.STREAMING));
+		agregarComponente(p, "CPU", cpu, 1);
+		agregarComponente(p, "GPU", gpu, 1);
+		agregarComponente(p, "Placa base", placa, 1);
+		agregarComponente(p, "RAM", ram, 1);
+		agregarComponente(p, "Almacenamiento", ssd, 1);
+		agregarComponente(p, "Fuente", psu, 1);
+		agregarComponente(p, "Caja", caja, 1);
+		agregarComponente(p, "Refrigeración", cooler, 1);
+		entityManager.persist(p);
+	}
+
+	// ── VERSÁTILES ───────────────────────────────────────────────────────────
+
+	private void asegurarPremontadoTodoEnUnoVersatil() {
+		if (existePremontadoConTipoUsoPrevisto("Todo en uno versátil")) return;
+		Procesador cpu = componenteMasBarato(Procesador.class,
+				c -> "AM4".equals(c.getSocket()) && (c.getGraficaIntegrada() == null || c.getGraficaIntegrada().isBlank()) && c.getNucleos() != null && c.getNucleos() >= 6 && c.getPrecio() != null && c.getPrecio() >= 100.0 && c.getPrecio() <= 175.0);
+		TarjetaGrafica gpu = componenteMasBarato(TarjetaGrafica.class,
+				g -> g.getPrecio() != null && g.getPrecio() >= 300.0 && g.getPrecio() <= 500.0);
+		PlacaBase placa = componenteMasBarato(PlacaBase.class,
+				p -> "AM4".equals(p.getSocket()) && "DDR4".equalsIgnoreCase(p.getTipoDDR()));
+		MemoriaRAM ram = componenteMasBarato(MemoriaRAM.class,
+				r -> "DDR4".equalsIgnoreCase(r.getTipoDDR()) && r.getNumModulos() != null && r.getNumModulos() == 2 && r.getGbPorModulo() != null && r.getGbPorModulo() == 16);
+		Almacenamiento ssd = componenteMasBarato(Almacenamiento.class,
+				s -> "SSD".equalsIgnoreCase(s.getTipo()) && s.getCapacidad() != null && s.getCapacidad() >= 1000 && s.getCapacidad() < 2000);
+		FuenteAlimentacion psu = componenteMasBarato(FuenteAlimentacion.class,
+				f -> f.getPotencia() != null && f.getPotencia() >= 650);
+		Caja caja = componenteMasBarato(Caja.class,
+				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
+		Premontado p = new Premontado();
+		p.setTipoUsoPrevisto("Todo en uno versátil");
+		p.setFavorita(Boolean.FALSE);
+		p.setDescripcion("El equipo para quien lo quiere todo: trabaja, programa, edita fotos y juega títulos de gama media. 32 GB de RAM para no cerrar nada nunca.");
+		p.setMarca("OptimaPC");
+		p.setDescuento(5);
+		p.setSistemaOperativo(TipoSO.WINDOWS);
+		p.setStock(9);
+		p.setEsReacondicionado(Boolean.FALSE);
+		p.setUsosPrevistos(Set.of(TipoUso.OFIMATICA, TipoUso.PROGRAMACION, TipoUso.GAMING));
+		agregarComponente(p, "CPU", cpu, 1);
+		agregarComponente(p, "GPU", gpu, 1);
+		agregarComponente(p, "Placa base", placa, 1);
+		agregarComponente(p, "RAM", ram, 1);
+		agregarComponente(p, "Almacenamiento", ssd, 1);
+		agregarComponente(p, "Fuente", psu, 1);
+		agregarComponente(p, "Caja", caja, 1);
+		entityManager.persist(p);
+	}
+
+	private void asegurarPremontadoWorkstationVersatil() {
+		if (existePremontadoConTipoUsoPrevisto("Workstation versátil")) return;
+		Procesador cpu = componenteMasBarato(Procesador.class,
+				c -> "AM5".equals(c.getSocket()) && c.getNucleos() != null && c.getNucleos() >= 12 && c.getPrecio() != null && c.getPrecio() >= 300.0 && c.getPrecio() <= 380.0);
+		TarjetaGrafica gpu = componenteMasBarato(TarjetaGrafica.class,
+				g -> g.getPrecio() != null && g.getPrecio() >= 600.0 && g.getPrecio() <= 1000.0);
+		PlacaBase placa = componenteMasBarato(PlacaBase.class,
+				p -> "AM5".equals(p.getSocket()) && "DDR5".equalsIgnoreCase(p.getTipoDDR()));
+		MemoriaRAM ram = componenteMasBarato(MemoriaRAM.class,
+				r -> "DDR5".equalsIgnoreCase(r.getTipoDDR()) && r.getNumModulos() != null && r.getNumModulos() == 2 && r.getGbPorModulo() != null && r.getGbPorModulo() == 32);
+		Almacenamiento ssd = componenteMasBarato(Almacenamiento.class,
+				s -> "SSD".equalsIgnoreCase(s.getTipo()) && s.getCapacidad() != null && s.getCapacidad() >= 2000 && s.getCapacidad() < 4000);
+		FuenteAlimentacion psu = componenteMasBarato(FuenteAlimentacion.class,
+				f -> f.getPotencia() != null && f.getPotencia() >= 850);
+		Caja caja = componenteMasBarato(Caja.class,
+				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
+		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
+				r -> r.getTamano() != null && r.getTamano().contains("240"));
+		Premontado p = new Premontado();
+		p.setTipoUsoPrevisto("Workstation versátil");
+		p.setFavorita(Boolean.FALSE);
+		p.setDescripcion("Plataforma AM5 de 12 núcleos con 64 GB DDR5 para exigencias profesionales variadas: compilación, modelos ML ligeros, edición y gaming ocasional en una sola máquina.");
+		p.setMarca("OptimaWork");
+		p.setDescuento(0);
+		p.setSistemaOperativo(TipoSO.WINDOWS);
+		p.setStock(4);
+		p.setEsReacondicionado(Boolean.FALSE);
+		p.setUsosPrevistos(Set.of(TipoUso.EDICION, TipoUso.PROGRAMACION));
+		agregarComponente(p, "CPU", cpu, 1);
+		agregarComponente(p, "GPU", gpu, 1);
+		agregarComponente(p, "Placa base", placa, 1);
+		agregarComponente(p, "RAM", ram, 1);
+		agregarComponente(p, "Almacenamiento", ssd, 1);
+		agregarComponente(p, "Fuente", psu, 1);
+		agregarComponente(p, "Caja", caja, 1);
+		agregarComponente(p, "Refrigeración", cooler, 1);
+		entityManager.persist(p);
 	}
 
 	private void sembrarValoracionesSiNecesario() {
