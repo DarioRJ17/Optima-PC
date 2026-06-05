@@ -45,6 +45,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/catalogo/**").permitAll()
                 .requestMatchers("/api/montar-pc/**").permitAll()
                 .requestMatchers("/api/configuracion-pc/**").permitAll()
+                .requestMatchers("/api/reciclaje/**").permitAll()
                 .requestMatchers("/api/banners/**").permitAll()
                 .anyRequest().authenticated())
             .exceptionHandling(ex -> ex.authenticationEntryPoint(new JwtAuthenticationEntryPoint()))

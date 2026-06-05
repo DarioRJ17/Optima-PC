@@ -1,5 +1,7 @@
 package com.optimapc.backend.montarPC;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -30,10 +32,70 @@ public class RendimientoService {
     // Media de todos los TipoUso: CPU 0.36, GPU 0.26, RAM 0.25, Storage 0.13
     private static final double[] PESOS_DEFAULT = {0.36, 0.26, 0.25, 0.13};
 
+    // Desviación mínima para considerar un componente como problemático (5%)
+    private static final double UMBRAL_DESVIACION = 0.05;
+
+    // Valores de referencia (~gama alta de mercado) para escalar cada sub-score crudo a 0-100.
+    // Como las fórmulas de cada categoría tienen magnitudes muy distintas (la capacidad de RAM
+    // crece sin techo y aplastaría a CPU/GPU), dividimos por una referencia por categoría y
+    // saturamos a 100. Así un componente tope de cada tipo vale ~100 y todos son comparables.
+    // Son una calibración a ojo, ajustable; no pretenden ser exactos sino homogeneizar escalas.
+    private static final double REF_CPU = 150;      // ~24 núcleos × 6,0 GHz
+    private static final double REF_GPU = 80;       // ~24 GB × 3300 MHz / 1000
+    private static final double REF_RAM = 288;      // 48 GB (capacidad útil máxima) a 6000 MHz
+    private static final double REF_STORAGE = 12;   // 2 TB NVMe (capacidad útil máxima × 6 / 1000)
+
+    // Topes de capacidad útil: más allá de esto, la capacidad extra no aporta rendimiento
+    // perceptible en un PC de escritorio y solo serviría para "ganar" la métrica de forma irreal.
+    private static final int CAP_RAM_GB = 48;
+    private static final int CAP_STORAGE_GB = 2000;
+
     public double calcularScore(ConfiguracionPC config, TipoUso tipoUso) {
         double[] pesos = tipoUso != null ? PESOS.getOrDefault(tipoUso, PESOS_DEFAULT) : PESOS_DEFAULT;
+        double[] sub = computeSubScores(config);
+        return pesos[0] * sub[0] + pesos[1] * sub[1] + pesos[2] * sub[2] + pesos[3] * sub[3];
+    }
 
-        double cpuScore = 0, gpuScore = 0, ramScore = 0, storageScore = 0;
+    // Calcula el equilibrio de la configuración para un tipo de uso dado.
+    // Mide cuánto se aleja la contribución real de cada componente de lo que el tipo de uso espera.
+    public EquilibrioResult calcularEquilibrio(ConfiguracionPC config, TipoUso tipoUso) {
+        double[] pesos = tipoUso != null ? PESOS.getOrDefault(tipoUso, PESOS_DEFAULT) : PESOS_DEFAULT;
+        double[] sub = computeSubScores(config);
+
+        double total = pesos[0] * sub[0] + pesos[1] * sub[1] + pesos[2] * sub[2] + pesos[3] * sub[3];
+        if (total == 0) {
+            config.setIndicadorEquilibrio(0.0);
+            return new EquilibrioResult(0.0, List.of());
+        }
+
+        String[] nombres = {"CPU", "GPU", "RAM", "STORAGE"};
+        List<ComponenteDesbalanceado> problematicos = new ArrayList<>();
+        double sumaDesviaciones = 0;
+
+        for (int i = 0; i < 4; i++) {
+            double contribucion = (pesos[i] * sub[i]) / total;
+            double desviacion = contribucion - pesos[i]; // positivo = sobredimensionado, negativo = cuello de botella
+            sumaDesviaciones += Math.abs(desviacion);
+            if (Math.abs(desviacion) >= UMBRAL_DESVIACION) {
+                problematicos.add(new ComponenteDesbalanceado(nombres[i], desviacion > 0, Math.abs(desviacion)));
+            }
+        }
+
+        // Ordenar de mayor a menor desviación para que el más problemático aparezca primero
+        problematicos.sort(Comparator.comparingDouble(ComponenteDesbalanceado::desviacion).reversed());
+
+        // sumaDesviaciones ∈ [0, 2] (contribuciones y pesos suman ambos 1), por eso dividimos
+        // entre 2 para acotar el equilibrio a [0, 100]: 0 = máximo desequilibrio, 100 = perfecto.
+        double score = (1 - sumaDesviaciones / 2.0) * 100;
+        config.setIndicadorEquilibrio(score);
+
+        return new EquilibrioResult(score, problematicos);
+    }
+
+    // Extrae los sub-scores de los cuatro tipos de componente, ya normalizados a 0-100.
+    // Orden: [cpuScore, gpuScore, ramScore, storageScore]
+    private double[] computeSubScores(ConfiguracionPC config) {
+        double cpuRaw = 0, gpuRaw = 0, ramRaw = 0, storageRaw = 0;
 
         for (ConfiguracionComponente cc : config.getComponentes()) {
             Componente proxy = cc.getComponente();
@@ -44,20 +106,39 @@ public class RendimientoService {
             int cantidad = cc.getCantidad() != null ? cc.getCantidad() : 1;
 
             if (componente instanceof Procesador cpu) {
-                cpuScore = scoreCpu(cpu);
+                cpuRaw = scoreCpu(cpu);
             } else if (componente instanceof TarjetaGrafica gpu) {
-                gpuScore = scoreGpu(gpu);
+                gpuRaw = scoreGpu(gpu);
             } else if (componente instanceof MemoriaRAM ram) {
-                ramScore += scoreRam(ram) * cantidad;
+                ramRaw += scoreRam(ram) * cantidad;
             } else if (componente instanceof Almacenamiento storage) {
-                storageScore += scoreStorage(storage) * cantidad;
+                storageRaw += scoreStorage(storage) * cantidad;
             }
         }
 
-        return pesos[0] * cpuScore
-             + pesos[1] * gpuScore
-             + pesos[2] * ramScore
-             + pesos[3] * storageScore;
+        // Escalar cada categoría a 0-100 con su referencia, para que sean comparables entre sí.
+        return new double[]{
+            normalizar(cpuRaw, REF_CPU),
+            normalizar(gpuRaw, REF_GPU),
+            normalizar(ramRaw, REF_RAM),
+            normalizar(storageRaw, REF_STORAGE)
+        };
+    }
+
+    // Escala un sub-score crudo a 0-100 según la referencia de su categoría, saturando en 100.
+    private double normalizar(double valor, double ref) {
+        return Math.min(100.0, (valor / ref) * 100.0);
+    }
+
+    // Score normalizado (0-100) de un componente individual, según su categoría.
+    // Lo usa el módulo de reciclaje para preseleccionar los mejores candidatos de forma comparable.
+    public double scoreNormalizado(Componente componente) {
+        var c = Hibernate.unproxy(componente);
+        if (c instanceof Procesador cpu) return normalizar(scoreCpu(cpu), REF_CPU);
+        if (c instanceof TarjetaGrafica gpu) return normalizar(scoreGpu(gpu), REF_GPU);
+        if (c instanceof MemoriaRAM ram) return normalizar(scoreRam(ram), REF_RAM);
+        if (c instanceof Almacenamiento storage) return normalizar(scoreStorage(storage), REF_STORAGE);
+        return 0;
     }
 
     // Normaliza usando pesos generales (media de todos los TipoUso). Para el catálogo.
@@ -102,23 +183,30 @@ public class RendimientoService {
         int modulos = ram.getNumModulos() != null ? ram.getNumModulos() : 0;
         int gbPorModulo = ram.getGbPorModulo() != null ? ram.getGbPorModulo() : 0;
         int velocidad = ram.getVelocidad() != null ? ram.getVelocidad() : 0;
-        return modulos * gbPorModulo * (velocidad / 1000.0);
+        // Capamos la capacidad total para que una RAM gigante (256 GB) no aplaste a una de gama alta normal.
+        int capacidadUtil = Math.min(modulos * gbPorModulo, CAP_RAM_GB);
+        return capacidadUtil * (velocidad / 1000.0);
     }
 
     private double scoreStorage(Almacenamiento storage) {
         int capacidad = storage.getCapacidad() != null ? storage.getCapacidad() : 0;
-        return (capacidad * interfazMultiplier(storage)) / 1000.0;
+        // Capamos la capacidad útil (2 TB): más allá no aporta rendimiento perceptible y evita que
+        // un HDD enorme y barato gane la métrica solo por capacidad bruta.
+        int capacidadUtil = Math.min(capacidad, CAP_STORAGE_GB);
+        return (capacidadUtil * interfazMultiplier(storage)) / 1000.0;
     }
 
-    // Asigna un multiplicador según la interfaz del almacenamiento para reflejar su impacto en el rendimiento
+    // Multiplicador según la interfaz: la velocidad pesa mucho más que la capacidad. Con esto un
+    // NVMe pequeño supera con holgura a un HDD grande (NVMe ×6, SSD SATA ×3, HDD ×1), que es lo
+    // realista en un PC de escritorio: lo que importa es el tipo de disco, no los TB.
     private int interfazMultiplier(Almacenamiento storage) {
         String interfaz = storage.getInterfaz();
         if (interfaz != null) {
             String lower = interfaz.toLowerCase();
             if (lower.contains("m.2") || lower.contains("nvme") || lower.contains("pcie")) {
-                return 3;
+                return 6;
             }
         }
-        return "SSD".equalsIgnoreCase(storage.getTipo()) ? 2 : 1;
+        return "SSD".equalsIgnoreCase(storage.getTipo()) ? 3 : 1;
     }
 }
