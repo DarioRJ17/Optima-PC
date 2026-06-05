@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import type { CompatiblePCComponent } from '../types'
 import ComponentDetailModal from './montarPC/ComponentDetailModal.tsx'
 import ComponentSidePanel from './montarPC/ComponentSidePanel'
@@ -29,8 +30,14 @@ interface MontarPCPageProps {
   onBack: () => void
 }
 
+interface MontarPCLocationState {
+  preseleccion?: SelectedComponent[]
+}
+
 export function MontarPCPage({ onBack }: MontarPCPageProps) {
-  const [selectedComponents, setSelectedComponents] = useState<SelectedComponent[]>([])
+  const location = useLocation()
+  const preseleccion = (location.state as MontarPCLocationState | null)?.preseleccion ?? []
+  const [selectedComponents, setSelectedComponents] = useState<SelectedComponent[]>(preseleccion)
   const [sidePanelOpen, setSidePanelOpen] = useState<string | null>(null)
   const [availableComponents, setAvailableComponents] = useState<CompatiblePCComponent[]>([])
   const [loading, setLoading] = useState(false)

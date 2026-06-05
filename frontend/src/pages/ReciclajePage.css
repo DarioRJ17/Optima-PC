@@ -1,0 +1,393 @@
+.reciclaje-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #f5f5f5;
+}
+
+.reciclaje-header {
+  background: white;
+  padding: 20px;
+  border-bottom: 1px solid #e0e0e0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.reciclaje-header .back-button {
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.reciclaje-header .back-button:hover {
+  color: #333;
+}
+
+.reciclaje-header .header-title h1 {
+  margin: 0;
+  font-size: 28px;
+  color: #333;
+}
+
+.reciclaje-header .header-title p {
+  margin: 4px 0 0;
+  color: #666;
+  font-size: 14px;
+  max-width: 640px;
+}
+
+.reciclaje-container {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 24px;
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* --- Selección de componentes --- */
+
+.reciclaje-seleccion {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  height: fit-content;
+  position: sticky;
+  top: 20px;
+}
+
+.reciclaje-seleccion h2 {
+  font-size: 20px;
+  margin: 0 0 4px;
+  color: #333;
+}
+
+.reciclaje-seleccion__hint {
+  margin: 0 0 16px;
+  font-size: 13px;
+  color: #999;
+}
+
+.reciclaje-tipos {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.reciclaje-tipo {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.reciclaje-tipo__btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: #fafafa;
+  border: 1px solid #e4e4e4;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+}
+
+.reciclaje-tipo__btn:hover {
+  border-color: #2196f3;
+  background: #f0f7ff;
+}
+
+.reciclaje-tipo__icon {
+  font-size: 22px;
+}
+
+.reciclaje-tipo__label {
+  flex: 1;
+  font-weight: 500;
+  color: #333;
+  font-size: 14px;
+}
+
+.reciclaje-tipo__status {
+  font-size: 12px;
+}
+
+.reciclaje-tipo__remove {
+  background: #f44336;
+  color: white;
+  border: none;
+  width: 32px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.reciclaje-tipo__remove:hover {
+  background: #d32f2f;
+}
+
+.reciclaje-calcular {
+  width: 100%;
+  padding: 14px;
+  background: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 15px;
+  transition: background 0.2s;
+}
+
+.reciclaje-calcular:hover:not(:disabled) {
+  background: #1976d2;
+}
+
+.reciclaje-calcular:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.reciclaje-error {
+  margin-top: 12px;
+  padding: 10px;
+  background: #ffebee;
+  border: 1px solid #ef9a9a;
+  border-radius: 6px;
+  color: #c62828;
+  font-size: 13px;
+}
+
+/* --- Resultados --- */
+
+.reciclaje-resultados {
+  min-height: 200px;
+}
+
+.reciclaje-vacio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 300px;
+  color: #999;
+  background: white;
+  border-radius: 8px;
+  border: 2px dashed #e0e0e0;
+}
+
+.reciclaje-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.reciclaje-tab {
+  padding: 10px 18px;
+  background: white;
+  border: 1px solid #e4e4e4;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+  transition: all 0.2s;
+}
+
+.reciclaje-tab:hover {
+  border-color: #2196f3;
+  color: #2196f3;
+}
+
+.reciclaje-tab.active {
+  background: #2196f3;
+  border-color: #2196f3;
+  color: white;
+}
+
+.reciclaje-configs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+/* --- Tarjeta de configuración --- */
+
+.config-card {
+  background: white;
+  border-radius: 10px;
+  padding: 18px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border: 1px solid #eee;
+  transition: box-shadow 0.2s;
+}
+
+.config-card:hover {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+}
+
+.config-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.config-card__rank {
+  font-size: 13px;
+  font-weight: 700;
+  color: white;
+  background: #2196f3;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.config-card__price {
+  font-size: 20px;
+  font-weight: 700;
+  color: #ff6b35;
+}
+
+.config-card__componentes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.config-comp {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  background: #fafafa;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.config-comp--fijo {
+  background: #f7fbf7;
+  border: 1px solid #c8e6c9;
+}
+
+.config-comp__nombre {
+  color: #333;
+  font-weight: 500;
+  word-break: break-word;
+}
+
+.config-comp__badge {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.config-comp__badge--sugerido {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.config-card__scores {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.score-bar__top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.score-bar__label {
+  color: #666;
+}
+
+.score-bar__value {
+  font-weight: 700;
+  color: #333;
+}
+
+.score-bar__track {
+  height: 6px;
+  background: #eee;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.score-bar__fill {
+  height: 100%;
+  background: #90caf9;
+  border-radius: 999px;
+  transition: width 0.3s;
+}
+
+.score-bar--highlight .score-bar__fill {
+  background: #4caf50;
+}
+
+.score-bar--highlight .score-bar__value {
+  color: #2e7d32;
+}
+
+.config-card__avisos {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.config-aviso {
+  font-size: 11px;
+  color: #856404;
+  background: #fff3cd;
+  border-radius: 4px;
+  padding: 4px 8px;
+}
+
+.config-card__completar {
+  margin-top: auto;
+  width: 100%;
+  padding: 11px;
+  background: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+
+.config-card__completar:hover {
+  background: #388e3c;
+}
+
+@media (max-width: 1024px) {
+  .reciclaje-container {
+    grid-template-columns: 1fr;
+  }
+
+  .reciclaje-seleccion {
+    position: static;
+  }
+}

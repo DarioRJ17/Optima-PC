@@ -11,6 +11,7 @@ import { PasswordResetPage } from './pages/PasswordResetPage'
 import { AuthProvider } from './auth/AuthContext'
 import { useAuth } from './auth/useAuth'
 import { MontarPCPage } from './pages/MontarPCPage'
+import { ReciclajePage } from './pages/ReciclajePage'
 import { ChatbotPage } from './pages/ChatbotPage'
 import type {
   ApiError,
@@ -351,6 +352,16 @@ function AppShell() {
                       type="button"
                       role="menuitem"
                       onClick={() => {
+                        navigate('/reciclaje')
+                        setMenuOpen(false)
+                      }}
+                    >
+                      ♻️ Reciclaje de componentes
+                    </button>
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={() => {
                         navigate('/chat')
                         setMenuOpen(false)
                       }}
@@ -414,6 +425,16 @@ function AppShell() {
                       }}
                     >
                       Montar tu propio PC
+                    </button>
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={() => {
+                        navigate('/reciclaje')
+                        setMenuOpen(false)
+                      }}
+                    >
+                      ♻️ Reciclaje de componentes
                     </button>
                     <button
                       type="button"
@@ -517,6 +538,7 @@ function AppShell() {
           element={<InitialSurveyPage onBack={() => navigate('/')} onSurveySaved={refreshRecommendations} />}
         />
         <Route path="/montar-pc" element={<MontarPCPage onBack={() => navigate('/')} />} />
+        <Route path="/reciclaje" element={<ReciclajePage onBack={() => navigate('/')} />} />
         <Route path="/chat" element={<ChatbotPage />} />
         <Route path="/auth" element={<Navigate to="/login" replace />} />
       </Routes>

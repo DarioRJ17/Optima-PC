@@ -55,6 +55,35 @@ export type CompatiblePCComponent = PCComponent & {
   warnings: CompatibilityWarning[]
 }
 
+export type ReciclajeComponente = {
+  id: number
+  nombre: string
+  categoria: string
+  precio: number
+  cantidad: number
+  esFijo: boolean
+}
+
+export type ComponenteDesbalanceado = {
+  nombre: string
+  sobredimensionado: boolean
+  desviacion: number
+}
+
+export type ReciclajeConfiguracion = {
+  componentes: ReciclajeComponente[]
+  scoreRendimiento: number
+  scoreEquilibrio: number
+  scoreCompuesto: number
+  precioTotal: number
+  componentesDesbalanceados: ComponenteDesbalanceado[]
+}
+
+export type ReciclajeTipoUso = {
+  tipoUso: string
+  configuraciones: ReciclajeConfiguracion[]
+}
+
 export type UserReview = {
   id: number
   usuarioNombre: string
