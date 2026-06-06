@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Bot } from 'lucide-react'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.trim() || 'http://localhost:8080'
 
@@ -92,7 +93,7 @@ export function ChatbotPage() {
     <div className="chat-page">
       <div className="chat-container">
         <div className="chat-header">
-          <div className="chat-header__icon" aria-hidden="true">🤖</div>
+          <div className="chat-header__icon" aria-hidden="true"><Bot size={30} strokeWidth={1.75} /></div>
           <div className="chat-header__info">
             <h1 className="chat-header__title">Asistente OptimaPc</h1>
             <p className="chat-header__subtitle">
@@ -132,7 +133,7 @@ export function ChatbotPage() {
           {mensajes.map((msg) => (
             <div key={msg.id} className={`chat-message chat-message--${msg.rol}`}>
               {msg.rol === 'assistant' && (
-                <span className="chat-avatar" aria-hidden="true">🤖</span>
+                <span className="chat-avatar" aria-hidden="true"><Bot size={20} strokeWidth={1.75} /></span>
               )}
               <div className="chat-bubble">{msg.contenido}</div>
             </div>
@@ -140,7 +141,7 @@ export function ChatbotPage() {
 
           {cargando && (
             <div className="chat-message chat-message--assistant">
-              <span className="chat-avatar" aria-hidden="true">🤖</span>
+              <span className="chat-avatar" aria-hidden="true"><Bot size={20} strokeWidth={1.75} /></span>
               <div className="chat-bubble chat-bubble--typing" aria-label="El asistente está escribiendo">
                 <span /><span /><span />
               </div>

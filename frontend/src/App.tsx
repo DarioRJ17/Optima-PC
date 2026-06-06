@@ -12,6 +12,7 @@ import { AuthProvider } from './auth/AuthContext'
 import { useAuth } from './auth/useAuth'
 import { MontarPCPage } from './pages/MontarPCPage'
 import { ReciclajePage } from './pages/ReciclajePage'
+import { Recycle, Wrench, Bot, LogIn, UserPlus, ShoppingCart, Menu } from 'lucide-react'
 import { ChatbotPage } from './pages/ChatbotPage'
 import type {
   ApiError,
@@ -332,7 +333,7 @@ function AppShell() {
                   aria-haspopup="true"
                   aria-expanded={menuOpen}
                 >
-                  <span aria-hidden="true">☰</span>
+                  <Menu size={16} strokeWidth={1.75} aria-hidden="true" />
                   <span>Menú</span>
                   <span aria-hidden="true">⌄</span>
                 </button>
@@ -346,7 +347,8 @@ function AppShell() {
                         setMenuOpen(false)
                       }}
                     >
-                      Montar tu propio PC
+                      <Wrench size={16} strokeWidth={1.75} aria-hidden="true" />
+                      <span>Montar tu propio PC</span>
                     </button>
                     <button
                       type="button"
@@ -356,7 +358,8 @@ function AppShell() {
                         setMenuOpen(false)
                       }}
                     >
-                      ♻️ Reciclaje de componentes
+                      <Recycle size={16} strokeWidth={1.75} aria-hidden="true" />
+                      <span>Reciclaje de componentes</span>
                     </button>
                     <button
                       type="button"
@@ -366,7 +369,8 @@ function AppShell() {
                         setMenuOpen(false)
                       }}
                     >
-                      🤖 Asistente IA
+                      <Bot size={16} strokeWidth={1.75} aria-hidden="true" />
+                      <span>Asistente IA</span>
                     </button>
                   </div>
                 ) : null}
@@ -410,7 +414,7 @@ function AppShell() {
                   aria-haspopup="true"
                   aria-expanded={menuOpen}
                 >
-                  <span aria-hidden="true">☰</span>
+                  <Menu size={16} strokeWidth={1.75} aria-hidden="true" />
                   <span>Menú</span>
                   <span aria-hidden="true">⌄</span>
                 </button>
@@ -424,7 +428,8 @@ function AppShell() {
                         setMenuOpen(false)
                       }}
                     >
-                      Montar tu propio PC
+                      <Wrench size={16} strokeWidth={1.75} aria-hidden="true" />
+                      <span>Montar tu propio PC</span>
                     </button>
                     <button
                       type="button"
@@ -434,7 +439,8 @@ function AppShell() {
                         setMenuOpen(false)
                       }}
                     >
-                      ♻️ Reciclaje de componentes
+                      <Recycle size={16} strokeWidth={1.75} aria-hidden="true" />
+                      <span>Reciclaje de componentes</span>
                     </button>
                     <button
                       type="button"
@@ -444,24 +450,25 @@ function AppShell() {
                         setMenuOpen(false)
                       }}
                     >
-                      🤖 Asistente IA
+                      <Bot size={16} strokeWidth={1.75} aria-hidden="true" />
+                      <span>Asistente IA</span>
                     </button>
                   </div>
                 ) : null}
               </div>
               <button type="button" className="nav-link" onClick={() => openAuth('login')}>
-                <span aria-hidden="true">↪</span>
+                <LogIn size={16} strokeWidth={1.75} aria-hidden="true" />
                 <span>Iniciar sesión</span>
               </button>
               <button type="button" className="nav-primary" onClick={() => openAuth('register')}>
-                <span aria-hidden="true">👤+</span>
+                <UserPlus size={16} strokeWidth={1.75} aria-hidden="true" />
                 <span>Registrarse</span>
               </button>
             </>
           )}
 
           <button type="button" className="nav-chip nav-chip--cart">
-            <span aria-hidden="true">🛒</span>
+            <ShoppingCart size={16} strokeWidth={1.75} aria-hidden="true" />
             <span>Carrito</span>
           </button>
         </nav>

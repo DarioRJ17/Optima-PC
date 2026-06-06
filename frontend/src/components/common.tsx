@@ -1,3 +1,5 @@
+import { Cpu, Gpu, MemoryStick, HardDrive, PlugZap, CircuitBoard, Box, Fan, Wrench } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import heroImage from '../assets/hero.png'
 import type { CatalogPremontado, PCComponent, ProductCard, UserReview } from '../types'
 
@@ -72,19 +74,19 @@ export function ProductCardView({ product, onViewDetails }: { product: ProductCa
 }
 
 export function PCComponentItem({ component }: { component: PCComponent }) {
-  const getIconoForTipo = (tipo: string) => {
+  const getIconoForTipo = (tipo: string): LucideIcon => {
     const tipoNormalizado = tipo.toLowerCase().trim()
-    const tiposIconos: Record<string, string> = {
-      cpu: '⚙️',
-      gpu: '🖥️',
-      ram: '💾',
-      almacenamiento: '💿',
-      fuente: '⚡',
-      'placa base': '📱',
-      caja: '📦',
-      'refrigeración': '❄️',
+    const tiposIconos: Record<string, LucideIcon> = {
+      cpu: Cpu,
+      gpu: Gpu,
+      ram: MemoryStick,
+      almacenamiento: HardDrive,
+      fuente: PlugZap,
+      'placa base': CircuitBoard,
+      caja: Box,
+      'refrigeración': Fan,
     }
-    return tiposIconos[tipoNormalizado] || '🔧'
+    return tiposIconos[tipoNormalizado] || Wrench
   }
 
   const getDescripcionForTipo = (tipo: string) => {
@@ -117,9 +119,11 @@ export function PCComponentItem({ component }: { component: PCComponent }) {
     return nombresAmigables[tipoNormalizado] || tipo
   }
 
+  const Icono = getIconoForTipo(component.tipo)
+
   return (
     <div className="component-item">
-      <div className="component-icon">{getIconoForTipo(component.tipo)}</div>
+      <div className="component-icon"><Icono size={36} strokeWidth={1.75} /></div>
       <div className="component-info">
         <h4>{getNombreTipo(component.tipo)}</h4>
         <p className="component-spec">{component.nombre}</p>

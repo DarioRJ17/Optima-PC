@@ -5,18 +5,19 @@ import ComponentDetailModal from './montarPC/ComponentDetailModal.tsx'
 import ComponentSidePanel from './montarPC/ComponentSidePanel'
 import SummaryPane from './montarPC/SummaryPane'
 import './montarPC/MontarPCPage.css'
+import { Cpu, CircuitBoard, MemoryStick, Gpu, HardDrive, PlugZap, Box, Fan } from 'lucide-react'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.trim() || 'http://localhost:8080'
 
 const COMPONENT_TYPES = [
-  { id: 'procesador', label: 'Procesador (CPU)', icon: '⚙️' },
-  { id: 'placa-base', label: 'Placa Base', icon: '⬜' },
-  { id: 'memoria-ram', label: 'Memoria RAM', icon: '🧠' },
-  { id: 'tarjeta-grafica', label: 'Tarjeta Gráfica', icon: '🎮' },
-  { id: 'almacenamiento', label: 'Almacenamiento', icon: '💾' },
-  { id: 'fuente-alimentacion', label: 'Fuente de Alimentación', icon: '⚡' },
-  { id: 'caja', label: 'Caja/Torre', icon: '📦' },
-  { id: 'refrigerador-cpu', label: 'Refrigeración', icon: '❄️' },
+  { id: 'procesador', label: 'Procesador (CPU)', Icon: Cpu },
+  { id: 'placa-base', label: 'Placa Base', Icon: CircuitBoard },
+  { id: 'memoria-ram', label: 'Memoria RAM', Icon: MemoryStick },
+  { id: 'tarjeta-grafica', label: 'Tarjeta Gráfica', Icon: Gpu },
+  { id: 'almacenamiento', label: 'Almacenamiento', Icon: HardDrive },
+  { id: 'fuente-alimentacion', label: 'Fuente de Alimentación', Icon: PlugZap },
+  { id: 'caja', label: 'Caja/Torre', Icon: Box },
+  { id: 'refrigerador-cpu', label: 'Refrigeración', Icon: Fan },
 ]
 
 interface SelectedComponent {
@@ -155,7 +156,7 @@ export function MontarPCPage({ onBack }: MontarPCPageProps) {
                     className={`component-header ${isRequired ? 'required' : ''}`}
                     onClick={() => handleTypeClick(type.id)}
                   >
-                    <span className="component-icon">{type.icon}</span>
+                    <span className="component-icon"><type.Icon size={22} strokeWidth={1.75} /></span>
                     <span className="component-label">
                       {type.label}
                       {isRequired && <span className="required-mark">*</span>}

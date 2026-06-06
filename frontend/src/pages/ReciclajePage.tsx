@@ -9,15 +9,16 @@ import type {
 import ComponentDetailModal from './montarPC/ComponentDetailModal.tsx'
 import ComponentSidePanel from './montarPC/ComponentSidePanel'
 import './ReciclajePage.css'
+import { Cpu, Gpu, MemoryStick, HardDrive } from 'lucide-react'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.trim() || 'http://localhost:8080'
 
 // Tipos de componente que admite el reciclaje (los que entran en la métrica de rendimiento).
 const COMPONENT_TYPES = [
-  { id: 'procesador', label: 'Procesador (CPU)', icon: '⚙️' },
-  { id: 'tarjeta-grafica', label: 'Tarjeta Gráfica', icon: '🎮' },
-  { id: 'memoria-ram', label: 'Memoria RAM', icon: '🧠' },
-  { id: 'almacenamiento', label: 'Almacenamiento', icon: '💾' },
+  { id: 'procesador', label: 'Procesador (CPU)', Icon: Cpu },
+  { id: 'tarjeta-grafica', label: 'Tarjeta Gráfica', Icon: Gpu },
+  { id: 'memoria-ram', label: 'Memoria RAM', Icon: MemoryStick },
+  { id: 'almacenamiento', label: 'Almacenamiento', Icon: HardDrive },
 ]
 
 // Mapeo categoría del backend de reciclaje (CPU/GPU/RAM/STORAGE) → tipo del configurador.
@@ -190,7 +191,7 @@ export function ReciclajePage({ onBack }: ReciclajePageProps) {
               return (
                 <div key={type.id} className="reciclaje-tipo">
                   <button className="reciclaje-tipo__btn" onClick={() => handleTypeClick(type.id)}>
-                    <span className="reciclaje-tipo__icon">{type.icon}</span>
+                    <span className="reciclaje-tipo__icon"><type.Icon size={22} strokeWidth={1.75} /></span>
                     <span className="reciclaje-tipo__label">{type.label}</span>
                     <span className="reciclaje-tipo__status">
                       {selected ? (

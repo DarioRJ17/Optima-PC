@@ -1,5 +1,7 @@
 import type { Dispatch, SetStateAction } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Star, TrendingUp, Tag, RefreshCw } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import heroImage from '../assets/hero.png'
 import { ProductCardView } from '../components/common'
 import { toProductCard, type CatalogSectionKey } from '../catalog-utils'
@@ -212,22 +214,22 @@ export function HomePage({
     })
   }
 
-  const sections: Array<{ title: string; icon: string; key: CatalogSectionKey; products: CatalogPremontado[] }> = [
+  const sections: Array<{ title: string; Icon: LucideIcon; key: CatalogSectionKey; products: CatalogPremontado[] }> = [
     {
       title: 'Ordenadores más vendidos',
-      icon: '↗',
+      Icon: TrendingUp,
       key: 'featured',
       products: bestSellers.length > 0 ? bestSellers : fallbackProducts,
     },
     {
       title: 'Mejores ofertas',
-      icon: '🏷',
+      Icon: Tag,
       key: 'offers',
       products: offers.length > 0 ? offers : fallbackProducts,
     },
     {
       title: 'Ordenadores reacondicionados',
-      icon: '⟲',
+      Icon: RefreshCw,
       key: 'refurbished',
       products: refurbished.length > 0 ? refurbished : fallbackProducts,
     },
@@ -236,7 +238,7 @@ export function HomePage({
   if (showRecommendations) {
     sections.unshift({
       title: 'Recomendados para ti',
-      icon: '✨',
+      Icon: Star,
       key: 'recommended',
       products: filteredRecommendationItems.slice(0, 3),
     })
@@ -396,7 +398,7 @@ export function HomePage({
             <section className="catalog-section" key={section.title}>
               <div className="section-title">
                 <span className="section-title__icon" aria-hidden="true">
-                  {section.icon}
+                  <section.Icon size={22} strokeWidth={1.75} />
                 </span>
                 <h2>{section.title}</h2>
               </div>

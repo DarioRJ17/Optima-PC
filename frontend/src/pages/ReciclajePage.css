@@ -105,7 +105,12 @@
 }
 
 .reciclaje-tipo__icon {
-  font-size: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  flex-shrink: 0;
+  color: #2196f3;
 }
 
 .reciclaje-tipo__label {

@@ -92,7 +92,12 @@
 }
 
 .component-icon {
-  font-size: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  flex-shrink: 0;
+  color: #2196f3;
 }
 
 .component-label {
