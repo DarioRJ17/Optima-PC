@@ -3,6 +3,39 @@ import type { LucideIcon } from 'lucide-react'
 import heroImage from '../assets/hero.png'
 import type { CatalogPremontado, PCComponent, ProductCard, UserReview } from '../types'
 
+const TIPOS_ICONOS: Record<string, LucideIcon> = {
+  cpu: Cpu,
+  gpu: Gpu,
+  ram: MemoryStick,
+  almacenamiento: HardDrive,
+  fuente: PlugZap,
+  'placa base': CircuitBoard,
+  caja: Box,
+  'refrigeración': Fan,
+}
+
+const DESCRIPCIONES: Record<string, string> = {
+  cpu: 'El cerebro del ordenador que ejecuta las instrucciones y procesa los datos. Cuanto más potente, mejor rendimiento en aplicaciones y multitarea.',
+  gpu: 'Procesa y renderiza imágenes, vídeos y gráficos 3D. Esencial para gaming, diseño gráfico, edición de vídeo y renderizado 3D.',
+  ram: 'Memoria de acceso rápido que almacena temporalmente los datos que el procesador necesita. Más RAM permite ejecutar más programas simultáneamente.',
+  almacenamiento: 'Disco que guarda permanentemente el sistema operativo, programas y archivos. Los SSD NVMe son mucho más rápidos que los discos duros tradicionales.',
+  fuente: 'Proporciona energía estable a todos los componentes del ordenador.',
+  'placa base': 'Placa base que conecta todos los componentes del ordenador entre sí.',
+  caja: 'Carcasa que aloja y protege todos los componentes del ordenador.',
+  'refrigeración': 'Sistema que mantiene la temperatura de los componentes bajo control para evitar sobrecalentamientos y mantener el rendimiento.',
+}
+
+const NOMBRES_COMPONENTES: Record<string, string> = {
+  cpu: 'Procesador',
+  gpu: 'Tarjeta Gráfica',
+  ram: 'Memoria RAM',
+  almacenamiento: 'Almacenamiento',
+  fuente: 'Fuente de Alimentación',
+  'placa base': 'Placa Base',
+  caja: 'Carcasa',
+  'refrigeración': 'Refrigeración CPU',
+}
+
 export function StarRating({ value }: { value: number }) {
   return (
     <div className="star-rating" aria-label={`${value} de 5 estrellas`}>
@@ -74,60 +107,18 @@ export function ProductCardView({ product, onViewDetails }: { product: ProductCa
 }
 
 export function PCComponentItem({ component }: { component: PCComponent }) {
-  const getIconoForTipo = (tipo: string): LucideIcon => {
-    const tipoNormalizado = tipo.toLowerCase().trim()
-    const tiposIconos: Record<string, LucideIcon> = {
-      cpu: Cpu,
-      gpu: Gpu,
-      ram: MemoryStick,
-      almacenamiento: HardDrive,
-      fuente: PlugZap,
-      'placa base': CircuitBoard,
-      caja: Box,
-      'refrigeración': Fan,
-    }
-    return tiposIconos[tipoNormalizado] || Wrench
-  }
-
-  const getDescripcionForTipo = (tipo: string) => {
-    const tipoNormalizado = tipo.toLowerCase().trim()
-    const descripciones: Record<string, string> = {
-      cpu: 'El cerebro del ordenador que ejecuta las instrucciones y procesa los datos. Cuanto más potente, mejor rendimiento en aplicaciones y multitarea.',
-      gpu: 'Procesa y renderiza imágenes, vídeos y gráficos 3D. Esencial para gaming, diseño gráfico, edición de vídeo y renderizado 3D.',
-      ram: 'Memoria de acceso rápido que almacena temporalmente los datos que el procesador necesita. Más RAM permite ejecutar más programas simultáneamente.',
-      almacenamiento: 'Disco que guarda permanentemente el sistema operativo, programas y archivos. Los SSD NVMe son mucho más rápidos que los discos duros tradicionales.',
-      fuente: 'Proporciona energía estable a todos los componentes del ordenador.',
-      'placa base': 'Placa base que conecta todos los componentes del ordenador entre sí.',
-      caja: 'Carcasa que aloja y protege todos los componentes del ordenador.',
-      'refrigeración': 'Sistema que mantiene la temperatura de los componentes bajo control para evitar sobrecalentamientos y mantener el rendimiento.',
-    }
-    return descripciones[tipoNormalizado] || 'Componente del ordenador'
-  }
-
-  const getNombreTipo = (tipo: string) => {
-    const tipoNormalizado = tipo.toLowerCase().trim()
-    const nombresAmigables: Record<string, string> = {
-      cpu: 'Procesador',
-      gpu: 'Tarjeta Gráfica',
-      ram: 'Memoria RAM',
-      almacenamiento: 'Almacenamiento',
-      fuente: 'Fuente de Alimentación',
-      'placa base': 'Placa Base',
-      caja: 'Carcasa',
-      'refrigeración': 'Refrigeración CPU',
-    }
-    return nombresAmigables[tipoNormalizado] || tipo
-  }
-
-  const Icono = getIconoForTipo(component.tipo)
+  const tipoNormalizado = (component.tipo || '').toLowerCase().trim()
+  const Icono = TIPOS_ICONOS[tipoNormalizado] || Wrench
+  const descripcion = DESCRIPCIONES[tipoNormalizado] || 'Componente del ordenador'
+  const nombreTipo = NOMBRES_COMPONENTES[tipoNormalizado] || component.tipo
 
   return (
     <div className="component-item">
       <div className="component-icon"><Icono size={36} strokeWidth={1.75} /></div>
       <div className="component-info">
-        <h4>{getNombreTipo(component.tipo)}</h4>
+        <h4>{nombreTipo}</h4>
         <p className="component-spec">{component.nombre}</p>
-        <p className="component-desc">{getDescripcionForTipo(component.tipo)}</p>
+        <p className="component-desc">{descripcion}</p>
       </div>
     </div>
   )
