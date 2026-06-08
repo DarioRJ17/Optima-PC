@@ -62,6 +62,39 @@ const BUDGET_OPTIONS: BudgetOption[] = [
   { label: 'Más de 2.000€', value: 2500 },
 ]
 
+const USE_PRICE_INFO: Record<TipoUsoValue, { desde: string; recommendedBudget: number; tooltip: string }> = {
+  GAMING: {
+    desde: '800€',
+    recommendedBudget: 1250,
+    tooltip:
+      'Gaming de entrada desde 800€ (1080p). Para 1440p recomendamos 1.200–2.500€. Setups 4K extremos pueden superar los 4.000€.',
+  },
+  OFIMATICA: {
+    desde: '400€',
+    recommendedBudget: 750,
+    tooltip:
+      'La opción más económica. Con 400–900€ cubres todas las necesidades ofimáticas. Solo aplicaciones profesionales exigen más.',
+  },
+  EDICION: {
+    desde: '1.100€',
+    recommendedBudget: 1750,
+    tooltip:
+      'Edición fotográfica desde 1.100€. Vídeo 4K requiere 2.000–3.000€. Producción 3D profesional puede superar los 4.000€.',
+  },
+  PROGRAMACION: {
+    desde: '500€',
+    recommendedBudget: 750,
+    tooltip:
+      'Desarrollo web desde 500€. Full stack y DevOps entre 800–1.500€. Data science y ML pueden requerir 2.000€ o más.',
+  },
+  STREAMING: {
+    desde: '1.300€',
+    recommendedBudget: 1750,
+    tooltip:
+      'Streaming básico desde 1.300€. Para calidad profesional y retransmisión en 1080p60 recomendamos 1.500–2.500€.',
+  },
+}
+
 const RECONDITIONED_OPTIONS = [
   { label: 'Sí', value: true, description: 'Me interesa priorizar reacondicionado' },
   { label: 'No', value: false, description: 'Prefiero componentes nuevos' },
@@ -93,6 +126,7 @@ export function InitialSurveyPage({ onBack, onSurveySaved }: { onBack: () => voi
   }, [usoPrincipal])
 
   const secondaryOptions = MAIN_USE_OPTIONS.filter((option) => option.value !== usoPrincipal)
+  const recommendedBudgetValue = usoPrincipal ? USE_PRICE_INFO[usoPrincipal].recommendedBudget : null
 
   const parseError = async (response: Response) => {
     try {
@@ -171,6 +205,7 @@ export function InitialSurveyPage({ onBack, onSurveySaved }: { onBack: () => voi
             <div className="onboarding-grid">
               {MAIN_USE_OPTIONS.map((option) => {
                 const selected = usoPrincipal === option.value
+                const priceInfo = USE_PRICE_INFO[option.value]
 
                 return (
                   <button
@@ -183,6 +218,13 @@ export function InitialSurveyPage({ onBack, onSurveySaved }: { onBack: () => voi
                     <span className="survey-option__content">
                       <strong>{option.title}</strong>
                       <span>{option.description}</span>
+                      <span className="survey-price-hint">
+                        Desde {priceInfo.desde}
+                        <span className="survey-price-tooltip">
+                          <strong>Orientación de presupuesto</strong>
+                          <span>{priceInfo.tooltip}</span>
+                        </span>
+                      </span>
                     </span>
                   </button>
                 )
@@ -199,16 +241,18 @@ export function InitialSurveyPage({ onBack, onSurveySaved }: { onBack: () => voi
             <div className="budget-grid">
               {BUDGET_OPTIONS.map((option) => {
                 const selected = presupuesto === option.value
+                const isRecommended = recommendedBudgetValue === option.value
 
                 return (
                   <button
                     key={option.label}
                     type="button"
-                    className={`budget-option ${selected ? 'budget-option--selected' : ''}`}
+                    className={`budget-option ${selected ? 'budget-option--selected' : ''} ${isRecommended ? 'budget-option--recommended' : ''}`}
                     onClick={() => setPresupuesto(selected ? null : option.value)}
                   >
                     <Euro size={16} />
                     <span>{option.label}</span>
+                    {isRecommended && <span className="budget-option__badge">Recomendado</span>}
                   </button>
                 )
               })}

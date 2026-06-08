@@ -1061,6 +1061,8 @@
   background: #ffffff;
   color: #16243c;
   box-shadow: 0 1px 0 rgba(21, 36, 60, 0.02);
+  position: relative;
+  overflow: visible;
 }
 
 .budget-option,
@@ -1085,6 +1087,10 @@
 .onboarding-skip:hover,
 .onboarding-continue:hover:enabled {
   transform: translateY(-1px);
+}
+
+.survey-option:hover {
+  z-index: 20;
 }
 
 .survey-option--selected,
@@ -1137,6 +1143,7 @@
 
 .budget-option {
   font-weight: 700;
+  position: relative;
 }
 
 .toggle-option {
@@ -1155,6 +1162,77 @@
 
 .survey-helper {
   margin: 0.75rem 0 0;
+}
+
+.survey-option__content .survey-price-hint {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #1560ef;
+  cursor: help;
+  text-decoration: underline dotted;
+  text-underline-offset: 2px;
+  width: fit-content;
+  line-height: 1;
+}
+
+.survey-price-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  top: auto;
+  width: 210px;
+  background: #0f172a;
+  color: #e2e8f0;
+  border-radius: 10px;
+  padding: 0.7rem 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 400;
+  line-height: 1.5;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  z-index: 20;
+  pointer-events: none;
+  white-space: normal;
+}
+
+.survey-price-tooltip strong {
+  display: block;
+  font-size: 0.83rem;
+  color: #f8fafc;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.survey-price-tooltip > span {
+  display: block;
+  color: #94a3b8;
+}
+
+.survey-price-hint:hover .survey-price-tooltip {
+  display: block;
+}
+
+.budget-option--recommended:not(.budget-option--selected) {
+  border-color: #7ba7ff;
+  background: #f5f8ff;
+}
+
+.budget-option__badge {
+  position: absolute;
+  top: -9px;
+  right: 8px;
+  background: #1560ef;
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  pointer-events: none;
 }
 
 .onboarding-actions {
