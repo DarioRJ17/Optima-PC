@@ -133,7 +133,8 @@ public class MontarPCService {
         String nombre = c instanceof TarjetaGrafica tg ? tg.getChipset() : c.getNombre();
         String especificacion = buildSpecification(c);
         List<CompatibilityWarningDto> warnings = CompatibilityService.buildWarnings(c, selected);
-        return new CompatibleComponenteDto(c.getId(), tipo, nombre, especificacion, c.getPrecio(), 1, warnings);
+        Map<String, Object> propiedades = buildComponenteDetalles(c);
+        return new CompatibleComponenteDto(c.getId(), tipo, nombre, especificacion, c.getPrecio(), 1, warnings, propiedades);
     }
 
     private boolean isAlreadySelected(Componente candidate, List<Componente> selected) {
@@ -285,7 +286,8 @@ public class MontarPCService {
             }
             case "tarjeta-grafica" -> {
                 TarjetaGrafica tarjetaGrafica = (TarjetaGrafica) componente;
-                detalles.put("chipset", tarjetaGrafica.getChipset());
+                detalles.put("modelo", tarjetaGrafica.getNombre());
+                detalles.put("fabricante", inferirFabricante(tarjetaGrafica.getChipset()));
                 detalles.put("memoria", tarjetaGrafica.getMemoria());
                 detalles.put("frecuenciaBase", tarjetaGrafica.getFrecuenciaBase());
                 detalles.put("frecuenciaBoost", tarjetaGrafica.getFrecuenciaBoost());
@@ -323,6 +325,18 @@ public class MontarPCService {
         }
 
         return detalles;
+    }
+
+    private String inferirFabricante(String chipset) {
+        if (chipset == null) return "Otro";
+        String lower = chipset.toLowerCase();
+        if (lower.contains("rtx") || lower.contains("gtx") || lower.contains("quadro")
+                || lower.contains("geforce") || lower.contains("titan")) return "NVIDIA";
+        if (lower.contains(" rx ") || lower.contains("radeon") || lower.contains("vega")
+                || lower.contains("fury") || lower.contains("firepro")) return "AMD";
+        if (lower.contains("arc") || lower.contains("iris") || lower.contains("uhd")
+                || lower.contains("hd graphics") || lower.contains("xe")) return "Intel";
+        return "Otro";
     }
 
     private String normalizeType(String tipo) {

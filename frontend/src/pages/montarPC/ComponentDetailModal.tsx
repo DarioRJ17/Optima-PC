@@ -76,7 +76,7 @@ export default function ComponentDetailModal({
       case 'memoria-ram':
         return ['tipoDDR', 'velocidad', 'gbPorModulo', 'numModulos', 'totalGB', 'latenciaCAS', 'color']
       case 'tarjeta-grafica':
-        return ['chipset', 'memoria', 'frecuenciaBase', 'frecuenciaBoost', 'longitud', 'color']
+        return ['modelo', 'memoria', 'frecuenciaBase', 'frecuenciaBoost', 'longitud', 'color']
       case 'almacenamiento':
         return ['tipo', 'capacidad', 'interfaz', 'factorForma']
       case 'fuente-alimentacion':

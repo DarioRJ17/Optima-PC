@@ -53,6 +53,7 @@ export type CompatibilityWarning = {
 
 export type CompatiblePCComponent = PCComponent & {
   warnings: CompatibilityWarning[]
+  propiedades?: Record<string, unknown>
 }
 
 export type ReciclajeComponente = {

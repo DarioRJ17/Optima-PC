@@ -21,8 +21,8 @@
 .side-panel {
   position: fixed;
   top: 0;
-  right: -750px;
-  width: 750px;
+  right: -960px;
+  width: 960px;
   height: 100vh;
   background: white;
   box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
@@ -34,6 +34,43 @@
 
 .side-panel.open {
   right: 0;
+}
+
+.filters-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 13px;
+  color: #555;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.filters-toggle-btn:hover {
+  background: #eeeeee;
+  color: #333;
+}
+
+.filters-toggle-btn.active {
+  background: #e3f2fd;
+  border-color: #90caf9;
+  color: #1565c0;
+}
+
+.filters-active-dot {
+  width: 7px;
+  height: 7px;
+  background: #2196f3;
+  border-radius: 50%;
+  position: absolute;
+  top: 4px;
+  right: 4px;
 }
 
 .side-panel-header {
@@ -77,12 +114,80 @@
   color: #333;
 }
 
+/* Barra de búsqueda por nombre */
+.side-panel-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-bottom: 1px solid #e8e8e8;
+  background: white;
+}
+
+.search-icon {
+  color: #aaa;
+  flex-shrink: 0;
+}
+
+.search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  color: #333;
+  background: transparent;
+}
+
+.search-input::placeholder {
+  color: #bbb;
+}
+
+.search-clear {
+  background: none;
+  border: none;
+  color: #bbb;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.search-clear:hover {
+  background: #f0f0f0;
+  color: #666;
+}
+
 .side-panel-wrapper {
   flex: 1;
   display: flex;
   overflow: hidden;
 }
 
+/* Columna izquierda de filtros */
+.side-panel-filters {
+  width: 220px;
+  min-width: 220px;
+  border-right: 1px solid #e8e8e8;
+  overflow-y: auto;
+  background: #fafafa;
+}
+
+.side-panel-filters::-webkit-scrollbar {
+  width: 5px;
+}
+
+.side-panel-filters::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.side-panel-filters::-webkit-scrollbar-thumb {
+  background: #ddd;
+  border-radius: 3px;
+}
+
+/* Columna derecha de componentes */
 .side-panel-content {
   flex: 1;
   overflow-y: auto;
@@ -143,27 +248,37 @@
   background: #999;
 }
 
-/* Responsive para pantallas pequeñas */
-@media (max-width: 900px) {
+/* En pantallas medianas, ocultar columna de filtros (usar botón toggle) */
+@media (max-width: 1100px) {
   .side-panel {
-    width: 360px;
+    width: 750px;
+    right: -750px;
+  }
+
+  .side-panel-filters {
+    width: 200px;
+    min-width: 200px;
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .side-panel {
     width: 100%;
-  }
-
-  .side-panel-overlay {
-    display: none;
-  }
-
-  .side-panel {
     right: -100%;
   }
 
-  .side-panel.open {
-    right: 0;
+  .side-panel-filters {
+    width: 180px;
+    min-width: 180px;
+  }
+}
+
+@media (max-width: 600px) {
+  .side-panel-filters {
+    display: none;
+  }
+
+  .filters-toggle-btn {
+    display: none;
   }
 }

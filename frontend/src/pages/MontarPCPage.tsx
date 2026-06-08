@@ -203,6 +203,7 @@ export function MontarPCPage({ onBack }: MontarPCPageProps) {
 
       <ComponentSidePanel
         isOpen={sidePanelOpen !== null}
+        tipo={sidePanelOpen || ''}
         title={COMPONENT_TYPES.find((t) => t.id === sidePanelOpen)?.label || ''}
         components={availableComponents}
         selectedComponentId={getSelectedComponentByType(sidePanelOpen || '')?.id}
