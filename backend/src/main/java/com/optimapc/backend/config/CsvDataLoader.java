@@ -100,7 +100,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		RefrigeradorCPU refrigeradorCPU = primer(RefrigeradorCPU.class);
 
 		ConfiguracionPC gaming = new ConfiguracionPC();
-		gaming.setTipoUsoPrevisto("Gaming equilibrado");
+		gaming.setUsosPrevistos(Set.of(TipoUso.GAMING));
 		gaming.setFavorita(Boolean.TRUE);
 		agregarComponente(gaming, "CPU", procesador, 1);
 		agregarComponente(gaming, "GPU", tarjetaGrafica, 1);
@@ -113,7 +113,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		entityManager.persist(gaming);
 
 		ConfiguracionPC ofimatica = new ConfiguracionPC();
-		ofimatica.setTipoUsoPrevisto("Ofimática y estudio");
+		ofimatica.setUsosPrevistos(Set.of(TipoUso.OFIMATICA));
 		ofimatica.setFavorita(Boolean.FALSE);
 		agregarComponente(ofimatica, "CPU", procesador, 1);
 		agregarComponente(ofimatica, "Placa base", placaBase, 1);
@@ -124,7 +124,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		entityManager.persist(ofimatica);
 
 		ConfiguracionPC edicion = new ConfiguracionPC();
-		edicion.setTipoUsoPrevisto("Edición y creación de contenido");
+		edicion.setUsosPrevistos(Set.of(TipoUso.EDICION));
 		edicion.setFavorita(Boolean.FALSE);
 		agregarComponente(edicion, "CPU", procesador, 1);
 		agregarComponente(edicion, "GPU", tarjetaGrafica, 1);
@@ -137,6 +137,7 @@ public class CsvDataLoader implements ApplicationRunner {
 	}
 
 	private void sembrarPremontadosSiNecesario() {
+		if (tieneFilas(Premontado.class)) return;
 		// OFIMÁTICA
 		asegurarPremontadoOfimaticaBasica();
 		asegurarPremontadoOfimaticaProductiva();
@@ -176,7 +177,6 @@ public class CsvDataLoader implements ApplicationRunner {
 	// ── OFIMÁTICA ────────────────────────────────────────────────────────────
 
 	private void asegurarPremontadoOfimaticaBasica() {
-		if (existePremontadoConTipoUsoPrevisto("Ofimática básica")) return;
 		Procesador cpu = componenteMasBarato(Procesador.class,
 				c -> "AM4".equals(c.getSocket()) && c.getGraficaIntegrada() != null && !c.getGraficaIntegrada().isBlank() && c.getNucleos() != null && c.getNucleos() >= 6);
 		PlacaBase placa = componenteMasBarato(PlacaBase.class,
@@ -190,7 +190,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		Caja caja = componenteMasBarato(Caja.class,
 				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("MICROATX"));
 		Premontado p = new Premontado();
-		p.setTipoUsoPrevisto("Ofimática básica");
+		p.setNombre("Ofimática básica");
 		p.setFavorita(Boolean.FALSE);
 		p.setDescripcion("Equipo de entrada para navegación, correo, Office y videollamadas. CPU con gráfica integrada; no necesita GPU dedicada.");
 		p.setMarca("OptimaPC");
@@ -209,7 +209,6 @@ public class CsvDataLoader implements ApplicationRunner {
 	}
 
 	private void asegurarPremontadoOfimaticaProductiva() {
-		if (existePremontadoConTipoUsoPrevisto("Ofimática productiva")) return;
 		Procesador cpu = componenteMasBarato(Procesador.class,
 				c -> "AM4".equals(c.getSocket()) && c.getGraficaIntegrada() != null && !c.getGraficaIntegrada().isBlank() && c.getNucleos() != null && c.getNucleos() >= 8);
 		PlacaBase placa = componenteMasBarato(PlacaBase.class,
@@ -223,7 +222,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		Caja caja = componenteMasBarato(Caja.class,
 				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
 		Premontado p = new Premontado();
-		p.setTipoUsoPrevisto("Ofimática productiva");
+		p.setNombre("Ofimática productiva");
 		p.setFavorita(Boolean.FALSE);
 		p.setDescripcion("APU de 8 núcleos y 32 GB de RAM para multitarea fluida, hojas de cálculo complejas y reuniones online simultáneas sin GPU dedicada.");
 		p.setMarca("OptimaPC");
@@ -242,7 +241,6 @@ public class CsvDataLoader implements ApplicationRunner {
 	}
 
 	private void asegurarPremontadoOfimaticaAM5() {
-		if (existePremontadoConTipoUsoPrevisto("Ofimática AM5")) return;
 		// APU Zen 4 de nueva generación: el campo graphics contiene el modelo (ej. "Radeon 740M"), no solo "Radeon"
 		Procesador cpu = componenteMasBarato(Procesador.class,
 				c -> "AM5".equals(c.getSocket()) && c.getGraficaIntegrada() != null && c.getGraficaIntegrada().length() > "Radeon".length());
@@ -257,7 +255,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		Caja caja = componenteMasBarato(Caja.class,
 				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("MICROATX"));
 		Premontado p = new Premontado();
-		p.setTipoUsoPrevisto("Ofimática AM5");
+		p.setNombre("Ofimática AM5");
 		p.setFavorita(Boolean.FALSE);
 		p.setDescripcion("APU Zen 4 en plataforma AM5 con DDR5. Gráfica integrada RDNA3 capaz de 4K, corrección de fotos básica y soporte multi-monitor sin GPU discreta.");
 		p.setMarca("OptimaPC");
@@ -276,7 +274,6 @@ public class CsvDataLoader implements ApplicationRunner {
 	}
 
 	private void asegurarPremontadoOficinaProfesional() {
-		if (existePremontadoConTipoUsoPrevisto("Oficina profesional")) return;
 		// APU AM5 de alta gama (Radeon 780M): precio >= 250
 		Procesador cpu = componenteMasBarato(Procesador.class,
 				c -> "AM5".equals(c.getSocket()) && c.getGraficaIntegrada() != null && c.getGraficaIntegrada().length() > "Radeon".length() && c.getPrecio() != null && c.getPrecio() >= 250.0);
@@ -291,7 +288,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		Caja caja = componenteMasBarato(Caja.class,
 				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
 		Premontado p = new Premontado();
-		p.setTipoUsoPrevisto("Oficina profesional");
+		p.setNombre("Oficina profesional");
 		p.setFavorita(Boolean.FALSE);
 		p.setDescripcion("Workstation de oficina con APU Radeon 780M, 32 GB DDR5 y 2 TB. Ideal para PYMES, soporte multi-monitor y aplicaciones ERP sin GPU dedicada.");
 		p.setMarca("OptimaWork");
@@ -312,7 +309,6 @@ public class CsvDataLoader implements ApplicationRunner {
 	// ── PROGRAMACIÓN ─────────────────────────────────────────────────────────
 
 	private void asegurarPremontadoProgramacionWeb() {
-		if (existePremontadoConTipoUsoPrevisto("Programación web")) return;
 		Procesador cpu = componenteMasBarato(Procesador.class,
 				c -> "AM4".equals(c.getSocket()) && c.getGraficaIntegrada() != null && !c.getGraficaIntegrada().isBlank() && c.getNucleos() != null && c.getNucleos() >= 6);
 		PlacaBase placa = componenteMasBarato(PlacaBase.class,
@@ -326,7 +322,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		Caja caja = componenteMasBarato(Caja.class,
 				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("MICROATX"));
 		Premontado p = new Premontado();
-		p.setTipoUsoPrevisto("Programación web");
+		p.setNombre("Programación web");
 		p.setFavorita(Boolean.FALSE);
 		p.setDescripcion("Equipo compacto y silencioso para desarrollo frontend/backend. APU con 16 GB de RAM para el IDE, el navegador y un servidor local simultáneamente.");
 		p.setMarca("OptimaPC");
@@ -345,7 +341,6 @@ public class CsvDataLoader implements ApplicationRunner {
 	}
 
 	private void asegurarPremontadoProgramacionFullStack() {
-		if (existePremontadoConTipoUsoPrevisto("Programación full stack")) return;
 		Procesador cpu = componenteMasBarato(Procesador.class,
 				c -> "AM4".equals(c.getSocket()) && c.getGraficaIntegrada() != null && !c.getGraficaIntegrada().isBlank() && c.getNucleos() != null && c.getNucleos() >= 8);
 		PlacaBase placa = componenteMasBarato(PlacaBase.class,
@@ -359,7 +354,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		Caja caja = componenteMasBarato(Caja.class,
 				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
 		Premontado p = new Premontado();
-		p.setTipoUsoPrevisto("Programación full stack");
+		p.setNombre("Programación full stack");
 		p.setFavorita(Boolean.FALSE);
 		p.setDescripcion("32 GB de RAM y 2 TB SSD para varios proyectos, bases de datos locales, máquinas virtuales ligeras e IDEs exigentes sin compromisos.");
 		p.setMarca("OptimaPC");
@@ -378,7 +373,6 @@ public class CsvDataLoader implements ApplicationRunner {
 	}
 
 	private void asegurarPremontadoDevOps() {
-		if (existePremontadoConTipoUsoPrevisto("DevOps y contenedores")) return;
 		// 12 núcleos AM4 sin iGPU para compilaciones y contenedores + GPU de display básica
 		Procesador cpu = componenteMasBarato(Procesador.class,
 				c -> "AM4".equals(c.getSocket()) && (c.getGraficaIntegrada() == null || c.getGraficaIntegrada().isBlank()) && c.getNucleos() != null && c.getNucleos() >= 12);
@@ -397,7 +391,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
 				r -> r.getPrecio() != null && r.getPrecio() >= 25.0);
 		Premontado p = new Premontado();
-		p.setTipoUsoPrevisto("DevOps y contenedores");
+		p.setNombre("DevOps y contenedores");
 		p.setFavorita(Boolean.FALSE);
 		p.setDescripcion("12 núcleos Zen 3 para compilaciones paralelas, stacks Docker y pipelines CI/CD locales. 32 GB RAM y 2 TB SSD para imágenes y volúmenes grandes.");
 		p.setMarca("OptimaWork");
@@ -418,7 +412,6 @@ public class CsvDataLoader implements ApplicationRunner {
 	}
 
 	private void asegurarPremontadoDataScience() {
-		if (existePremontadoConTipoUsoPrevisto("Data science")) return;
 		Procesador cpu = componenteMasBarato(Procesador.class,
 				c -> "AM5".equals(c.getSocket()) && c.getNucleos() != null && c.getNucleos() >= 12 && c.getPrecio() != null && c.getPrecio() >= 300.0);
 		TarjetaGrafica gpu = componenteMasBarato(TarjetaGrafica.class,
@@ -436,7 +429,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
 				r -> r.getTamano() != null && r.getTamano().contains("240"));
 		Premontado p = new Premontado();
-		p.setTipoUsoPrevisto("Data science");
+		p.setNombre("Data science");
 		p.setFavorita(Boolean.FALSE);
 		p.setDescripcion("Plataforma AM5 de 12 núcleos con GPU CUDA para acelerar notebooks de machine learning. 32 GB DDR5 y 2 TB NVMe para datasets locales y entornos conda.");
 		p.setMarca("OptimaWork");
@@ -459,7 +452,6 @@ public class CsvDataLoader implements ApplicationRunner {
 	// ── GAMING ───────────────────────────────────────────────────────────────
 
 	private void asegurarPremontadoGamingEntrada1080p() {
-		if (existePremontadoConTipoUsoPrevisto("Gaming entrada 1080p")) return;
 		Procesador cpu = componenteMasBarato(Procesador.class,
 				c -> "AM4".equals(c.getSocket()) && (c.getGraficaIntegrada() == null || c.getGraficaIntegrada().isBlank()) && c.getNucleos() != null && c.getNucleos() >= 6);
 		TarjetaGrafica gpu = componenteMasBarato(TarjetaGrafica.class,
@@ -475,7 +467,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		Caja caja = componenteMasBarato(Caja.class,
 				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
 		Premontado p = new Premontado();
-		p.setTipoUsoPrevisto("Gaming entrada 1080p");
+		p.setNombre("Gaming entrada 1080p");
 		p.setFavorita(Boolean.FALSE);
 		p.setDescripcion("Primera PC gaming a precio mínimo. GPU de entrada para jugar títulos competitivos en 1080p a más de 60 FPS con ajustes medios-altos.");
 		p.setMarca("OptimaPC");
@@ -495,7 +487,6 @@ public class CsvDataLoader implements ApplicationRunner {
 	}
 
 	private void asegurarPremontadoGamingEconomico() {
-		if (existePremontadoConTipoUsoPrevisto("Gaming económico")) return;
 		Procesador cpu = componenteMasBarato(Procesador.class,
 				c -> "AM4".equals(c.getSocket()) && (c.getGraficaIntegrada() == null || c.getGraficaIntegrada().isBlank()) && c.getNucleos() != null && c.getNucleos() >= 6 && c.getPrecio() != null && c.getPrecio() >= 140.0);
 		TarjetaGrafica gpu = componenteMasBarato(TarjetaGrafica.class,
@@ -511,7 +502,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		Caja caja = componenteMasBarato(Caja.class,
 				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
 		Premontado p = new Premontado();
-		p.setTipoUsoPrevisto("Gaming económico");
+		p.setNombre("Gaming económico");
 		p.setFavorita(Boolean.TRUE);
 		p.setDescripcion("Equipo gaming por debajo de los 900 €. GPU de generación actual para 1080p a 60+ FPS en títulos AAA con ajustes altos. Excelente relación calidad-precio.");
 		p.setMarca("OptimaPC");
@@ -531,7 +522,6 @@ public class CsvDataLoader implements ApplicationRunner {
 	}
 
 	private void asegurarPremontadoGamingEquilibrado1080p() {
-		if (existePremontadoConTipoUsoPrevisto("Gaming equilibrado 1080p")) return;
 		Procesador cpu = componenteMasBarato(Procesador.class,
 				c -> "AM5".equals(c.getSocket()) && c.getNucleos() != null && c.getNucleos() >= 6 && c.getPrecio() != null && c.getPrecio() >= 150.0 && c.getPrecio() <= 230.0);
 		TarjetaGrafica gpu = componenteMasBarato(TarjetaGrafica.class,
@@ -547,7 +537,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		Caja caja = componenteMasBarato(Caja.class,
 				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
 		Premontado p = new Premontado();
-		p.setTipoUsoPrevisto("Gaming equilibrado 1080p");
+		p.setNombre("Gaming equilibrado 1080p");
 		p.setFavorita(Boolean.FALSE);
 		p.setDescripcion("Plataforma AM5 moderna con GPU de gama media para 1080p máximos o 1440p en ajustes medios. 32 GB DDR5 y amplia vida útil gracias al socket AM5.");
 		p.setMarca("OptimaPC");
@@ -567,7 +557,6 @@ public class CsvDataLoader implements ApplicationRunner {
 	}
 
 	private void asegurarPremontadoGamingAlto1080p() {
-		if (existePremontadoConTipoUsoPrevisto("Gaming alto 1080p")) return;
 		// Ryzen 7 5700X3D: AM4, 8 núcleos, ~313 €
 		Procesador cpu = componenteMasBarato(Procesador.class,
 				c -> "AM4".equals(c.getSocket()) && (c.getGraficaIntegrada() == null || c.getGraficaIntegrada().isBlank()) && c.getNucleos() != null && c.getNucleos() >= 8 && c.getPrecio() != null && c.getPrecio() >= 290.0);
@@ -586,7 +575,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
 				r -> r.getPrecio() != null && r.getPrecio() >= 30.0 && (r.getTamano() == null || r.getTamano().isBlank()));
 		Premontado p = new Premontado();
-		p.setTipoUsoPrevisto("Gaming alto 1080p");
+		p.setNombre("Gaming alto 1080p");
 		p.setFavorita(Boolean.FALSE);
 		p.setDescripcion("CPU con caché 3D para máximo FPS en juegos competitivos 1080p. GPU de gama media sólida que supera los 100 FPS en todos los títulos AAA actuales.");
 		p.setMarca("OptimaPC");
@@ -607,7 +596,6 @@ public class CsvDataLoader implements ApplicationRunner {
 	}
 
 	private void asegurarPremontadoGaming1440pEntrada() {
-		if (existePremontadoConTipoUsoPrevisto("Gaming 1440p entrada")) return;
 		Procesador cpu = componenteMasBarato(Procesador.class,
 				c -> "AM5".equals(c.getSocket()) && c.getNucleos() != null && c.getNucleos() >= 8 && c.getPrecio() != null && c.getPrecio() >= 220.0 && c.getPrecio() <= 310.0);
 		TarjetaGrafica gpu = componenteMasBarato(TarjetaGrafica.class,
@@ -625,7 +613,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
 				r -> r.getPrecio() != null && r.getPrecio() >= 30.0 && (r.getTamano() == null || r.getTamano().isBlank()));
 		Premontado p = new Premontado();
-		p.setTipoUsoPrevisto("Gaming 1440p entrada");
+		p.setNombre("Gaming 1440p entrada");
 		p.setFavorita(Boolean.FALSE);
 		p.setDescripcion("El salto a 1440p con GPU capaz de superar 60 FPS en títulos exigentes. Plataforma AM5 de 8 núcleos con DDR5 preparada para los próximos años.");
 		p.setMarca("OptimaPC");
@@ -646,7 +634,6 @@ public class CsvDataLoader implements ApplicationRunner {
 	}
 
 	private void asegurarPremontadoGaming1440p() {
-		if (existePremontadoConTipoUsoPrevisto("Gaming 1440p")) return;
 		// Ryzen 7 7800X3D: AM5, 8 núcleos, ~340 €
 		Procesador cpu = componenteMasBarato(Procesador.class,
 				c -> "AM5".equals(c.getSocket()) && c.getNucleos() != null && c.getNucleos() >= 8 && c.getPrecio() != null && c.getPrecio() >= 310.0 && c.getPrecio() <= 400.0);
@@ -665,7 +652,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
 				r -> r.getTamano() != null && r.getTamano().contains("240"));
 		Premontado p = new Premontado();
-		p.setTipoUsoPrevisto("Gaming 1440p");
+		p.setNombre("Gaming 1440p");
 		p.setFavorita(Boolean.TRUE);
 		p.setDescripcion("El mejor punto dulce gaming del catálogo. CPU con caché 3D líder en FPS + GPU de gama alta para 1440p a más de 100 FPS en todos los juegos actuales con ajustes máximos.");
 		p.setMarca("OptimaPC");
@@ -686,7 +673,6 @@ public class CsvDataLoader implements ApplicationRunner {
 	}
 
 	private void asegurarPremontadoGaming1440pAlto() {
-		if (existePremontadoConTipoUsoPrevisto("Gaming 1440p alto")) return;
 		Procesador cpu = componenteMasBarato(Procesador.class,
 				c -> "AM5".equals(c.getSocket()) && c.getNucleos() != null && c.getNucleos() >= 12 && c.getPrecio() != null && c.getPrecio() >= 330.0 && c.getPrecio() <= 430.0);
 		TarjetaGrafica gpu = componenteMasBarato(TarjetaGrafica.class,
@@ -704,7 +690,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
 				r -> r.getTamano() != null && r.getTamano().contains("360"));
 		Premontado p = new Premontado();
-		p.setTipoUsoPrevisto("Gaming 1440p alto");
+		p.setNombre("Gaming 1440p alto");
 		p.setFavorita(Boolean.FALSE);
 		p.setDescripcion("Potencia de sobra para 1440p a alta tasa de refresco o 4K casual. CPU de 12 núcleos con margen para streaming simultáneo y GPU de primera línea.");
 		p.setMarca("OptimaPC");
@@ -725,7 +711,6 @@ public class CsvDataLoader implements ApplicationRunner {
 	}
 
 	private void asegurarPremontadoGaming4K() {
-		if (existePremontadoConTipoUsoPrevisto("Gaming 4K")) return;
 		// Ryzen 7 9800X3D: AM5, 8 núcleos, ~452 €
 		Procesador cpu = componenteMasBarato(Procesador.class,
 				c -> "AM5".equals(c.getSocket()) && c.getNucleos() != null && c.getNucleos() == 8 && c.getPrecio() != null && c.getPrecio() >= 430.0);
@@ -744,7 +729,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
 				r -> r.getTamano() != null && r.getTamano().contains("360"));
 		Premontado p = new Premontado();
-		p.setTipoUsoPrevisto("Gaming 4K");
+		p.setNombre("Gaming 4K");
 		p.setFavorita(Boolean.FALSE);
 		p.setDescripcion("La CPU gaming más rápida del mercado combinada con una GPU de élite. Juega en 4K a ajustes máximos o en 1440p a más de 165 FPS sin ninguna concesión.");
 		p.setMarca("OptimaPC");
@@ -765,7 +750,6 @@ public class CsvDataLoader implements ApplicationRunner {
 	}
 
 	private void asegurarPremontadoGamingExtremo() {
-		if (existePremontadoConTipoUsoPrevisto("Gaming extremo")) return;
 		// Ryzen 9 9950X3D: AM5, 16 núcleos, ~650 €
 		Procesador cpu = componenteMasBarato(Procesador.class,
 				c -> "AM5".equals(c.getSocket()) && c.getNucleos() != null && c.getNucleos() >= 16 && c.getPrecio() != null && c.getPrecio() >= 600.0);
@@ -784,7 +768,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
 				r -> r.getTamano() != null && r.getTamano().contains("360"));
 		Premontado p = new Premontado();
-		p.setTipoUsoPrevisto("Gaming extremo");
+		p.setNombre("Gaming extremo");
 		p.setFavorita(Boolean.FALSE);
 		p.setDescripcion("Sin compromisos: 16 núcleos con 3D V-Cache y la GPU más potente del mercado. Diseñado para 4K a 120+ FPS en cualquier título presente y futuro.");
 		p.setMarca("OptimaPC");
@@ -805,7 +789,6 @@ public class CsvDataLoader implements ApplicationRunner {
 	}
 
 	private void asegurarPremontadoGamingYStreaming() {
-		if (existePremontadoConTipoUsoPrevisto("Gaming y streaming")) return;
 		Procesador cpu = componenteMasBarato(Procesador.class,
 				c -> "AM4".equals(c.getSocket()) && (c.getGraficaIntegrada() == null || c.getGraficaIntegrada().isBlank()) && c.getNucleos() != null && c.getNucleos() >= 8 && c.getPrecio() != null && c.getPrecio() >= 130.0 && c.getPrecio() <= 200.0);
 		TarjetaGrafica gpu = componenteMasBarato(TarjetaGrafica.class,
@@ -823,7 +806,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		Caja caja = componenteMasBarato(Caja.class,
 				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
 		Premontado p = new Premontado();
-		p.setTipoUsoPrevisto("Gaming y streaming");
+		p.setNombre("Gaming y streaming");
 		p.setFavorita(Boolean.FALSE);
 		p.setDescripcion("8 núcleos para jugar y encodear en OBS sin caídas de FPS. NVENC/AMF de GPU actual para streams 1080p60. HDD de 2 TB para almacenar grabaciones largas.");
 		p.setMarca("OptimaPC");
@@ -846,7 +829,6 @@ public class CsvDataLoader implements ApplicationRunner {
 	// ── EDICIÓN ──────────────────────────────────────────────────────────────
 
 	private void asegurarPremontadoEdicionFotografica() {
-		if (existePremontadoConTipoUsoPrevisto("Edición fotográfica")) return;
 		Procesador cpu = componenteMasBarato(Procesador.class,
 				c -> "AM4".equals(c.getSocket()) && (c.getGraficaIntegrada() == null || c.getGraficaIntegrada().isBlank()) && c.getNucleos() != null && c.getNucleos() >= 8 && c.getPrecio() != null && c.getPrecio() >= 130.0 && c.getPrecio() <= 200.0);
 		TarjetaGrafica gpu = componenteMasBarato(TarjetaGrafica.class,
@@ -862,7 +844,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		Caja caja = componenteMasBarato(Caja.class,
 				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
 		Premontado p = new Premontado();
-		p.setTipoUsoPrevisto("Edición fotográfica");
+		p.setNombre("Edición fotográfica");
 		p.setFavorita(Boolean.FALSE);
 		p.setDescripcion("32 GB RAM y 2 TB NVMe para catálogos RAW en Lightroom y retoques en Photoshop sin tiempos de espera. GPU con aceleración para filtros y exportación.");
 		p.setMarca("OptimaPC");
@@ -882,7 +864,6 @@ public class CsvDataLoader implements ApplicationRunner {
 	}
 
 	private void asegurarPremontadoEdicionVideo1080p() {
-		if (existePremontadoConTipoUsoPrevisto("Edición vídeo 1080p")) return;
 		Procesador cpu = componenteMasBarato(Procesador.class,
 				c -> "AM4".equals(c.getSocket()) && (c.getGraficaIntegrada() == null || c.getGraficaIntegrada().isBlank()) && c.getNucleos() != null && c.getNucleos() >= 12 && c.getPrecio() != null && c.getPrecio() >= 230.0);
 		TarjetaGrafica gpu = componenteMasBarato(TarjetaGrafica.class,
@@ -900,7 +881,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
 				r -> r.getPrecio() != null && r.getPrecio() >= 30.0 && (r.getTamano() == null || r.getTamano().isBlank()));
 		Premontado p = new Premontado();
-		p.setTipoUsoPrevisto("Edición vídeo 1080p");
+		p.setNombre("Edición vídeo 1080p");
 		p.setFavorita(Boolean.FALSE);
 		p.setDescripcion("12 núcleos para renderizar líneas de tiempo complejas en Premiere o Resolve. GPU acelera efectos y exportación H.265. Ideal para youtubers y videógrafos.");
 		p.setMarca("OptimaPC");
@@ -921,7 +902,6 @@ public class CsvDataLoader implements ApplicationRunner {
 	}
 
 	private void asegurarPremontadoEdicionVideo4K() {
-		if (existePremontadoConTipoUsoPrevisto("Edición vídeo 4K")) return;
 		Procesador cpu = componenteMasBarato(Procesador.class,
 				c -> "AM5".equals(c.getSocket()) && c.getNucleos() != null && c.getNucleos() >= 12 && c.getPrecio() != null && c.getPrecio() >= 300.0 && c.getPrecio() <= 380.0);
 		TarjetaGrafica gpu = componenteMasBarato(TarjetaGrafica.class,
@@ -941,7 +921,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
 				r -> r.getTamano() != null && r.getTamano().contains("360"));
 		Premontado p = new Premontado();
-		p.setTipoUsoPrevisto("Edición vídeo 4K");
+		p.setNombre("Edición vídeo 4K");
 		p.setFavorita(Boolean.FALSE);
 		p.setDescripcion("Edita vídeo 4K RAW sin proxies. 12 núcleos AM5 + GPU de gama alta + HDD de archivo para los proyectos terminados. Refrigeración AIO para sostenibilidad en renders largos.");
 		p.setMarca("OptimaWork");
@@ -963,7 +943,6 @@ public class CsvDataLoader implements ApplicationRunner {
 	}
 
 	private void asegurarPremontadoEdicionProfesional() {
-		if (existePremontadoConTipoUsoPrevisto("Edición profesional 4K")) return;
 		// Ryzen 9 9950X: AM5, 16 núcleos, ~534 €
 		Procesador cpu = componenteMasBarato(Procesador.class,
 				c -> "AM5".equals(c.getSocket()) && c.getNucleos() != null && c.getNucleos() >= 16 && c.getPrecio() != null && c.getPrecio() >= 500.0);
@@ -982,7 +961,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
 				r -> r.getTamano() != null && r.getTamano().contains("360"));
 		Premontado p = new Premontado();
-		p.setTipoUsoPrevisto("Edición profesional 4K");
+		p.setNombre("Edición profesional 4K");
 		p.setFavorita(Boolean.FALSE);
 		p.setDescripcion("Workstation de alto nivel: 16 núcleos Zen 5 y 64 GB DDR5 para proyectos 4K/8K, composición multicapa y renders nocturnos en DaVinci Resolve Studio.");
 		p.setMarca("OptimaWork");
@@ -1004,7 +983,6 @@ public class CsvDataLoader implements ApplicationRunner {
 	}
 
 	private void asegurarPremontadoMotionGraphics3D() {
-		if (existePremontadoConTipoUsoPrevisto("Motion graphics y 3D")) return;
 		Procesador cpu = componenteMasBarato(Procesador.class,
 				c -> "AM5".equals(c.getSocket()) && c.getNucleos() != null && c.getNucleos() >= 16 && c.getPrecio() != null && c.getPrecio() >= 500.0);
 		TarjetaGrafica gpu = componenteMasBarato(TarjetaGrafica.class,
@@ -1022,7 +1000,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
 				r -> r.getTamano() != null && r.getTamano().contains("360"));
 		Premontado p = new Premontado();
-		p.setTipoUsoPrevisto("Motion graphics y 3D");
+		p.setNombre("Motion graphics y 3D");
 		p.setFavorita(Boolean.FALSE);
 		p.setDescripcion("Render GPU de escenas 3D en Blender o motion graphics en After Effects acelerados por hardware. 64 GB RAM y GPU top de gama para tiempos de render mínimos.");
 		p.setMarca("OptimaWork");
@@ -1046,7 +1024,6 @@ public class CsvDataLoader implements ApplicationRunner {
 	// ── STREAMING ────────────────────────────────────────────────────────────
 
 	private void asegurarPremontadoStreamingEconomico() {
-		if (existePremontadoConTipoUsoPrevisto("Streaming económico")) return;
 		Procesador cpu = componenteMasBarato(Procesador.class,
 				c -> "AM4".equals(c.getSocket()) && (c.getGraficaIntegrada() == null || c.getGraficaIntegrada().isBlank()) && c.getNucleos() != null && c.getNucleos() >= 8 && c.getPrecio() != null && c.getPrecio() >= 130.0 && c.getPrecio() <= 200.0);
 		TarjetaGrafica gpu = componenteMasBarato(TarjetaGrafica.class,
@@ -1064,7 +1041,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		Caja caja = componenteMasBarato(Caja.class,
 				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
 		Premontado p = new Premontado();
-		p.setTipoUsoPrevisto("Streaming económico");
+		p.setNombre("Streaming económico");
 		p.setFavorita(Boolean.FALSE);
 		p.setDescripcion("8 núcleos con margen para OBS + juego simultáneo. NVENC/AMF de GPU actual para streams 1080p60 sin impacto en FPS. HDD 2 TB para guardar VODs.");
 		p.setMarca("OptimaPC");
@@ -1085,7 +1062,6 @@ public class CsvDataLoader implements ApplicationRunner {
 	}
 
 	private void asegurarPremontadoStreamingProfesional() {
-		if (existePremontadoConTipoUsoPrevisto("Streaming profesional")) return;
 		Procesador cpu = componenteMasBarato(Procesador.class,
 				c -> "AM5".equals(c.getSocket()) && c.getNucleos() != null && c.getNucleos() >= 12 && c.getPrecio() != null && c.getPrecio() >= 330.0 && c.getPrecio() <= 430.0);
 		TarjetaGrafica gpu = componenteMasBarato(TarjetaGrafica.class,
@@ -1103,7 +1079,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
 				r -> r.getTamano() != null && r.getTamano().contains("240"));
 		Premontado p = new Premontado();
-		p.setTipoUsoPrevisto("Streaming profesional");
+		p.setNombre("Streaming profesional");
 		p.setFavorita(Boolean.FALSE);
 		p.setDescripcion("12 núcleos AM5 para streams 1440p con bitrate alto, editar los VODs y jugar sin cuellos de botella. GPU de élite con el mejor encoder de nueva generación.");
 		p.setMarca("OptimaPC");
@@ -1124,7 +1100,6 @@ public class CsvDataLoader implements ApplicationRunner {
 	}
 
 	private void asegurarPremontadoCreadorContenido() {
-		if (existePremontadoConTipoUsoPrevisto("Creador de contenido")) return;
 		Procesador cpu = componenteMasBarato(Procesador.class,
 				c -> "AM5".equals(c.getSocket()) && c.getNucleos() != null && c.getNucleos() >= 12 && c.getPrecio() != null && c.getPrecio() >= 300.0 && c.getPrecio() <= 370.0);
 		TarjetaGrafica gpu = componenteMasBarato(TarjetaGrafica.class,
@@ -1142,7 +1117,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
 				r -> r.getTamano() != null && r.getTamano().contains("240"));
 		Premontado p = new Premontado();
-		p.setTipoUsoPrevisto("Creador de contenido");
+		p.setNombre("Creador de contenido");
 		p.setFavorita(Boolean.FALSE);
 		p.setDescripcion("Equilibrio perfecto entre edición y streaming: 12 núcleos para renderizar vídeos mientras se emite en directo, GPU con buen encoder y 2 TB para proyectos.");
 		p.setMarca("OptimaPC");
@@ -1165,7 +1140,6 @@ public class CsvDataLoader implements ApplicationRunner {
 	// ── VERSÁTILES ───────────────────────────────────────────────────────────
 
 	private void asegurarPremontadoTodoEnUnoVersatil() {
-		if (existePremontadoConTipoUsoPrevisto("Todo en uno versátil")) return;
 		Procesador cpu = componenteMasBarato(Procesador.class,
 				c -> "AM4".equals(c.getSocket()) && (c.getGraficaIntegrada() == null || c.getGraficaIntegrada().isBlank()) && c.getNucleos() != null && c.getNucleos() >= 6 && c.getPrecio() != null && c.getPrecio() >= 100.0 && c.getPrecio() <= 175.0);
 		TarjetaGrafica gpu = componenteMasBarato(TarjetaGrafica.class,
@@ -1181,7 +1155,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		Caja caja = componenteMasBarato(Caja.class,
 				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
 		Premontado p = new Premontado();
-		p.setTipoUsoPrevisto("Todo en uno versátil");
+		p.setNombre("Todo en uno versátil");
 		p.setFavorita(Boolean.FALSE);
 		p.setDescripcion("El equipo para quien lo quiere todo: trabaja, programa, edita fotos y juega títulos de gama media. 32 GB de RAM para no cerrar nada nunca.");
 		p.setMarca("OptimaPC");
@@ -1201,7 +1175,6 @@ public class CsvDataLoader implements ApplicationRunner {
 	}
 
 	private void asegurarPremontadoWorkstationVersatil() {
-		if (existePremontadoConTipoUsoPrevisto("Workstation versátil")) return;
 		Procesador cpu = componenteMasBarato(Procesador.class,
 				c -> "AM5".equals(c.getSocket()) && c.getNucleos() != null && c.getNucleos() >= 12 && c.getPrecio() != null && c.getPrecio() >= 300.0 && c.getPrecio() <= 380.0);
 		TarjetaGrafica gpu = componenteMasBarato(TarjetaGrafica.class,
@@ -1219,7 +1192,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
 				r -> r.getTamano() != null && r.getTamano().contains("240"));
 		Premontado p = new Premontado();
-		p.setTipoUsoPrevisto("Workstation versátil");
+		p.setNombre("Workstation versátil");
 		p.setFavorita(Boolean.FALSE);
 		p.setDescripcion("Plataforma AM5 de 12 núcleos con 64 GB DDR5 para exigencias profesionales variadas: compilación, modelos ML ligeros, edición y gaming ocasional en una sola máquina.");
 		p.setMarca("OptimaWork");
@@ -1325,15 +1298,6 @@ public class CsvDataLoader implements ApplicationRunner {
 
 	private boolean tieneFilas(Class<?> entityClass) {
 		Long total = entityManager.createQuery("select count(e) from " + entityClass.getSimpleName() + " e", Long.class)
-				.getSingleResult();
-		return total != null && total > 0;
-	}
-
-	private boolean existePremontadoConTipoUsoPrevisto(String tipoUsoPrevisto) {
-		Long total = entityManager.createQuery(
-				"select count(p) from Premontado p where lower(p.tipoUsoPrevisto) = lower(:tipoUsoPrevisto)",
-				Long.class)
-				.setParameter("tipoUsoPrevisto", tipoUsoPrevisto)
 				.getSingleResult();
 		return total != null && total > 0;
 	}

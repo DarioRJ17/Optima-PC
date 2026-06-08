@@ -186,12 +186,12 @@ public class PremontadoCatalogoService {
     }
 
     private String construirTitulo(Premontado premontado) {
-        String tipoUso = premontado.getTipoUsoPrevisto();
+        String nombre = premontado.getNombre();
         String marca = premontado.getMarca();
-        if (tipoUso == null || tipoUso.isBlank()) {
+        if (nombre == null || nombre.isBlank()) {
             return marca;
         }
-        return String.format(Locale.ROOT, "%s %s", marca, tipoUso).trim();
+        return String.format(Locale.ROOT, "%s %s", marca, nombre).trim();
     }
 
     private double redondear(double value) {
