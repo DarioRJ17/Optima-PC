@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import com.optimapc.backend.catalogo.ComponenteDto;
 import com.optimapc.backend.montarPC.dto.CompatibleComponenteDto;
 import com.optimapc.backend.montarPC.dto.ComponenteDetalleDto;
+import com.optimapc.backend.montarPC.EquilibrioResult;
 
 @RestController
 @RequestMapping("/api/configuracion-pc")
@@ -44,5 +45,10 @@ public class ConfiguracionPCController {
         return montarPCService.getComponenteDetalle(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/equilibrio")
+    public EquilibrioResult getEquilibrio(@RequestParam(required = false) List<Long> selectedIds) {
+        return montarPCService.calcularEquilibrio(selectedIds);
     }
 }

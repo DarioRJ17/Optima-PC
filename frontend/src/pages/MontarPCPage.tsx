@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
-import type { CompatiblePCComponent } from '../types'
+import type { CompatiblePCComponent, EquilibrioData } from '../types'
 import ComponentDetailModal from './montarPC/ComponentDetailModal.tsx'
 import ComponentSidePanel from './montarPC/ComponentSidePanel'
 import SummaryPane from './montarPC/SummaryPane'
@@ -45,6 +45,22 @@ export function MontarPCPage({ onBack }: MontarPCPageProps) {
   const [error, setError] = useState('')
   const [detailModalOpen, setDetailModalOpen] = useState(false)
   const [selectedComponentDetail, setSelectedComponentDetail] = useState<CompatiblePCComponent | null>(null)
+  const [equilibrio, setEquilibrio] = useState<EquilibrioData | null>(null)
+
+  const RELEVANT_TYPES = new Set(['procesador', 'tarjeta-grafica', 'memoria-ram', 'almacenamiento'])
+
+  useEffect(() => {
+    const relevantes = selectedComponents.filter((c) => RELEVANT_TYPES.has(c.tipo))
+    if (relevantes.length === 0) {
+      setEquilibrio(null)
+      return
+    }
+    const ids = selectedComponents.map((c) => c.id).join(',')
+    fetch(`${API_BASE_URL}/api/configuracion-pc/equilibrio?selectedIds=${ids}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: EquilibrioData | null) => setEquilibrio(data))
+      .catch(() => setEquilibrio(null))
+  }, [selectedComponents])
 
   const totalPrice = selectedComponents.reduce((sum, c) => sum + c.precio, 0)
   const requiredCount = COMPONENT_TYPES.filter((componentType) => componentType.id !== 'refrigerador-cpu').length
@@ -190,6 +206,7 @@ export function MontarPCPage({ onBack }: MontarPCPageProps) {
           onRemove={handleRemoveComponent}
           totalPrice={totalPrice}
           requiredCount={requiredCount}
+          equilibrio={equilibrio}
         />
       </div>
 

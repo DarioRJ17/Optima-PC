@@ -1,3 +1,5 @@
+import type { EquilibrioData } from '../../types'
+
 interface SelectedComponent {
   id: number
   tipo: string
@@ -16,9 +18,23 @@ interface Props {
   onRemove: (tipo: string) => void
   totalPrice: number
   requiredCount: number
+  equilibrio: EquilibrioData | null
 }
 
-export default function SummaryPane({ componentTypes, selectedComponents, onRemove, totalPrice, requiredCount }: Props) {
+function scoreColor(score: number): string {
+  if (score >= 70) return '#4caf50'
+  if (score >= 40) return '#ff9800'
+  return '#f44336'
+}
+
+export default function SummaryPane({
+  componentTypes,
+  selectedComponents,
+  onRemove,
+  totalPrice,
+  requiredCount,
+  equilibrio,
+}: Props) {
   const selectedTypeIds = new Set(selectedComponents.map((component) => component.tipo))
   const requiredTypeIds = componentTypes
     .filter((componentType) => componentType.id !== 'refrigerador-cpu')
@@ -58,9 +74,43 @@ export default function SummaryPane({ componentTypes, selectedComponents, onRemo
 
       <div className="summary-stats">
         <p>
-          Componentes obligatiorios seleccionados: <strong>{selectedRequiredCount} / {requiredCount}</strong>
+          Componentes obligatorios seleccionados:{' '}
+          <strong>
+            {selectedRequiredCount} / {requiredCount}
+          </strong>
         </p>
       </div>
+
+      {/* Indicador de equilibrio */}
+      {equilibrio && (
+        <div className="summary-equilibrio">
+          <div className="equilibrio-header">
+            <span className="equilibrio-label">Equilibrio de la build</span>
+            <span className="equilibrio-score" style={{ color: scoreColor(equilibrio.score) }}>
+              {Math.round(equilibrio.score)}<span className="equilibrio-max">/100</span>
+            </span>
+          </div>
+          <div className="equilibrio-track">
+            <div
+              className="equilibrio-fill"
+              style={{
+                width: `${Math.min(100, Math.max(0, equilibrio.score))}%`,
+                background: scoreColor(equilibrio.score),
+              }}
+            />
+          </div>
+          {equilibrio.componentes.length > 0 && (
+            <div className="equilibrio-avisos">
+              {equilibrio.componentes.map((d) => (
+                <span key={d.nombre} className="equilibrio-aviso">
+                  {d.sobredimensionado ? '▲' : '▼'} {d.nombre}{' '}
+                  {d.sobredimensionado ? 'sobredimensionada' : 'es cuello de botella'}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="summary-total">
         <span>Precio total:</span>

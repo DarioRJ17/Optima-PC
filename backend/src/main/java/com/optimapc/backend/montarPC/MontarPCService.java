@@ -15,6 +15,8 @@ import com.optimapc.backend.montarPC.dto.CompatibilityWarningDto;
 import com.optimapc.backend.modelo.Componente;
 import com.optimapc.backend.modelo.Almacenamiento;
 import com.optimapc.backend.modelo.Caja;
+import com.optimapc.backend.modelo.ConfiguracionComponente;
+import com.optimapc.backend.modelo.ConfiguracionPC;
 import com.optimapc.backend.modelo.FuenteAlimentacion;
 import com.optimapc.backend.modelo.MemoriaRAM;
 import com.optimapc.backend.modelo.PlacaBase;
@@ -26,9 +28,11 @@ import com.optimapc.backend.modelo.TarjetaGrafica;
 public class MontarPCService {
 
     private final ComponenteRepository componenteRepository;
+    private final RendimientoService rendimientoService;
 
-    public MontarPCService(ComponenteRepository componenteRepository) {
+    public MontarPCService(ComponenteRepository componenteRepository, RendimientoService rendimientoService) {
         this.componenteRepository = componenteRepository;
+        this.rendimientoService = rendimientoService;
     }
 
     public List<ComponenteDto> getAllComponents() {
@@ -325,6 +329,21 @@ public class MontarPCService {
         }
 
         return detalles;
+    }
+
+    public EquilibrioResult calcularEquilibrio(List<Long> selectedIds) {
+        if (selectedIds == null || selectedIds.isEmpty()) {
+            return new EquilibrioResult(0.0, List.of());
+        }
+        List<Componente> componentes = componenteRepository.findAllById(selectedIds);
+        ConfiguracionPC config = new ConfiguracionPC();
+        for (Componente c : componentes) {
+            ConfiguracionComponente cc = new ConfiguracionComponente();
+            cc.setComponente(c);
+            cc.setCantidad(1);
+            config.agregarComponente(cc);
+        }
+        return rendimientoService.calcularEquilibrio(config, null);
     }
 
     private String inferirFabricante(String chipset) {

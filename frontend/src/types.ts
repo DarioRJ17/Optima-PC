@@ -71,6 +71,11 @@ export type ComponenteDesbalanceado = {
   desviacion: number
 }
 
+export type EquilibrioData = {
+  score: number
+  componentes: ComponenteDesbalanceado[]
+}
+
 export type ReciclajeConfiguracion = {
   componentes: ReciclajeComponente[]
   scoreRendimiento: number
