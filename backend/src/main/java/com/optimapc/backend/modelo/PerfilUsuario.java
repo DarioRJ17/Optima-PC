@@ -3,6 +3,7 @@ package com.optimapc.backend.modelo;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import com.optimapc.backend.usuario.Usuario;
 
@@ -153,7 +154,7 @@ public class PerfilUsuario {
         fechaUltimaActualizacion = LocalDateTime.now();
     }
 
-    public void actualizarDesdeValoracion(TipoUso usoInferido, Double presupuestoRelacionado, Boolean compraReacondicionado, Integer puntuacion) {
+    public void actualizarDesdeValoracion(Set<TipoUso> usosInferidos, Double presupuestoRelacionado, Boolean compraReacondicionado, Integer puntuacion) {
         if (presupuestoRelacionado != null) {
             presupuestoEstimado = presupuestoEstimado == null || presupuestoEstimado <= 0.0
                     ? presupuestoRelacionado
@@ -164,7 +165,9 @@ public class PerfilUsuario {
             preferenciaDeReacondicionado = true;
         }
 
-        actualizarDesdeUsoInferido(usoInferido);
+        if (usosInferidos != null) {
+            usosInferidos.forEach(this::actualizarDesdeUsoInferido);
+        }
 
         aplicarImpactoGeneral(PESO_ACCION_VALORACION * calcularIntensidadValoracion(puntuacion));
 

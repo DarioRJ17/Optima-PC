@@ -80,8 +80,8 @@ public class CatalogoController {
         return perfilUsuarioService.obtenerPorUsuarioId(usuarioId)
                 .map(perfil -> {
                     List<Premontado> premontados = premontadoCatalogoService.obtenerTodosLosPremontados();
+                    rendimientoService.normalizarLista(premontados, perfil.getTipoUsoFrecuente());
                     List<Premontado> recomendados = scoringService.recomendarPremontados(perfil, premontados);
-                    rendimientoService.normalizarLista(recomendados, perfil.getTipoUsoFrecuente());
                     List<PremontadoCatalogoDto> recomendaciones = recomendados.stream()
                             .map(premontadoCatalogoService::toDto)
                             .toList();

@@ -20,6 +20,7 @@ import com.optimapc.backend.modelo.ConfiguracionComponente;
 import com.optimapc.backend.modelo.FuenteAlimentacion;
 import com.optimapc.backend.modelo.MemoriaRAM;
 import com.optimapc.backend.modelo.PlacaBase;
+import com.optimapc.backend.modelo.PerfilUsuario;
 import com.optimapc.backend.modelo.Premontado;
 import com.optimapc.backend.modelo.TipoUso;
 import com.optimapc.backend.modelo.Valoracion;
@@ -27,6 +28,7 @@ import com.optimapc.backend.montarPC.RendimientoService;
 import com.optimapc.backend.modelo.Procesador;
 import com.optimapc.backend.modelo.RefrigeradorCPU;
 import com.optimapc.backend.modelo.TarjetaGrafica;
+import com.optimapc.backend.usuario.PerfilUsuarioRepository;
 import com.optimapc.backend.usuario.Usuario;
 import com.optimapc.backend.usuario.UsuarioRepository;
 
@@ -37,16 +39,19 @@ public class PremontadoCatalogoService {
     private final ValoracionRepository valoracionRepository;
     private final UsuarioRepository usuarioRepository;
     private final RendimientoService rendimientoService;
+    private final PerfilUsuarioRepository perfilUsuarioRepository;
 
     public PremontadoCatalogoService(
             PremontadoRepository premontadoRepository,
             ValoracionRepository valoracionRepository,
             UsuarioRepository usuarioRepository,
-            RendimientoService rendimientoService) {
+            RendimientoService rendimientoService,
+            PerfilUsuarioRepository perfilUsuarioRepository) {
         this.premontadoRepository = premontadoRepository;
         this.valoracionRepository = valoracionRepository;
         this.usuarioRepository = usuarioRepository;
         this.rendimientoService = rendimientoService;
+        this.perfilUsuarioRepository = perfilUsuarioRepository;
     }
 
     // -------------------------------------------------------------------------
@@ -251,6 +256,15 @@ public class PremontadoCatalogoService {
         Valoracion guardada = valoracionRepository.save(valoracion);
         usuario.getValoraciones().add(guardada);
         premontado.getValoraciones().add(guardada);
+
+        perfilUsuarioRepository.findByUsuario_Id(usuarioId).ifPresent(perfil -> {
+            perfil.actualizarDesdeValoracion(
+                    premontado.getUsosPrevistos(),
+                    premontado.getPrecioEfectivo(),
+                    premontado.getEsReacondicionado(),
+                    guardada.getPuntuacion());
+            perfilUsuarioRepository.save(perfil);
+        });
 
         return new ValoracionDto(
                 guardada.getId(),
