@@ -58,9 +58,16 @@ export function PerformanceMeter({ value }: { value: number }) {
           <div className="performance-meter__tooltip" role="tooltip">
             <strong>Métrica de Rendimiento/€</strong>
             <p>
-              Evalúa la relación calidad-precio calculando el rendimiento de los componentes
-              principales (CPU, GPU, RAM y almacenamiento) dividido entre el precio. Un valor
-              más alto indica mejor rendimiento por cada euro invertido.
+              Compara el rendimiento estimado de CPU, GPU, RAM y almacenamiento con el precio
+              del equipo. Un valor más alto indica mejor relación calidad-precio dentro del
+              catálogo.
+            </p>
+            <p>
+              <strong>Limitaciones:</strong> el rendimiento se estima a partir de
+              especificaciones técnicas (núcleos, frecuencia, capacidad), sin datos de
+              benchmarks reales ni diferencias entre arquitecturas. La puntuación es
+              relativa al catálogo: equipos más baratos tienden a puntuar mejor en esta
+              métrica aunque su potencia absoluta sea menor.
             </p>
           </div>
         </span>

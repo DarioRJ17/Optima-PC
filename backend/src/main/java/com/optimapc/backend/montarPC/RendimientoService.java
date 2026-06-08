@@ -41,7 +41,7 @@ public class RendimientoService {
     // saturamos a 100. Así un componente tope de cada tipo vale ~100 y todos son comparables.
     // Son una calibración a ojo, ajustable; no pretenden ser exactos sino homogeneizar escalas.
     private static final double REF_CPU = 150;      // ~24 núcleos × 6,0 GHz
-    private static final double REF_GPU = 80;       // ~24 GB × 3300 MHz / 1000
+    private static final double REF_GPU = 15.0;     // √32 × 2655 MHz / 1000 ≈ RTX 5090
     private static final double REF_RAM = 288;      // 48 GB (capacidad útil máxima) a 6000 MHz
     private static final double REF_STORAGE = 12;   // 2 TB NVMe (capacidad útil máxima × 6 / 1000)
 
@@ -157,12 +157,23 @@ public class RendimientoService {
             return precio > 0 ? score / precio : 0.0;
         }).toList();
 
-        double min = ratios.stream().mapToDouble(Double::doubleValue).min().orElse(0);
-        double max = ratios.stream().mapToDouble(Double::doubleValue).max().orElse(1);
-        double rango = max - min;
+        // Si hay tipoUso, el max se calcula solo entre los premontados de ese tipo,
+        // para no dejar que un PC de otra categoría más barato aplaste la escala.
+        double max;
+        if (tipoUso != null) {
+            double typeMax = 0;
+            for (int i = 0; i < configs.size(); i++) {
+                if (configs.get(i).getUsosPrevistos().contains(tipoUso)) {
+                    typeMax = Math.max(typeMax, ratios.get(i));
+                }
+            }
+            max = typeMax > 0 ? typeMax : ratios.stream().mapToDouble(Double::doubleValue).max().orElse(1);
+        } else {
+            max = ratios.stream().mapToDouble(Double::doubleValue).max().orElse(1);
+        }
 
         for (int i = 0; i < configs.size(); i++) {
-            double normalizado = rango > 0 ? ((ratios.get(i) - min) / rango) * 100.0 : 50.0;
+            double normalizado = max > 0 ? Math.min(100.0, (ratios.get(i) / max) * 100.0) : 0.0;
             configs.get(i).setRendimientoPorEuro(normalizado);
         }
     }
@@ -175,8 +186,9 @@ public class RendimientoService {
 
     private double scoreGpu(TarjetaGrafica gpu) {
         int memoria = gpu.getMemoria() != null ? gpu.getMemoria() : 0;
-        int boost = gpu.getFrecuenciaBoost() != null ? gpu.getFrecuenciaBoost() : 0;
-        return (memoria * boost) / 1000.0;
+        int boost = gpu.getFrecuenciaBoost() != null ? gpu.getFrecuenciaBoost()
+                  : (gpu.getFrecuenciaBase() != null ? gpu.getFrecuenciaBase() : 0);
+        return (Math.sqrt(memoria) * boost) / 1000.0;
     }
 
     private double scoreRam(MemoriaRAM ram) {

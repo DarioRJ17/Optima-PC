@@ -55,9 +55,9 @@ export function buildRibbon(item: CatalogPremontado, section: CatalogSectionKey)
 }
 
 export function buildPerformanceLabel(value: number) {
-  if (value >= 90) return 'Excelente'
-  if (value >= 75) return 'Muy bueno'
-  if (value >= 60) return 'Bueno'
+  if (value >= 85) return 'Excelente'
+  if (value >= 65) return 'Muy bueno'
+  if (value >= 42) return 'Bueno'
   return 'Regular'
 }
 
