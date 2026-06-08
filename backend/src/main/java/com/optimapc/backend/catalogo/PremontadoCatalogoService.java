@@ -12,11 +12,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.optimapc.backend.modelo.Almacenamiento;
+import com.optimapc.backend.modelo.Caja;
+import com.optimapc.backend.modelo.Componente;
 import com.optimapc.backend.modelo.ConfiguracionComponente;
+import com.optimapc.backend.modelo.FuenteAlimentacion;
+import com.optimapc.backend.modelo.MemoriaRAM;
+import com.optimapc.backend.modelo.PlacaBase;
 import com.optimapc.backend.modelo.Premontado;
 import com.optimapc.backend.modelo.TipoUso;
 import com.optimapc.backend.modelo.Valoracion;
 import com.optimapc.backend.montarPC.RendimientoService;
+import com.optimapc.backend.modelo.Procesador;
+import com.optimapc.backend.modelo.RefrigeradorCPU;
+import com.optimapc.backend.modelo.TarjetaGrafica;
 import com.optimapc.backend.usuario.Usuario;
 import com.optimapc.backend.usuario.UsuarioRepository;
 
@@ -94,14 +103,19 @@ public class PremontadoCatalogoService {
                 : valoraciones.stream().mapToInt(Valoracion::getPuntuacion).average().orElse(0.0);
 
         List<ComponenteDto> componentesDto = premontado.getComponentes().stream()
-                .map(cfg -> new ComponenteDto(
-                        cfg.getComponente().getId(),
-                        cfg.getCategoria(),
-                        cfg.getComponente().getNombre(),
-                        cfg.getComponente().getNombre(),
-                        cfg.getComponente().getPrecio(),
-                        cfg.getCantidad()))
-                .collect(Collectors.toList());
+                .map(cfg -> {
+                    String nombre = asignarNombre(cfg);
+                    String especificacion = asignarEspecificacion(cfg);
+
+                    return new ComponenteDto(
+                            cfg.getComponente().getId(),
+                            cfg.getCategoria(),
+                            nombre,
+                            especificacion,
+                            cfg.getComponente().getPrecio(),
+                            cfg.getCantidad());
+                })
+                .toList();
 
         return new PremontadoCatalogoDto(
                 premontado.getId(),
@@ -121,6 +135,53 @@ public class PremontadoCatalogoService {
                 premontado.getFavorita(),
                 premontado.getRendimientoPorEuro(),
                 componentesDto);
+    }
+
+    private String asignarNombre(ConfiguracionComponente cfg) {
+        if (cfg.getComponente() instanceof TarjetaGrafica tg) {
+            return tg.getChipset();
+        } else {
+            return cfg.getComponente().getNombre();
+        }
+    }
+
+    private String asignarEspecificacion(ConfiguracionComponente cfg) {
+        Componente comp = cfg.getComponente();
+        String res = "";
+        if (comp instanceof TarjetaGrafica tg) {
+            res = tg.getMemoria() + " GB | " + tg.getLongitud() + " mm | " + formatFrecuencia(tg.getFrecuenciaBase(), tg.getFrecuenciaBoost());
+            if (tg.getConsumoWatts() != null) res += " | " + tg.getConsumoWatts() + " W";
+        } else if (comp instanceof Procesador p) {
+            res = p.getSocket() + " | " + p.getNucleos() + " núcleos | " + formatFrecuencia(p.getFrecuenciaBase(), p.getFrecuenciaBoost());
+            if (p.getConsumoWatts() != null) res += " | " + p.getConsumoWatts() + " W";
+            else if (p.getTdp() != null) res += " | " + p.getTdp() + " W";
+        } else if (comp instanceof MemoriaRAM ram) {
+            res = ram.getTipoDDR() + " | " + ram.getVelocidad() + " MHz | " + ram.getGbPorModulo() + "x" + ram.getNumModulos() + " GB | " + "CL" + ram.getLatenciaCAS();
+            if (ram.getConsumoWatts() != null) res += " | " + ram.getConsumoWatts() + " W";
+        } else if (comp instanceof Almacenamiento a) {
+            res = a.getCapacidad() + " GB " + a.getTipo() + " | Interfaz: " + a.getInterfaz() + " | FF: " + a.getFactorForma();
+            if (a.getConsumoWatts() != null) res += " | " + a.getConsumoWatts() + " W";
+        } else if (comp instanceof PlacaBase pb) {
+            res = pb.getSocket() + " | " + pb.getTipoDDR() + " | FF: " + pb.getFactorForma() + " | " + pb.getMemoriaMaxima() + " GB en " + pb.getRanurasMemoria() + " ranuras";
+            if (pb.getConsumoWatts() != null) res += " | " + pb.getConsumoWatts() + " W";
+        } else if (comp instanceof FuenteAlimentacion fa) {
+            res = fa.getPotencia() + " W | " + fa.getTipo() + " | Modular: " + fa.getModular();
+            if (fa.getConsumoWatts() != null) res += " | " + fa.getConsumoWatts() + " W";
+        } else if (comp instanceof Caja c) {
+            res = c.getTipo() + " | Panel lateral: " + c.getPanelLateral();
+            if (c.getConsumoWatts() != null) res += " | " + c.getConsumoWatts() + " W";
+        } else if (comp instanceof RefrigeradorCPU r) {
+            res = r.getRpm() + " RPM | " + r.getNivelRuido() + " dBA";
+            if (r.getConsumoWatts() != null) res += " | " + r.getConsumoWatts() + " W";
+        }
+        return res;
+    }
+
+    private String formatFrecuencia(Number base, Number boost) {
+        if (boost != null) {
+            return base + "-" + boost + " MHz";
+        }
+        return base + " MHz";
     }
 
     private String construirTitulo(Premontado premontado) {

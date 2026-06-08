@@ -119,8 +119,9 @@ public class MontarPCService {
 
     private ComponenteDto mapToDto(Componente c) {
         String tipo = toTypeLabel(c);
+        String nombre = c instanceof TarjetaGrafica tg ? tg.getChipset() : c.getNombre();
         String especificacion = buildSpecification(c);
-        return new ComponenteDto(c.getId(), tipo, c.getNombre(), especificacion, c.getPrecio(), 1);
+        return new ComponenteDto(c.getId(), tipo, nombre, especificacion, c.getPrecio(), 1);
     }
 
     private CompatibleComponenteDto mapToCompatibleDto(Componente c) {
@@ -129,9 +130,10 @@ public class MontarPCService {
 
     private CompatibleComponenteDto mapToCompatibleDto(Componente c, List<Componente> selected) {
         String tipo = toTypeLabel(c);
+        String nombre = c instanceof TarjetaGrafica tg ? tg.getChipset() : c.getNombre();
         String especificacion = buildSpecification(c);
         List<CompatibilityWarningDto> warnings = CompatibilityService.buildWarnings(c, selected);
-        return new CompatibleComponenteDto(c.getId(), tipo, c.getNombre(), especificacion, c.getPrecio(), 1, warnings);
+        return new CompatibleComponenteDto(c.getId(), tipo, nombre, especificacion, c.getPrecio(), 1, warnings);
     }
 
     private boolean isAlreadySelected(Componente candidate, List<Componente> selected) {
@@ -183,32 +185,41 @@ public class MontarPCService {
     }
 
     private String buildSpecification(Componente componente) {
-        return switch (toTypeLabel(componente)) {
-            case "procesador" -> {
-                Procesador procesador = (Procesador) componente;
-                yield procesador.getMicroarquitectura();
-            }
-            case "placa-base" -> {
-                PlacaBase placaBase = (PlacaBase) componente;
-                yield placaBase.getSocket() + " | " + placaBase.getTipoDDR();
-            }
-            case "memoria-ram" -> {
-                MemoriaRAM memoriaRAM = (MemoriaRAM) componente;
-                yield memoriaRAM.getTipoDDR() + " | " + memoriaRAM.getVelocidad();
-            }
-            case "tarjeta-grafica" -> componente.getNombre();
-            case "almacenamiento" -> {
-                Almacenamiento almacenamiento = (Almacenamiento) componente;
-                yield almacenamiento.getTipo() + " | " + almacenamiento.getInterfaz();
-            }
-            case "fuente-alimentacion" -> {
-                FuenteAlimentacion fuente = (FuenteAlimentacion) componente;
-                yield fuente.getPotencia() + "W | " + fuente.getEficiencia();
-            }
-            case "caja" -> componente.getNombre();
-            case "refrigerador-cpu" -> componente.getNombre();
-            default -> componente.getNombre();
-        };
+        String res = "";
+        if (componente instanceof TarjetaGrafica tg) {
+            res = tg.getMemoria() + " GB | " + tg.getLongitud() + " mm | " + formatFrecuencia(tg.getFrecuenciaBase(), tg.getFrecuenciaBoost());
+            if (tg.getConsumoWatts() != null) res += " | " + tg.getConsumoWatts() + " W";
+        } else if (componente instanceof Procesador p) {
+            res = p.getSocket() + " | " + p.getNucleos() + " núcleos | " + formatFrecuencia(p.getFrecuenciaBase(), p.getFrecuenciaBoost());
+            if (p.getConsumoWatts() != null) res += " | " + p.getConsumoWatts() + " W";
+            else if (p.getTdp() != null) res += " | " + p.getTdp() + " W";
+        } else if (componente instanceof MemoriaRAM ram) {
+            res = ram.getTipoDDR() + " | " + ram.getVelocidad() + " MHz | " + ram.getGbPorModulo() + "x" + ram.getNumModulos() + " GB | CL" + ram.getLatenciaCAS();
+            if (ram.getConsumoWatts() != null) res += " | " + ram.getConsumoWatts() + " W";
+        } else if (componente instanceof Almacenamiento a) {
+            res = a.getCapacidad() + " GB " + a.getTipo() + " | Interfaz: " + a.getInterfaz() + " | FF: " + a.getFactorForma();
+            if (a.getConsumoWatts() != null) res += " | " + a.getConsumoWatts() + " W";
+        } else if (componente instanceof PlacaBase pb) {
+            res = pb.getSocket() + " | " + pb.getTipoDDR() + " | FF: " + pb.getFactorForma() + " | " + pb.getMemoriaMaxima() + " GB en " + pb.getRanurasMemoria() + " ranuras";
+            if (pb.getConsumoWatts() != null) res += " | " + pb.getConsumoWatts() + " W";
+        } else if (componente instanceof FuenteAlimentacion fa) {
+            res = fa.getPotencia() + " W | " + fa.getTipo() + " | Modular: " + fa.getModular();
+            if (fa.getConsumoWatts() != null) res += " | " + fa.getConsumoWatts() + " W";
+        } else if (componente instanceof Caja c) {
+            res = c.getTipo() + " | Panel lateral: " + c.getPanelLateral();
+            if (c.getConsumoWatts() != null) res += " | " + c.getConsumoWatts() + " W";
+        } else if (componente instanceof RefrigeradorCPU r) {
+            res = r.getRpm() + " RPM | " + r.getNivelRuido() + " dBA";
+            if (r.getConsumoWatts() != null) res += " | " + r.getConsumoWatts() + " W";
+        }
+        return res;
+    }
+
+    private String formatFrecuencia(Number base, Number boost) {
+        if (boost != null) {
+            return base + "-" + boost + " MHz";
+        }
+        return base + " MHz";
     }
 
     public Optional<ComponenteDetalleDto> getComponenteDetalle(Long id) {
@@ -217,13 +228,14 @@ public class MontarPCService {
 
     private ComponenteDetalleDto mapToComponenteDetalleDto(Componente c) {
         String tipo = toTypeLabel(c);
+        String nombre = c instanceof TarjetaGrafica tg ? tg.getChipset() : c.getNombre();
         String especificacion = buildSpecification(c);
         Map<String, Object> detalles = buildComponenteDetalles(c);
 
         return new ComponenteDetalleDto(
                 c.getId(),
                 tipo,
-                c.getNombre(),
+                nombre,
                 especificacion,
                 c.getPrecio(),
                 1,

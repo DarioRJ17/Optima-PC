@@ -27,6 +27,7 @@ export default function ComponentOptionCard({
       <div className="option-card-top">
         <div className="option-content">
           <h4 className="option-name">{component.nombre}</h4>
+          {component.especificacion && <p className="option-spec">{component.especificacion}</p>}
         </div>
 
         <div className="option-price-and-badges">

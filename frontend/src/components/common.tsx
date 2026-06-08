@@ -116,8 +116,9 @@ export function PCComponentItem({ component }: { component: PCComponent }) {
     <div className="component-item">
       <div className="component-icon"><Icono size={36} strokeWidth={1.75} /></div>
       <div className="component-info">
-        <h4>{nombreTipo}</h4>
-        <p className="component-spec">{component.nombre}</p>
+        <p className="component-type">{nombreTipo}</p>
+        <h4>{component.nombre}</h4>
+        {component.especificacion && <p className="component-spec">{component.especificacion}</p>}
         <p className="component-desc">{descripcion}</p>
       </div>
     </div>

@@ -1496,6 +1496,15 @@
   color: #1766e5;
 }
 
+.component-type {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 0.2rem;
+}
+
 .component-info h4 {
   margin: 0 0 0.3rem;
   font-size: 1rem;
