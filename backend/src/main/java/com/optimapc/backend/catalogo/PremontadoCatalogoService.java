@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.hibernate.Hibernate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -138,15 +139,15 @@ public class PremontadoCatalogoService {
     }
 
     private String asignarNombre(ConfiguracionComponente cfg) {
-        if (cfg.getComponente() instanceof TarjetaGrafica tg) {
+        Componente comp = (Componente) Hibernate.unproxy(cfg.getComponente());
+        if (comp instanceof TarjetaGrafica tg) {
             return tg.getChipset();
-        } else {
-            return cfg.getComponente().getNombre();
         }
+        return comp.getNombre();
     }
 
     private String asignarEspecificacion(ConfiguracionComponente cfg) {
-        Componente comp = cfg.getComponente();
+        Componente comp = (Componente) Hibernate.unproxy(cfg.getComponente());
         String res = "";
         if (comp instanceof TarjetaGrafica tg) {
             res = tg.getMemoria() + " GB | " + tg.getLongitud() + " mm | " + formatFrecuencia(tg.getFrecuenciaBase(), tg.getFrecuenciaBoost());
