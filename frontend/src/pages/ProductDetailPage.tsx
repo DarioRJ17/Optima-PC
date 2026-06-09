@@ -11,9 +11,10 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.trim() || 'http://localh
 type ProductDetailPageProps = {
   productId?: number
   onBack: () => void
+  onReviewSubmitted?: () => void
 }
 
-export function ProductDetailPage({ productId: propProductId, onBack }: ProductDetailPageProps) {
+export function ProductDetailPage({ productId: propProductId, onBack, onReviewSubmitted }: ProductDetailPageProps) {
   const params = useParams()
   const navigate = useNavigate()
   const { token, isAuthenticated, user } = useAuth()
@@ -151,6 +152,7 @@ export function ProductDetailPage({ productId: propProductId, onBack }: ProductD
       setReviewLocked(true)
       setReviewSuccess('Tu reseña se ha publicado correctamente')
       await Promise.all([loadProduct(), loadReviews()])
+      onReviewSubmitted?.()
     } catch {
       setReviewError('No se pudo conectar con el backend')
     } finally {

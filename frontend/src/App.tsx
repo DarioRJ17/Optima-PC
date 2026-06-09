@@ -493,7 +493,7 @@ function AppShell() {
             />
           }
         />
-        <Route path="/productos/:id" element={<ProductDetailPage onBack={() => navigate('/')} />} />
+        <Route path="/productos/:id" element={<ProductDetailPage onBack={() => navigate('/')} onReviewSubmitted={refreshRecommendations} />} />
         <Route
           path="/login"
           element={
