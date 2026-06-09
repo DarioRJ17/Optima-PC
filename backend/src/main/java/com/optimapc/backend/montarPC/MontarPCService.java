@@ -6,7 +6,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.optimapc.backend.catalogo.ComponenteDto;
 import com.optimapc.backend.montarPC.dto.CompatibleComponenteDto;
@@ -23,16 +26,20 @@ import com.optimapc.backend.modelo.PlacaBase;
 import com.optimapc.backend.modelo.Procesador;
 import com.optimapc.backend.modelo.RefrigeradorCPU;
 import com.optimapc.backend.modelo.TarjetaGrafica;
+import com.optimapc.backend.pedido.ConfiguracionPCRepository;
 
 @Service
 public class MontarPCService {
 
     private final ComponenteRepository componenteRepository;
     private final RendimientoService rendimientoService;
+    private final ConfiguracionPCRepository configuracionPCRepository;
 
-    public MontarPCService(ComponenteRepository componenteRepository, RendimientoService rendimientoService) {
+    public MontarPCService(ComponenteRepository componenteRepository, RendimientoService rendimientoService,
+            ConfiguracionPCRepository configuracionPCRepository) {
         this.componenteRepository = componenteRepository;
         this.rendimientoService = rendimientoService;
+        this.configuracionPCRepository = configuracionPCRepository;
     }
 
     public List<ComponenteDto> getAllComponents() {
@@ -360,5 +367,23 @@ public class MontarPCService {
 
     private String normalizeType(String tipo) {
         return tipo == null ? "" : tipo.trim().toLowerCase();
+    }
+
+    @Transactional
+    public ConfiguracionGuardadaDto guardarConfiguracion(List<Long> componenteIds) {
+        List<Componente> componentes = componenteRepository.findAllById(componenteIds);
+        if (componentes.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se encontraron los componentes indicados");
+        }
+        ConfiguracionPC config = new ConfiguracionPC();
+        for (Componente c : componentes) {
+            ConfiguracionComponente cc = new ConfiguracionComponente();
+            cc.setCategoria(toTypeLabel(c));
+            cc.setCantidad(1);
+            cc.setComponente(c);
+            config.agregarComponente(cc);
+        }
+        ConfiguracionPC saved = configuracionPCRepository.save(config);
+        return new ConfiguracionGuardadaDto(saved.getId(), saved.getPrecio());
     }
 }
