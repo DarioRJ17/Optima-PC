@@ -41,6 +41,7 @@ public class ConfiguracionPC {
     @Column(name = "uso")
     private Set<TipoUso> usosPrevistos = new HashSet<>();
 
+    @Transient
     private Boolean favorita;
 
     @Transient

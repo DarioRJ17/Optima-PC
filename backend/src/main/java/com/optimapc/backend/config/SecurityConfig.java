@@ -42,6 +42,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/premontados/chat").permitAll()
                 .requestMatchers("/api/catalogo/premontados/recomendaciones").authenticated()
                 .requestMatchers(HttpMethod.POST, "/api/catalogo/premontados/*/valoraciones").authenticated()
+                .requestMatchers("/api/catalogo/favoritos").authenticated()
+                .requestMatchers("/api/catalogo/premontados/*/favoritos/**").authenticated()
                 .requestMatchers("/api/catalogo/**").permitAll()
                 .requestMatchers("/api/montar-pc/**").permitAll()
                 .requestMatchers("/api/configuracion-pc/**").permitAll()
