@@ -415,7 +415,9 @@ export function HomePage({
               !recommendationsLoading &&
               !recommendationsError &&
               section.products.length === 0 ? (
-                <p className="catalog-message">Aún no hay recomendaciones para tu perfil.</p>
+                <p className="catalog-message">
+                  Marca productos como favoritos, añade valoraciones o realiza compras para que podamos recomendarte equipos personalizados.
+                </p>
               ) : null}
 
               <div className="product-grid">

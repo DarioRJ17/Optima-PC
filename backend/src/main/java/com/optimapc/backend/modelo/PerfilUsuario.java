@@ -150,6 +150,7 @@ public class PerfilUsuario {
         actualizarDesdeUsoInferido(usoInferido);
 
         aplicarImpactoGeneral(PESO_ACCION_COMPRA);
+        aplicarImpactoReacondicionado(Boolean.TRUE.equals(compraReacondicionado), PESO_ACCION_COMPRA);
 
         fechaUltimaActualizacion = LocalDateTime.now();
     }
@@ -169,7 +170,9 @@ public class PerfilUsuario {
             usosInferidos.forEach(this::actualizarDesdeUsoInferido);
         }
 
-        aplicarImpactoGeneral(PESO_ACCION_VALORACION * calcularIntensidadValoracion(puntuacion));
+        double impactoValoracion = PESO_ACCION_VALORACION * calcularIntensidadValoracion(puntuacion);
+        aplicarImpactoGeneral(impactoValoracion);
+        aplicarImpactoReacondicionado(Boolean.TRUE.equals(compraReacondicionado), impactoValoracion);
 
         fechaUltimaActualizacion = LocalDateTime.now();
     }
@@ -188,6 +191,7 @@ public class PerfilUsuario {
         actualizarDesdeUsoInferido(usoInferido);
 
         aplicarImpactoGeneral(PESO_ACCION_FAVORITO);
+        aplicarImpactoReacondicionado(Boolean.TRUE.equals(compraReacondicionado), PESO_ACCION_FAVORITO);
 
         fechaUltimaActualizacion = LocalDateTime.now();
     }
@@ -216,7 +220,18 @@ public class PerfilUsuario {
         scoreTipoUsoFrecuente = limitarScore((scoreTipoUsoFrecuente * COEF_DECAIMIENTO_SCORE) + (impactoBase * COEF_IMPACTO_NUEVO));
         scoreUsosSecundarios = limitarScore((scoreUsosSecundarios * COEF_DECAIMIENTO_SCORE) + (impactoBase * COEF_IMPACTO_NUEVO));
         scorePresupuestoEstimado = limitarScore((scorePresupuestoEstimado * COEF_DECAIMIENTO_SCORE) + (impactoBase * COEF_IMPACTO_NUEVO));
-        scorePreferenciaDeReacondicionado = limitarScore((scorePreferenciaDeReacondicionado * COEF_DECAIMIENTO_SCORE) + (impactoBase * COEF_IMPACTO_NUEVO));
+    }
+
+    private void aplicarImpactoReacondicionado(boolean esReacondicionado, double impactoBase) {
+        if (esReacondicionado) {
+            scorePreferenciaDeReacondicionado = limitarScore(
+                (scorePreferenciaDeReacondicionado * COEF_DECAIMIENTO_SCORE) + (impactoBase * COEF_IMPACTO_NUEVO)
+            );
+        } else {
+            scorePreferenciaDeReacondicionado = limitarScore(
+                scorePreferenciaDeReacondicionado * COEF_DECAIMIENTO_SCORE
+            );
+        }
     }
 
     private double calcularIntensidadValoracion(Integer puntuacion) {

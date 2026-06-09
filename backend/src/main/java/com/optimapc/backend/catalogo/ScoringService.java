@@ -15,7 +15,7 @@ public class ScoringService {
     private static final double SCORE_MINIMO = 0.0;
 
     private static final double TOLERANCIA_PRESUPUESTO = 500.0;
-    private static final double UMBRAL_PRIORIZAR_REACONDICIONADO = 0.5;
+    private static final double UMBRAL_PRIORIZAR_REACONDICIONADO = 0.1;
     private static final double BONUS_REACONDICIONADO_PRIORIZADO = 0.15;
     private static final double SCORE_USO_COINCIDENCIA_TOTAL = 1.0;
     private static final double SCORE_USO_COINCIDENCIA_PARCIAL = 0.5;
@@ -23,6 +23,10 @@ public class ScoringService {
 
     public List<Premontado> recomendarPremontados(PerfilUsuario perfil, List<Premontado> premontados) {
         if (perfil == null || premontados == null || premontados.isEmpty()) {
+            return List.of();
+        }
+
+        if (perfil.getTipoUsoFrecuente() == null && perfil.getUsosSecundarios().isEmpty()) {
             return List.of();
         }
 
