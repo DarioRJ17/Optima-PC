@@ -52,6 +52,9 @@ export function MontarPCPage({ onBack, onAddToCart }: MontarPCPageProps) {
   const [equilibrio, setEquilibrio] = useState<EquilibrioData | null>(null)
   const [completing, setCompleting] = useState(false)
   const [completeError, setCompleteError] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState('')
+  const [saveSuccess, setSaveSuccess] = useState(false)
 
   const RELEVANT_TYPES = new Set(['procesador', 'tarjeta-grafica', 'memoria-ram', 'almacenamiento'])
 
@@ -149,6 +152,36 @@ export function MontarPCPage({ onBack, onAddToCart }: MontarPCPageProps) {
     setTimeout(() => {
       setSelectedComponentDetail(null)
     }, 300)
+  }
+
+  const handleSave = async (ids: number[], nombre: string) => {
+    if (!isAuthenticated || !token) {
+      navigate('/login')
+      return
+    }
+    setSaving(true)
+    setSaveError('')
+    setSaveSuccess(false)
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/mis-configuraciones`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ componenteIds: ids, nombre }),
+      })
+      if (!response.ok) {
+        setSaveError('No se pudo guardar la configuración. Inténtalo de nuevo.')
+        return
+      }
+      setSaveSuccess(true)
+      setTimeout(() => setSaveSuccess(false), 4000)
+    } catch {
+      setSaveError('No se pudo conectar con el servidor.')
+    } finally {
+      setSaving(false)
+    }
   }
 
   const handleComplete = async (ids: number[]) => {
@@ -251,6 +284,10 @@ export function MontarPCPage({ onBack, onAddToCart }: MontarPCPageProps) {
           onComplete={handleComplete}
           completing={completing}
           completeError={completeError}
+          onSave={isAuthenticated ? handleSave : undefined}
+          saving={saving}
+          saveError={saveError}
+          saveSuccess={saveSuccess}
         />
       </div>
 

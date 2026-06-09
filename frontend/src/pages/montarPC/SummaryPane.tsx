@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import type { EquilibrioData } from '../../types'
 
 interface SelectedComponent {
@@ -22,6 +23,10 @@ interface Props {
   onComplete?: (ids: number[]) => void
   completing?: boolean
   completeError?: string
+  onSave?: (ids: number[], nombre: string) => void
+  saving?: boolean
+  saveError?: string
+  saveSuccess?: boolean
 }
 
 function scoreColor(score: number): string {
@@ -40,7 +45,17 @@ export default function SummaryPane({
   onComplete,
   completing = false,
   completeError,
+  onSave,
+  saving = false,
+  saveError,
+  saveSuccess = false,
 }: Props) {
+  const [saveName, setSaveName] = useState('')
+
+  useEffect(() => {
+    if (saveSuccess) setSaveName('')
+  }, [saveSuccess])
+
   const selectedTypeIds = new Set(selectedComponents.map((component) => component.tipo))
   const requiredTypeIds = componentTypes
     .filter((componentType) => componentType.id !== 'refrigerador-cpu')
@@ -130,8 +145,30 @@ export default function SummaryPane({
         disabled={!canCompleteConfiguration || completing}
         onClick={() => onComplete?.(selectedComponents.map((c) => c.id))}
       >
-        {completing ? 'Guardando...' : 'Completar configuración'}
+        {completing ? 'Añadiendo...' : 'Añadir al carrito'}
       </button>
+
+      {onSave && (
+        <div className="save-config-section">
+          <input
+            type="text"
+            className="save-config-input"
+            placeholder="Nombre de la configuración"
+            value={saveName}
+            maxLength={100}
+            onChange={(e) => setSaveName(e.currentTarget.value)}
+          />
+          <button
+            className="save-config-btn"
+            disabled={!canCompleteConfiguration || saving || !saveName.trim()}
+            onClick={() => onSave(selectedComponents.map((c) => c.id), saveName.trim())}
+          >
+            {saving ? 'Guardando...' : 'Guardar configuración'}
+          </button>
+          {saveSuccess && <p className="save-config-success">¡Configuración guardada correctamente!</p>}
+          {saveError && <p className="complete-error">{saveError}</p>}
+        </div>
+      )}
     </aside>
   )
 }

@@ -490,6 +490,58 @@
   text-align: center;
 }
 
+.save-config-section {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.save-config-input {
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.save-config-input:focus {
+  border-color: #6c63ff;
+}
+
+.save-config-btn {
+  width: 100%;
+  padding: 0.65rem;
+  background: transparent;
+  border: 1.5px solid #6c63ff;
+  color: #6c63ff;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.save-config-btn:hover:not(:disabled) {
+  background: #6c63ff;
+  color: #fff;
+}
+
+.save-config-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.save-config-success {
+  color: #2e7d32;
+  font-size: 0.82rem;
+  text-align: center;
+  margin: 0;
+}
+
 @media (max-width: 1024px) {
   .montar-pc-container {
     grid-template-columns: 1fr;

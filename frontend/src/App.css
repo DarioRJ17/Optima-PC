@@ -2717,3 +2717,73 @@
   min-width: 70px;
   text-align: right;
 }
+
+/* ── Mis configuraciones ───────────────────────────── */
+.mis-config-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mis-config-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.mis-config-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.83rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.mis-config-btn--load {
+  background: transparent;
+  border-color: #6c63ff;
+  color: #6c63ff;
+}
+
+.mis-config-btn--load:hover {
+  background: #6c63ff;
+  color: #fff;
+}
+
+.mis-config-btn--cart {
+  background: #17417a;
+  color: #fff;
+  border-color: #17417a;
+}
+
+.mis-config-btn--cart:hover {
+  background: #0f2d58;
+}
+
+.mis-config-btn--delete {
+  background: transparent;
+  border-color: #c0392b;
+  color: #c0392b;
+  margin-left: auto;
+}
+
+.mis-config-btn--delete:hover:not(:disabled) {
+  background: #c0392b;
+  color: #fff;
+}
+
+.mis-config-btn--delete:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.mis-config-delete-error {
+  margin: 0.25rem 0 0;
+  font-size: 0.82rem;
+}

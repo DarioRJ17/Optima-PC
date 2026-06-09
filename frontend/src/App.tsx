@@ -12,11 +12,12 @@ import { AuthProvider } from './auth/AuthContext'
 import { useAuth } from './auth/useAuth'
 import { MontarPCPage } from './pages/MontarPCPage'
 import { ReciclajePage } from './pages/ReciclajePage'
-import { Recycle, Wrench, Bot, LogIn, UserPlus, ShoppingCart, Menu, Heart, Package } from 'lucide-react'
+import { Recycle, Wrench, Bot, LogIn, UserPlus, ShoppingCart, Menu, Heart, Package, Bookmark } from 'lucide-react'
 import { ChatbotPage } from './pages/ChatbotPage'
 import { FavoritosPage } from './pages/FavoritosPage'
 import { CarritoPage } from './pages/CarritoPage'
 import { ComprasPage } from './pages/ComprasPage'
+import { MisConfiguracionesPage } from './pages/MisConfiguracionesPage'
 import type {
   ApiError,
   AuthMode,
@@ -501,6 +502,17 @@ function AppShell() {
                       <Heart size={16} strokeWidth={1.75} aria-hidden="true" />
                       <span>Mis favoritos</span>
                     </button>
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={() => {
+                        navigate('/mis-configuraciones')
+                        setUserMenuOpen(false)
+                      }}
+                    >
+                      <Bookmark size={16} strokeWidth={1.75} aria-hidden="true" />
+                      <span>Mis configuraciones</span>
+                    </button>
                     <div className="nav-user__menu-divider" aria-hidden="true" />
                     <button
                       type="button"
@@ -693,6 +705,10 @@ function AppShell() {
           }
         />
         <Route path="/compras" element={<ComprasPage />} />
+        <Route
+          path="/mis-configuraciones"
+          element={<MisConfiguracionesPage onAddToCart={addToCart} />}
+        />
         <Route path="/auth" element={<Navigate to="/login" replace />} />
       </Routes>
     </div>

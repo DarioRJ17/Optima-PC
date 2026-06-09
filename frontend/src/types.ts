@@ -172,3 +172,18 @@ export type PedidoDto = {
   total: number
   items: ItemPedidoDto[]
 }
+
+export type MiConfiguracionComponenteDto = {
+  id: number
+  tipo: string
+  nombre: string
+  precio: number
+}
+
+export type MiConfiguracionDto = {
+  id: number
+  nombre: string
+  precio: number
+  fechaCreacion: string
+  componentes: MiConfiguracionComponenteDto[]
+}
