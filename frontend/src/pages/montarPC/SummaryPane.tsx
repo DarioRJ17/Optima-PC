@@ -19,6 +19,9 @@ interface Props {
   totalPrice: number
   requiredCount: number
   equilibrio: EquilibrioData | null
+  onComplete?: (ids: number[]) => void
+  completing?: boolean
+  completeError?: string
 }
 
 function scoreColor(score: number): string {
@@ -34,6 +37,9 @@ export default function SummaryPane({
   totalPrice,
   requiredCount,
   equilibrio,
+  onComplete,
+  completing = false,
+  completeError,
 }: Props) {
   const selectedTypeIds = new Set(selectedComponents.map((component) => component.tipo))
   const requiredTypeIds = componentTypes
@@ -117,8 +123,14 @@ export default function SummaryPane({
         <span className="total-price">{totalPrice.toFixed(2)}€</span>
       </div>
 
-      <button className="complete-button" disabled={!canCompleteConfiguration}>
-        Completar configuración
+      {completeError && <p className="complete-error">{completeError}</p>}
+
+      <button
+        className="complete-button"
+        disabled={!canCompleteConfiguration || completing}
+        onClick={() => onComplete?.(selectedComponents.map((c) => c.id))}
+      >
+        {completing ? 'Guardando...' : 'Completar configuración'}
       </button>
     </aside>
   )

@@ -483,6 +483,13 @@
   cursor: not-allowed;
 }
 
+.complete-error {
+  color: #c0392b;
+  font-size: 0.82rem;
+  margin: 0.5rem 0 0;
+  text-align: center;
+}
+
 @media (max-width: 1024px) {
   .montar-pc-container {
     grid-template-columns: 1fr;

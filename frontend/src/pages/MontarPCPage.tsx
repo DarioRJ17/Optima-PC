@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
-import type { CompatiblePCComponent, EquilibrioData } from '../types'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { useAuth } from '../auth/useAuth'
+import type { CartItem, CompatiblePCComponent, EquilibrioData } from '../types'
 import ComponentDetailModal from './montarPC/ComponentDetailModal.tsx'
 import ComponentSidePanel from './montarPC/ComponentSidePanel'
 import SummaryPane from './montarPC/SummaryPane'
@@ -29,14 +30,17 @@ interface SelectedComponent {
 
 interface MontarPCPageProps {
   onBack: () => void
+  onAddToCart?: (item: CartItem) => void
 }
 
 interface MontarPCLocationState {
   preseleccion?: SelectedComponent[]
 }
 
-export function MontarPCPage({ onBack }: MontarPCPageProps) {
+export function MontarPCPage({ onBack, onAddToCart }: MontarPCPageProps) {
   const location = useLocation()
+  const navigate = useNavigate()
+  const { token, isAuthenticated } = useAuth()
   const preseleccion = (location.state as MontarPCLocationState | null)?.preseleccion ?? []
   const [selectedComponents, setSelectedComponents] = useState<SelectedComponent[]>(preseleccion)
   const [sidePanelOpen, setSidePanelOpen] = useState<string | null>(null)
@@ -46,6 +50,8 @@ export function MontarPCPage({ onBack }: MontarPCPageProps) {
   const [detailModalOpen, setDetailModalOpen] = useState(false)
   const [selectedComponentDetail, setSelectedComponentDetail] = useState<CompatiblePCComponent | null>(null)
   const [equilibrio, setEquilibrio] = useState<EquilibrioData | null>(null)
+  const [completing, setCompleting] = useState(false)
+  const [completeError, setCompleteError] = useState('')
 
   const RELEVANT_TYPES = new Set(['procesador', 'tarjeta-grafica', 'memoria-ram', 'almacenamiento'])
 
@@ -145,6 +151,41 @@ export function MontarPCPage({ onBack }: MontarPCPageProps) {
     }, 300)
   }
 
+  const handleComplete = async (ids: number[]) => {
+    if (!isAuthenticated || !token) {
+      navigate('/login')
+      return
+    }
+    setCompleting(true)
+    setCompleteError('')
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/configuracion-pc`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ componenteIds: ids }),
+      })
+      if (!response.ok) {
+        setCompleteError('No se pudo guardar la configuración. Inténtalo de nuevo.')
+        return
+      }
+      const data = (await response.json()) as { id: number; precio: number }
+      onAddToCart?.({
+        configuracionId: data.id,
+        nombre: 'Configuración personalizada',
+        precio: data.precio,
+        cantidad: 1,
+      })
+      navigate('/carrito')
+    } catch {
+      setCompleteError('No se pudo conectar con el servidor.')
+    } finally {
+      setCompleting(false)
+    }
+  }
+
   return (
     <div className="montar-pc-page">
       <header className="montar-pc-header">
@@ -207,6 +248,9 @@ export function MontarPCPage({ onBack }: MontarPCPageProps) {
           totalPrice={totalPrice}
           requiredCount={requiredCount}
           equilibrio={equilibrio}
+          onComplete={handleComplete}
+          completing={completing}
+          completeError={completeError}
         />
       </div>
 
