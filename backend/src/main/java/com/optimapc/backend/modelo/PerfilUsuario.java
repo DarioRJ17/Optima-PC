@@ -177,22 +177,28 @@ public class PerfilUsuario {
         fechaUltimaActualizacion = LocalDateTime.now();
     }
 
-    public void actualizarDesdeFavorito(TipoUso usoInferido, Double presupuestoRelacionado, Boolean compraReacondicionado) {
+    public void actualizarDesdeFavorito(TipoUso usoInferido, Double presupuestoRelacionado, Boolean esReacondicionado) {
         if (presupuestoRelacionado != null) {
             presupuestoEstimado = presupuestoEstimado == null || presupuestoEstimado <= 0.0
                     ? presupuestoRelacionado
                     : (presupuestoEstimado * 0.9) + (presupuestoRelacionado * 0.1);
         }
 
-        if (Boolean.TRUE.equals(compraReacondicionado)) {
+        if (Boolean.TRUE.equals(esReacondicionado)) {
             preferenciaDeReacondicionado = true;
         }
 
         actualizarDesdeUsoInferido(usoInferido);
 
         aplicarImpactoGeneral(PESO_ACCION_FAVORITO);
-        aplicarImpactoReacondicionado(Boolean.TRUE.equals(compraReacondicionado), PESO_ACCION_FAVORITO);
+        aplicarImpactoReacondicionado(Boolean.TRUE.equals(esReacondicionado), PESO_ACCION_FAVORITO);
 
+        fechaUltimaActualizacion = LocalDateTime.now();
+    }
+
+    public void revertirDesdeFavorito(Boolean esReacondicionado) {
+        revertirImpactoGeneral(PESO_ACCION_FAVORITO);
+        revertirImpactoReacondicionado(Boolean.TRUE.equals(esReacondicionado), PESO_ACCION_FAVORITO);
         fechaUltimaActualizacion = LocalDateTime.now();
     }
 
@@ -230,6 +236,29 @@ public class PerfilUsuario {
         } else {
             scorePreferenciaDeReacondicionado = limitarScore(
                 scorePreferenciaDeReacondicionado * COEF_DECAIMIENTO_SCORE
+            );
+        }
+    }
+
+    // Inverso exacto de aplicarImpactoGeneral: score_prev = (score_now - impacto*COEF_IMPACTO) / COEF_DECAIMIENTO
+    private void revertirImpactoGeneral(double impactoBase) {
+        double delta = impactoBase * COEF_IMPACTO_NUEVO;
+        scoreTipoUsoFrecuente     = limitarScore((scoreTipoUsoFrecuente     - delta) / COEF_DECAIMIENTO_SCORE);
+        scoreUsosSecundarios       = limitarScore((scoreUsosSecundarios       - delta) / COEF_DECAIMIENTO_SCORE);
+        scorePresupuestoEstimado   = limitarScore((scorePresupuestoEstimado   - delta) / COEF_DECAIMIENTO_SCORE);
+    }
+
+    // Inverso de aplicarImpactoReacondicionado
+    private void revertirImpactoReacondicionado(boolean esReacondicionado, double impactoBase) {
+        if (esReacondicionado) {
+            double delta = impactoBase * COEF_IMPACTO_NUEVO;
+            scorePreferenciaDeReacondicionado = limitarScore(
+                (scorePreferenciaDeReacondicionado - delta) / COEF_DECAIMIENTO_SCORE
+            );
+        } else {
+            // Forward fue: score * COEF_DECAIMIENTO → inverso: score / COEF_DECAIMIENTO
+            scorePreferenciaDeReacondicionado = limitarScore(
+                scorePreferenciaDeReacondicionado / COEF_DECAIMIENTO_SCORE
             );
         }
     }

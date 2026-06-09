@@ -9,6 +9,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.optimapc.backend.modelo.Favorito;
 import com.optimapc.backend.modelo.Premontado;
+import com.optimapc.backend.modelo.TipoUso;
+import com.optimapc.backend.usuario.PerfilUsuarioRepository;
 import com.optimapc.backend.usuario.Usuario;
 import com.optimapc.backend.usuario.UsuarioRepository;
 
@@ -19,16 +21,19 @@ public class FavoritoService {
     private final PremontadoRepository premontadoRepository;
     private final UsuarioRepository usuarioRepository;
     private final PremontadoCatalogoService premontadoCatalogoService;
+    private final PerfilUsuarioRepository perfilUsuarioRepository;
 
     public FavoritoService(
             FavoritoRepository favoritoRepository,
             PremontadoRepository premontadoRepository,
             UsuarioRepository usuarioRepository,
-            PremontadoCatalogoService premontadoCatalogoService) {
+            PremontadoCatalogoService premontadoCatalogoService,
+            PerfilUsuarioRepository perfilUsuarioRepository) {
         this.favoritoRepository = favoritoRepository;
         this.premontadoRepository = premontadoRepository;
         this.usuarioRepository = usuarioRepository;
         this.premontadoCatalogoService = premontadoCatalogoService;
+        this.perfilUsuarioRepository = perfilUsuarioRepository;
     }
 
     @Transactional
@@ -48,6 +53,13 @@ public class FavoritoService {
         favorito.setPremontado(premontado);
 
         Favorito guardado = favoritoRepository.save(favorito);
+
+        perfilUsuarioRepository.findByUsuario_Id(usuarioId).ifPresent(perfil -> {
+            TipoUso usoInferido = premontado.getUsosPrevistos().stream().findFirst().orElse(null);
+            perfil.actualizarDesdeFavorito(usoInferido, premontado.getPrecioEfectivo(), premontado.getEsReacondicionado());
+            perfilUsuarioRepository.save(perfil);
+        });
+
         return toDto(guardado);
     }
 
@@ -56,6 +68,15 @@ public class FavoritoService {
         if (!favoritoRepository.existsByUsuario_IdAndPremontado_Id(usuarioId, premontadoId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "El premontado no está en favoritos");
         }
+
+        Premontado premontado = premontadoRepository.findById(premontadoId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Premontado no encontrado"));
+
+        perfilUsuarioRepository.findByUsuario_Id(usuarioId).ifPresent(perfil -> {
+            perfil.revertirDesdeFavorito(premontado.getEsReacondicionado());
+            perfilUsuarioRepository.save(perfil);
+        });
+
         favoritoRepository.deleteByUsuario_IdAndPremontado_Id(usuarioId, premontadoId);
     }
 

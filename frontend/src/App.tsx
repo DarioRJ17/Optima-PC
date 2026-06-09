@@ -221,6 +221,7 @@ function AppShell() {
         method: esFavorito ? 'DELETE' : 'POST',
         headers: { Authorization: `Bearer ${token}` },
       })
+      refreshRecommendations()
     } catch {
       setFavoritosIds((prev) => {
         const next = new Set(prev)
