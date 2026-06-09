@@ -4,7 +4,7 @@ import heroImage from '../assets/hero.png'
 import { useAuth } from '../auth/useAuth'
 import { PCComponentItem, RatingSummary, StarRating, UserReviewItem } from '../components/common'
 import { buildBadge, formatEuro } from '../catalog-utils'
-import type { CatalogPremontado, UserReview } from '../types'
+import type { CartItem, CatalogPremontado, UserReview } from '../types'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.trim() || 'http://localhost:8080'
 
@@ -12,9 +12,11 @@ type ProductDetailPageProps = {
   productId?: number
   onBack: () => void
   onReviewSubmitted?: () => void
+  onAddToCart?: (item: CartItem) => void
+  cartItems?: CartItem[]
 }
 
-export function ProductDetailPage({ productId: propProductId, onBack, onReviewSubmitted }: ProductDetailPageProps) {
+export function ProductDetailPage({ productId: propProductId, onBack, onReviewSubmitted, onAddToCart, cartItems = [] }: ProductDetailPageProps) {
   const params = useParams()
   const navigate = useNavigate()
   const { token, isAuthenticated, user } = useAuth()
@@ -222,9 +224,24 @@ export function ProductDetailPage({ productId: propProductId, onBack, onReviewSu
 
             <p className="product-price-note">IVA incluido • Envío gratis</p>
 
-            <button type="button" className="cta-button">
-              🛒 Añadir al carrito
-            </button>
+            {onAddToCart && product && (() => {
+              const enCarrito = cartItems.some((i) => i.configuracionId === product.id)
+              return (
+                <button
+                  type="button"
+                  className={`cta-button${enCarrito ? ' cta-button--added' : ''}`}
+                  onClick={() => onAddToCart({
+                    configuracionId: product.id,
+                    nombre: product.titulo,
+                    precio: product.precioReducido ?? product.precio,
+                    imagenUrl: product.imagenUrl,
+                    cantidad: 1,
+                  })}
+                >
+                  {enCarrito ? '✓ Añadido al carrito' : '🛒 Añadir al carrito'}
+                </button>
+              )
+            })()}
 
             <div className="product-highlights">
               {product.sistemaOperativo && (

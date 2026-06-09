@@ -12,13 +12,16 @@ import { AuthProvider } from './auth/AuthContext'
 import { useAuth } from './auth/useAuth'
 import { MontarPCPage } from './pages/MontarPCPage'
 import { ReciclajePage } from './pages/ReciclajePage'
-import { Recycle, Wrench, Bot, LogIn, UserPlus, ShoppingCart, Menu, Heart } from 'lucide-react'
+import { Recycle, Wrench, Bot, LogIn, UserPlus, ShoppingCart, Menu, Heart, Package } from 'lucide-react'
 import { ChatbotPage } from './pages/ChatbotPage'
 import { FavoritosPage } from './pages/FavoritosPage'
+import { CarritoPage } from './pages/CarritoPage'
+import { ComprasPage } from './pages/ComprasPage'
 import type {
   ApiError,
   AuthMode,
   AuthResponse,
+  CartItem,
   CatalogPremontado,
   LoginData,
   RegisterData,
@@ -35,6 +38,7 @@ function AppShell() {
   const [recommendationsRefreshKey, setRecommendationsRefreshKey] = useState(0)
   const [favoritosIds, setFavoritosIds] = useState<Set<number>>(new Set())
   const [favoritosLoaded, setFavoritosLoaded] = useState(false)
+  const [cartItems, setCartItems] = useState<CartItem[]>([])
 
   // Estados que antes estaban en App()
   const [catalogItems, setCatalogItems] = useState<CatalogPremontado[]>([])
@@ -376,6 +380,31 @@ function AppShell() {
     }
   }
 
+  const addToCart = (item: CartItem) => {
+    setCartItems((prev) => {
+      const existing = prev.find((i) => i.configuracionId === item.configuracionId)
+      if (existing) {
+        return prev.map((i) =>
+          i.configuracionId === item.configuracionId ? { ...i, cantidad: i.cantidad + 1 } : i
+        )
+      }
+      return [...prev, item]
+    })
+  }
+
+  const removeFromCart = (configuracionId: number) => {
+    setCartItems((prev) => prev.filter((i) => i.configuracionId !== configuracionId))
+  }
+
+  const updateCartQuantity = (configuracionId: number, cantidad: number) => {
+    if (cantidad < 1) return
+    setCartItems((prev) =>
+      prev.map((i) => (i.configuracionId === configuracionId ? { ...i, cantidad } : i))
+    )
+  }
+
+  const clearCart = () => setCartItems([])
+
   return (
     <div className="app-root">
       <header className="topbar">
@@ -450,6 +479,17 @@ function AppShell() {
                 </button>
                 {userMenuOpen ? (
                   <div className="nav-user__menu" role="menu">
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={() => {
+                        navigate('/compras')
+                        setUserMenuOpen(false)
+                      }}
+                    >
+                      <Package size={16} strokeWidth={1.75} aria-hidden="true" />
+                      <span>Mis compras</span>
+                    </button>
                     <button
                       type="button"
                       role="menuitem"
@@ -540,9 +580,14 @@ function AppShell() {
             </>
           )}
 
-          <button type="button" className="nav-chip nav-chip--cart">
+          <button type="button" className="nav-chip nav-chip--cart" onClick={() => navigate('/carrito')}>
             <ShoppingCart size={16} strokeWidth={1.75} aria-hidden="true" />
             <span>Carrito</span>
+            {cartItems.length > 0 && (
+              <span className="cart-badge" aria-label={`${cartItems.length} productos en el carrito`}>
+                {cartItems.length}
+              </span>
+            )}
           </button>
         </nav>
       </header>
@@ -568,7 +613,17 @@ function AppShell() {
             />
           }
         />
-        <Route path="/productos/:id" element={<ProductDetailPage onBack={() => navigate('/')} onReviewSubmitted={refreshRecommendations} />} />
+        <Route
+          path="/productos/:id"
+          element={
+            <ProductDetailPage
+              onBack={() => navigate('/')}
+              onReviewSubmitted={refreshRecommendations}
+              onAddToCart={addToCart}
+              cartItems={cartItems}
+            />
+          }
+        />
         <Route
           path="/login"
           element={
@@ -619,13 +674,25 @@ function AppShell() {
           path="/perfil-inicial"
           element={<InitialSurveyPage onBack={() => navigate('/')} onSurveySaved={refreshRecommendations} />}
         />
-        <Route path="/montar-pc" element={<MontarPCPage onBack={() => navigate('/')} />} />
+        <Route path="/montar-pc" element={<MontarPCPage onBack={() => navigate('/')} onAddToCart={addToCart} />} />
         <Route path="/reciclaje" element={<ReciclajePage onBack={() => navigate('/')} />} />
         <Route path="/chat" element={<ChatbotPage />} />
         <Route
           path="/favoritos"
           element={<FavoritosPage favoritosIds={favoritosIds} toggleFavorito={toggleFavorito} />}
         />
+        <Route
+          path="/carrito"
+          element={
+            <CarritoPage
+              cartItems={cartItems}
+              onRemoveFromCart={removeFromCart}
+              onUpdateQuantity={updateCartQuantity}
+              onClearCart={clearCart}
+            />
+          }
+        />
+        <Route path="/compras" element={<ComprasPage />} />
         <Route path="/auth" element={<Navigate to="/login" replace />} />
       </Routes>
     </div>

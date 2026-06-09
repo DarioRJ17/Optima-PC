@@ -148,3 +148,27 @@ export type FavoritoDto = {
   fechaGuardado: string
   premontado: CatalogPremontado
 }
+
+export type CartItem = {
+  configuracionId: number
+  nombre: string
+  precio: number
+  imagenUrl?: string | null
+  cantidad: number
+}
+
+export type ItemPedidoDto = {
+  id: number
+  configuracionId: number
+  nombreProducto: string
+  cantidad: number
+  precioUnitario: number
+  subtotal: number
+}
+
+export type PedidoDto = {
+  id: number
+  fecha: string
+  total: number
+  items: ItemPedidoDto[]
+}
