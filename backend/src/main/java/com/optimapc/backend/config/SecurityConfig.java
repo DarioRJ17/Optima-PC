@@ -51,6 +51,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/reciclaje/**").permitAll()
                 .requestMatchers("/api/banners/**").permitAll()
                 .requestMatchers("/api/pedidos/**").authenticated()
+                .requestMatchers("/api/mis-configuraciones/**").authenticated()
                 .anyRequest().authenticated())
             .exceptionHandling(ex -> ex.authenticationEntryPoint(new JwtAuthenticationEntryPoint()))
             .addFilterBefore(new JwtAuthenticationFilter(jwtService), UsernamePasswordAuthenticationFilter.class)

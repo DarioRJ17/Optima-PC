@@ -123,6 +123,8 @@ public class PedidoService {
             if (nombre == null || nombre.isBlank()) return marca;
             return String.format(Locale.ROOT, "%s %s", marca, nombre).trim();
         }
+        String nombreConfig = unproxied.getNombreConfiguracion();
+        if (nombreConfig != null && !nombreConfig.isBlank()) return nombreConfig;
         return "Configuración personalizada #" + configuracion.getId();
     }
 
