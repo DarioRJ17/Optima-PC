@@ -136,6 +136,8 @@ type HomePageProps = {
   selectedFilters: SelectedFilters
   setSelectedFilters: Dispatch<SetStateAction<SelectedFilters>>
   openAuth: (nextMode: AuthMode) => void
+  favoritosIds?: Set<number>
+  toggleFavorito?: (id: number) => void
 }
 
 export function HomePage({
@@ -150,6 +152,8 @@ export function HomePage({
   selectedFilters,
   setSelectedFilters,
   openAuth,
+  favoritosIds,
+  toggleFavorito,
 }: HomePageProps) {
   const navigate = useNavigate()
   const allCatalogAndRecommendationItems = [...catalogItems, ...recommendationItems]
@@ -428,6 +432,8 @@ export function HomePage({
                       key={item.id}
                       product={productCard}
                       onViewDetails={() => navigate(`/productos/${item.id}`)}
+                      favorita={favoritosIds ? favoritosIds.has(item.id) : undefined}
+                      onToggleFavorite={toggleFavorito ? () => toggleFavorito(item.id) : undefined}
                     />
                   )
                 })}

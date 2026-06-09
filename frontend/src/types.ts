@@ -142,3 +142,9 @@ export type RegisterData = {
   password: string
   confirmPassword: string
 }
+
+export type FavoritoDto = {
+  id: number
+  fechaGuardado: string
+  premontado: CatalogPremontado
+}

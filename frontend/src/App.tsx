@@ -12,8 +12,9 @@ import { AuthProvider } from './auth/AuthContext'
 import { useAuth } from './auth/useAuth'
 import { MontarPCPage } from './pages/MontarPCPage'
 import { ReciclajePage } from './pages/ReciclajePage'
-import { Recycle, Wrench, Bot, LogIn, UserPlus, ShoppingCart, Menu } from 'lucide-react'
+import { Recycle, Wrench, Bot, LogIn, UserPlus, ShoppingCart, Menu, Heart } from 'lucide-react'
 import { ChatbotPage } from './pages/ChatbotPage'
+import { FavoritosPage } from './pages/FavoritosPage'
 import type {
   ApiError,
   AuthMode,
@@ -32,6 +33,8 @@ function AppShell() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [recommendationsRefreshKey, setRecommendationsRefreshKey] = useState(0)
+  const [favoritosIds, setFavoritosIds] = useState<Set<number>>(new Set())
+  const [favoritosLoaded, setFavoritosLoaded] = useState(false)
 
   // Estados que antes estaban en App()
   const [catalogItems, setCatalogItems] = useState<CatalogPremontado[]>([])
@@ -169,6 +172,63 @@ function AppShell() {
 
   const refreshRecommendations = () => {
     setRecommendationsRefreshKey((current) => current + 1)
+  }
+
+  useEffect(() => {
+    if (!user || !token) {
+      setFavoritosIds(new Set())
+      setFavoritosLoaded(false)
+      return
+    }
+
+    const controller = new AbortController()
+
+    const loadFavoritos = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/catalogo/favoritos`, {
+          headers: { Authorization: `Bearer ${token}` },
+          signal: controller.signal,
+        })
+        if (response.ok) {
+          const data = (await response.json()) as Array<{ premontado: { id: number } }>
+          setFavoritosIds(new Set(data.map((f) => f.premontado.id)))
+        }
+      } catch {
+        // silencioso — el estado de favoritos queda vacío
+      } finally {
+        if (!controller.signal.aborted) setFavoritosLoaded(true)
+      }
+    }
+
+    void loadFavoritos()
+    return () => controller.abort()
+  }, [user, token])
+
+  const toggleFavorito = async (premontadoId: number) => {
+    if (!user || !token) return
+
+    const esFavorito = favoritosIds.has(premontadoId)
+
+    setFavoritosIds((prev) => {
+      const next = new Set(prev)
+      if (esFavorito) next.delete(premontadoId)
+      else next.add(premontadoId)
+      return next
+    })
+
+    try {
+      await fetch(`${API_BASE_URL}/api/catalogo/premontados/${premontadoId}/favoritos`, {
+        method: esFavorito ? 'DELETE' : 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      })
+    } catch {
+      setFavoritosIds((prev) => {
+        const next = new Set(prev)
+        if (esFavorito) next.add(premontadoId)
+        else next.delete(premontadoId)
+        return next
+      })
+    }
   }
 
   /**
@@ -393,6 +453,18 @@ function AppShell() {
                       type="button"
                       role="menuitem"
                       onClick={() => {
+                        navigate('/favoritos')
+                        setUserMenuOpen(false)
+                      }}
+                    >
+                      <Heart size={16} strokeWidth={1.75} aria-hidden="true" />
+                      <span>Mis favoritos</span>
+                    </button>
+                    <div className="nav-user__menu-divider" aria-hidden="true" />
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={() => {
                         logout()
                         navigate('/')
                         setUserMenuOpen(false)
@@ -490,6 +562,8 @@ function AppShell() {
               selectedFilters={selectedFilters}
               setSelectedFilters={setSelectedFilters}
               openAuth={openAuth}
+              favoritosIds={favoritosLoaded ? favoritosIds : undefined}
+              toggleFavorito={favoritosLoaded ? toggleFavorito : undefined}
             />
           }
         />
@@ -547,6 +621,10 @@ function AppShell() {
         <Route path="/montar-pc" element={<MontarPCPage onBack={() => navigate('/')} />} />
         <Route path="/reciclaje" element={<ReciclajePage onBack={() => navigate('/')} />} />
         <Route path="/chat" element={<ChatbotPage />} />
+        <Route
+          path="/favoritos"
+          element={<FavoritosPage favoritosIds={favoritosIds} toggleFavorito={toggleFavorito} />}
+        />
         <Route path="/auth" element={<Navigate to="/login" replace />} />
       </Routes>
     </div>

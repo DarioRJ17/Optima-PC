@@ -1,4 +1,4 @@
-import { Cpu, Gpu, MemoryStick, HardDrive, PlugZap, CircuitBoard, Box, Fan, Wrench } from 'lucide-react'
+import { Cpu, Gpu, MemoryStick, HardDrive, PlugZap, CircuitBoard, Box, Fan, Wrench, Heart } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import heroImage from '../assets/hero.png'
 import type { CatalogPremontado, PCComponent, ProductCard, UserReview } from '../types'
@@ -80,7 +80,17 @@ export function PerformanceMeter({ value }: { value: number }) {
   )
 }
 
-export function ProductCardView({ product, onViewDetails }: { product: ProductCard; onViewDetails: () => void }) {
+export function ProductCardView({
+  product,
+  onViewDetails,
+  favorita,
+  onToggleFavorite,
+}: {
+  product: ProductCard
+  onViewDetails: () => void
+  favorita?: boolean
+  onToggleFavorite?: () => void
+}) {
   return (
     <article className={`product-card product-card--${product.tone}`}>
       <div className="product-card__media">
@@ -88,6 +98,16 @@ export function ProductCardView({ product, onViewDetails }: { product: ProductCa
         <span className="pill pill--accent">{product.ribbon}</span>
         <div className="product-card__shine" aria-hidden="true" />
         <img className="product-card__image" src={product.imageUrl || heroImage} alt="" aria-hidden="true" />
+        {onToggleFavorite !== undefined && (
+          <button
+            type="button"
+            className={`favorite-btn${favorita ? ' favorite-btn--active' : ''}`}
+            onClick={(e) => { e.stopPropagation(); onToggleFavorite() }}
+            aria-label={favorita ? 'Quitar de favoritos' : 'Añadir a favoritos'}
+          >
+            <Heart size={18} fill={favorita ? '#ef4444' : 'none'} stroke={favorita ? '#ef4444' : 'currentColor'} strokeWidth={2} />
+          </button>
+        )}
       </div>
 
       <div className="product-card__body">
