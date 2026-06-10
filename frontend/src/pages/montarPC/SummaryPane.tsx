@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import type { EquilibrioData } from '../../types'
+import type { ConsumoData, EquilibrioData } from '../../types'
+import { Zap } from 'lucide-react'
 
 interface SelectedComponent {
   id: number
@@ -20,6 +21,7 @@ interface Props {
   totalPrice: number
   requiredCount: number
   equilibrio: EquilibrioData | null
+  consumo: ConsumoData | null
   onComplete?: (ids: number[]) => void
   completing?: boolean
   completeError?: string
@@ -42,6 +44,7 @@ export default function SummaryPane({
   totalPrice,
   requiredCount,
   equilibrio,
+  consumo,
   onComplete,
   completing = false,
   completeError,
@@ -128,6 +131,45 @@ export default function SummaryPane({
                   {d.sobredimensionado ? 'sobredimensionada' : 'es cuello de botella'}
                 </span>
               ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Indicador de consumo */}
+      {consumo && consumo.consumoEstimadoW > 0 && (
+        <div className={`summary-consumo${!consumo.suficiente ? ' summary-consumo--warn' : ''}`}>
+          <div className="consumo-header">
+            <span className="consumo-label">
+              <Zap size={13} strokeWidth={2.5} aria-hidden="true" />
+              Consumo estimado
+            </span>
+            <span className="consumo-valor">{consumo.consumoEstimadoW}W</span>
+          </div>
+          {consumo.potenciaPSUW != null ? (
+            <>
+              <div className="consumo-row">
+                <span>Fuente seleccionada</span>
+                <span>{consumo.potenciaPSUW}W</span>
+              </div>
+              <div className="consumo-row">
+                <span>Disponible (con margen 25%)</span>
+                <span className={consumo.suficiente ? 'consumo-ok' : 'consumo-nok'}>
+                  {consumo.disponibleW != null
+                    ? consumo.disponibleW >= 0
+                      ? `+${consumo.disponibleW}W`
+                      : `−${Math.abs(consumo.disponibleW)}W`
+                    : '—'}
+                </span>
+              </div>
+              {!consumo.suficiente && (
+                <p className="consumo-aviso">La fuente puede quedarse corta. Se recomiendan al menos {consumo.consumoRecomendadoW}W.</p>
+              )}
+            </>
+          ) : (
+            <div className="consumo-row">
+              <span>Fuente recomendada</span>
+              <span className="consumo-recom">≥ {consumo.consumoRecomendadoW}W</span>
             </div>
           )}
         </div>

@@ -70,9 +70,17 @@
 .components-list {
   background: rgba(255, 255, 255, 0.95);
   border-radius: 20px;
-  overflow: hidden;
+  overflow: visible;
   border: 1px solid rgba(219, 228, 240, 0.85);
   box-shadow: 0 8px 24px rgba(39, 54, 80, 0.08);
+}
+
+.component-item:first-child .component-header {
+  border-radius: 20px 20px 0 0;
+}
+
+.component-item:last-child .component-header {
+  border-radius: 0 0 20px 20px;
 }
 
 .component-item {
@@ -568,6 +576,121 @@
   font-size: 0.82rem;
   text-align: center;
   margin: 0;
+}
+
+/* Info icon tooltip on component type rows */
+.component-type-info {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: #9aa8bc;
+  cursor: help;
+  line-height: 1;
+}
+
+.component-type-info:hover {
+  color: #5a6a7e;
+}
+
+.component-type-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  background: #1e293b;
+  color: #94a3b8;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.79rem;
+  line-height: 1.55;
+  width: 230px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.28);
+  pointer-events: none;
+  font-weight: 400;
+  text-align: left;
+  white-space: normal;
+}
+
+.component-type-info:hover .component-type-tooltip {
+  display: block;
+}
+
+/* Power consumption indicator in SummaryPane */
+.summary-consumo {
+  padding: 10px 14px;
+  background: #f0f9f4;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  font-size: 13px;
+}
+
+.summary-consumo--warn {
+  background: #fff8f0;
+  border-color: rgba(251, 146, 60, 0.35);
+}
+
+.consumo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 7px;
+}
+
+.consumo-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 600;
+  color: #166534;
+}
+
+.summary-consumo--warn .consumo-label {
+  color: #9a3412;
+}
+
+.consumo-valor {
+  font-size: 16px;
+  font-weight: 800;
+  color: #166534;
+}
+
+.summary-consumo--warn .consumo-valor {
+  color: #9a3412;
+}
+
+.consumo-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #5a6a7e;
+  padding: 3px 0;
+  border-top: 1px solid rgba(219, 228, 240, 0.5);
+}
+
+.consumo-ok {
+  color: #16a34a;
+  font-weight: 700;
+}
+
+.consumo-nok {
+  color: #ea580c;
+  font-weight: 700;
+}
+
+.consumo-recom {
+  color: #1560ef;
+  font-weight: 700;
+}
+
+.consumo-aviso {
+  margin: 6px 0 0;
+  color: #9a3412;
+  font-size: 11.5px;
+  line-height: 1.4;
 }
 
 @media (max-width: 1024px) {

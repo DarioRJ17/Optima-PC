@@ -53,6 +53,11 @@ public class ConfiguracionPCController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/consumo")
+    public ConsumoDto getConsumo(@RequestParam(required = false) List<Long> selectedIds) {
+        return montarPCService.calcularConsumo(selectedIds);
+    }
+
     @GetMapping("/equilibrio")
     public EquilibrioResult getEquilibrio(@RequestParam(required = false) List<Long> selectedIds) {
         return montarPCService.calcularEquilibrio(selectedIds);

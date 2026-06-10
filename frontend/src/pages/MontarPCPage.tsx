@@ -1,14 +1,25 @@
 import { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/useAuth'
-import type { CartItem, CompatiblePCComponent, EquilibrioData } from '../types'
+import type { CartItem, CompatiblePCComponent, ConsumoData, EquilibrioData } from '../types'
 import ComponentDetailModal from './montarPC/ComponentDetailModal.tsx'
 import ComponentSidePanel from './montarPC/ComponentSidePanel'
 import SummaryPane from './montarPC/SummaryPane'
 import './montarPC/MontarPCPage.css'
-import { Cpu, CircuitBoard, MemoryStick, Gpu, HardDrive, PlugZap, Box, Fan, Wrench } from 'lucide-react'
+import { Cpu, CircuitBoard, MemoryStick, Gpu, HardDrive, PlugZap, Box, Fan, Wrench, Info } from 'lucide-react'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.trim() || 'http://localhost:8080'
+
+const COMPONENT_INFO: Record<string, string> = {
+  'procesador': 'El cerebro del ordenador que ejecuta las instrucciones y procesa los datos. Cuanto más potente, mejor rendimiento en aplicaciones y multitarea.',
+  'placa-base': 'Conecta e interconecta todos los componentes entre sí. Determina la compatibilidad con el procesador, la RAM y las ranuras de expansión.',
+  'memoria-ram': 'Memoria de acceso rápido que almacena temporalmente los datos que el procesador necesita. Más RAM permite ejecutar más programas simultáneamente.',
+  'tarjeta-grafica': 'Procesa y renderiza imágenes, vídeos y gráficos 3D. Esencial para gaming, diseño gráfico, edición de vídeo y renderizado 3D.',
+  'almacenamiento': 'Guarda permanentemente el sistema operativo, programas y archivos. Los SSD NVMe son mucho más rápidos que los discos duros tradicionales.',
+  'fuente-alimentacion': 'Proporciona energía estable a todos los componentes del ordenador. Es importante elegir una con suficiente potencia y buena eficiencia.',
+  'caja': 'Carcasa que aloja y protege todos los componentes del ordenador. Determina el tamaño del sistema y el flujo de aire.',
+  'refrigerador-cpu': 'Sistema que mantiene la temperatura del procesador bajo control para evitar sobrecalentamientos y mantener el rendimiento.',
+}
 
 const COMPONENT_TYPES = [
   { id: 'procesador', label: 'Procesador (CPU)', Icon: Cpu },
@@ -50,6 +61,7 @@ export function MontarPCPage({ onBack, onAddToCart }: MontarPCPageProps) {
   const [detailModalOpen, setDetailModalOpen] = useState(false)
   const [selectedComponentDetail, setSelectedComponentDetail] = useState<CompatiblePCComponent | null>(null)
   const [equilibrio, setEquilibrio] = useState<EquilibrioData | null>(null)
+  const [consumo, setConsumo] = useState<ConsumoData | null>(null)
   const [completing, setCompleting] = useState(false)
   const [completeError, setCompleteError] = useState('')
   const [saving, setSaving] = useState(false)
@@ -69,6 +81,18 @@ export function MontarPCPage({ onBack, onAddToCart }: MontarPCPageProps) {
       .then((res) => (res.ok ? res.json() : null))
       .then((data: EquilibrioData | null) => setEquilibrio(data))
       .catch(() => setEquilibrio(null))
+  }, [selectedComponents])
+
+  useEffect(() => {
+    if (selectedComponents.length === 0) {
+      setConsumo(null)
+      return
+    }
+    const ids = selectedComponents.map((c) => c.id).join(',')
+    fetch(`${API_BASE_URL}/api/configuracion-pc/consumo?selectedIds=${ids}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: ConsumoData | null) => setConsumo(data))
+      .catch(() => setConsumo(null))
   }, [selectedComponents])
 
   const totalPrice = selectedComponents.reduce((sum, c) => sum + c.precio, 0)
@@ -251,6 +275,12 @@ export function MontarPCPage({ onBack, onAddToCart }: MontarPCPageProps) {
                       {type.label}
                       {isRequired && <span className="required-mark">*</span>}
                     </span>
+                    {COMPONENT_INFO[type.id] && (
+                      <span className="component-type-info">
+                        <Info size={14} strokeWidth={2} aria-hidden="true" />
+                        <span className="component-type-tooltip">{COMPONENT_INFO[type.id]}</span>
+                      </span>
+                    )}
                     <span className="component-status">
                       {selected ? (
                         <span className="status-selected">✓ {selected.nombre}</span>
@@ -281,6 +311,7 @@ export function MontarPCPage({ onBack, onAddToCart }: MontarPCPageProps) {
           totalPrice={totalPrice}
           requiredCount={requiredCount}
           equilibrio={equilibrio}
+          consumo={consumo}
           onComplete={handleComplete}
           completing={completing}
           completeError={completeError}

@@ -338,6 +338,24 @@ public class MontarPCService {
         return detalles;
     }
 
+    public ConsumoDto calcularConsumo(List<Long> selectedIds) {
+        if (selectedIds == null || selectedIds.isEmpty()) {
+            return new ConsumoDto(0, 0, null, null, true);
+        }
+        List<Componente> componentes = componenteRepository.findAllById(selectedIds);
+        FuenteAlimentacion psu = componentes.stream()
+                .filter(c -> c instanceof FuenteAlimentacion)
+                .map(c -> (FuenteAlimentacion) c)
+                .findFirst()
+                .orElse(null);
+        int consumo = PowerEstimationService.estimateTotalWatts(componentes);
+        int recomendado = (int) Math.ceil(consumo * 1.25);
+        Integer potenciaPSU = psu != null ? psu.getPotencia() : null;
+        boolean suficiente = psu == null || PowerEstimationService.isPowerSufficient(psu, componentes, 1.25);
+        Integer disponible = potenciaPSU != null ? (int) Math.floor(potenciaPSU * 0.8) - consumo : null;
+        return new ConsumoDto(consumo, recomendado, potenciaPSU, disponible, suficiente);
+    }
+
     public EquilibrioResult calcularEquilibrio(List<Long> selectedIds) {
         if (selectedIds == null || selectedIds.isEmpty()) {
             return new EquilibrioResult(0.0, List.of());

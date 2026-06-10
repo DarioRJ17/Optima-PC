@@ -76,6 +76,14 @@ export type EquilibrioData = {
   componentes: ComponenteDesbalanceado[]
 }
 
+export type ConsumoData = {
+  consumoEstimadoW: number
+  consumoRecomendadoW: number
+  potenciaPSUW: number | null
+  disponibleW: number | null
+  suficiente: boolean
+}
+
 export type ReciclajeConfiguracion = {
   componentes: ReciclajeComponente[]
   scoreRendimiento: number

@@ -10,15 +10,12 @@ import java.util.stream.Collectors;
 
 import com.optimapc.backend.montarPC.dto.CompatibilityWarningDto;
 
-import com.optimapc.backend.modelo.Almacenamiento;
 import com.optimapc.backend.modelo.Caja;
 import com.optimapc.backend.modelo.Componente;
 import com.optimapc.backend.modelo.FuenteAlimentacion;
 import com.optimapc.backend.modelo.MemoriaRAM;
 import com.optimapc.backend.modelo.PlacaBase;
 import com.optimapc.backend.modelo.Procesador;
-import com.optimapc.backend.modelo.RefrigeradorCPU;
-import com.optimapc.backend.modelo.TarjetaGrafica;
 
 /**
  * Hook interface for component compatibility logic.
@@ -108,24 +105,6 @@ public interface CompatibilityService {
         }
 
         return true; // default to compatible if no specific rules apply
-
-        // if (candidate instanceof Procesador) {
-        //     return isCompatibleProcesador((Procesador) candidate, selected);
-        // } else if (candidate instanceof PlacaBase) {
-        //     return isCompatiblePlacaBase((PlacaBase) candidate, selected);
-        // } else if (candidate instanceof MemoriaRAM) {
-        //     return isCompatibleMemoriaRAM((MemoriaRAM) candidate, selected);
-        // } else if (candidate instanceof TarjetaGrafica) {
-        //     return isCompatibleTarjetaGrafica((TarjetaGrafica) candidate, selected);
-        // } else if (candidate instanceof Almacenamiento) {
-        //     return isCompatibleAlmacenamiento((Almacenamiento) candidate, selected);
-        // } else if (candidate instanceof FuenteAlimentacion) {
-        //     return isCompatibleFuenteAlimentacion((FuenteAlimentacion) candidate, selected);
-        // } else if (candidate instanceof Caja) {
-        //     return isCompatibleCaja((Caja) candidate, selected);
-        // } else if (candidate instanceof RefrigeradorCPU) {
-        //     return isCompatibleRefrigeradorCPU((RefrigeradorCPU) candidate, selected);
-        // }
     }
 
     private static boolean isCompatibleProcesadorVSPlacaBase(Procesador candidate, PlacaBase placaBaseSeleccionada) {
@@ -367,25 +346,4 @@ public interface CompatibilityService {
         return limpio;
     }
 
-    
-
-    // public boolean isCompatibleTarjetaGrafica(TarjetaGrafica candidate, List<Componente> selected) {
-    //     return true;
-    // }
-
-    // public boolean isCompatibleAlmacenamiento(Almacenamiento candidate, List<Componente> selected) {
-    //     return true;
-    // }
-
-    // public boolean isCompatibleFuenteAlimentacion(FuenteAlimentacion candidate, List<Componente> selected) {
-    //     return true;
-    // }
-
-    // public boolean isCompatibleCaja(Caja candidate, List<Componente> selected) {
-    //     return true;
-    // }
-
-    // public boolean isCompatibleRefrigeradorCPU(RefrigeradorCPU candidate, List<Componente> selected) {
-    //     return true;
-    // }
 }
