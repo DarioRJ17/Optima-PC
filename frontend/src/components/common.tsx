@@ -1,4 +1,4 @@
-import { Cpu, Gpu, MemoryStick, HardDrive, PlugZap, CircuitBoard, Box, Fan, Wrench, Heart } from 'lucide-react'
+import { Cpu, Gpu, MemoryStick, HardDrive, PlugZap, CircuitBoard, Box, Fan, Wrench, Heart, Info, Star, StarHalf, Zap } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import heroImage from '../assets/hero.png'
 import type { CatalogPremontado, PCComponent, ProductCard, UserReview } from '../types'
@@ -39,11 +39,18 @@ const NOMBRES_COMPONENTES: Record<string, string> = {
 export function StarRating({ value }: { value: number }) {
   return (
     <div className="star-rating" aria-label={`${value} de 5 estrellas`}>
-      {Array.from({ length: 5 }).map((_, index) => (
-        <span key={index} className={index < value ? 'star star--filled' : 'star'}>
-          ★
-        </span>
-      ))}
+      {Array.from({ length: 5 }).map((_, index) => {
+        const full = value >= index + 1
+        const half = !full && value >= index + 0.5
+        if (full) return <Star key={index} size={16} strokeWidth={1.5} fill="#f5b400" stroke="#f5b400" />
+        if (half) return (
+          <span key={index} style={{ position: 'relative', display: 'inline-flex' }}>
+            <Star size={16} strokeWidth={1.5} fill="none" stroke="#c0cad8" />
+            <StarHalf size={16} strokeWidth={1.5} fill="#f5b400" stroke="#f5b400" style={{ position: 'absolute', left: 0 }} />
+          </span>
+        )
+        return <Star key={index} size={16} strokeWidth={1.5} fill="none" stroke="#c0cad8" />
+      })}
     </div>
   )
 }
@@ -51,30 +58,32 @@ export function StarRating({ value }: { value: number }) {
 export function PerformanceMeter({ value }: { value: number }) {
   return (
     <div className="performance-meter" aria-label={`Rendimiento ${value} sobre 100`}>
-      <div className="performance-meter__header">
-        <span>⚡ Rendimiento/€</span>
+      <div className="performance-meter__row">
+        <span className="performance-meter__label">
+          <Zap size={12} strokeWidth={2.5} aria-hidden="true" />
+          Rendimiento/€
+        </span>
+        <span className="performance-meter__val">
+          <strong>{value}</strong><span>/100</span>
+        </span>
         <span className="performance-meter__info">
-          ⓘ
-          <div className="performance-meter__tooltip" role="tooltip">
-            <strong>Métrica de Rendimiento/€</strong>
-            <p>
-              Compara el rendimiento estimado de CPU, GPU, RAM y almacenamiento con el precio
-              del equipo. Un valor más alto indica mejor relación calidad-precio dentro del
-              catálogo.
-            </p>
-            <p>
-              <strong>Limitaciones:</strong> el rendimiento se estima a partir de
-              especificaciones técnicas (núcleos, frecuencia, capacidad), sin datos de
-              benchmarks reales ni diferencias entre arquitecturas. La puntuación es
-              relativa al catálogo: equipos más baratos tienden a puntuar mejor en esta
-              métrica aunque su potencia absoluta sea menor.
-            </p>
-          </div>
+          <Info size={13} strokeWidth={2} aria-hidden="true" />
         </span>
       </div>
-      <div className="performance-meter__value">
-        <strong>{value}</strong>
-        <span>/ 100</span>
+      <div className="performance-meter__tooltip" role="tooltip">
+        <strong>Métrica de Rendimiento/€</strong>
+        <p>
+          Compara el rendimiento estimado de CPU, GPU, RAM y almacenamiento con el precio
+          del equipo. Un valor más alto indica mejor relación calidad-precio dentro del
+          catálogo.
+        </p>
+        <p>
+          <strong>Limitaciones:</strong> El rendimiento se estima a partir de
+          especificaciones técnicas (núcleos, frecuencia, capacidad), sin datos de
+          benchmarks reales ni diferencias entre arquitecturas. La puntuación es
+          relativa al catálogo: equipos más baratos tienden a puntuar mejor en esta
+          métrica aunque su potencia absoluta sea menor.
+        </p>
       </div>
     </div>
   )
@@ -112,8 +121,15 @@ export function ProductCardView({
 
       <div className="product-card__body">
         <h3>{product.title}</h3>
-        <StarRating value={product.rating} />
-        <p className="reviews">({product.reviews})</p>
+        <div className="card-rating-row">
+          <StarRating value={product.rating} />
+          {product.reviews == 1 ? (
+              <p className="reviews">{product.reviews} valoración</p>
+            ) : (
+              <p className="reviews">{product.reviews} valoraciones</p>
+            )
+          }
+        </div>
         <PerformanceMeter value={product.performance} />
         <div className="performance-label-row">
           <span>{product.performanceLabel}</span>
@@ -166,7 +182,7 @@ export function UserReviewItem({ review }: { review: UserReview }) {
 }
 
 export function RatingSummary({ product }: { product: CatalogPremontado }) {
-  const rating = Math.max(1, Math.min(5, Math.round(product.valoracionMedia || 0)))
+  const rating = Math.max(0, Math.min(5, product.valoracionMedia || 0))
 
   return (
     <div className="rating-summary">

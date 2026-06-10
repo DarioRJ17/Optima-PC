@@ -484,17 +484,19 @@
 }
 
 .product-card {
-  overflow: hidden;
   border-radius: 20px;
   background: #ffffff;
   border: 1px solid rgba(219, 228, 240, 0.96);
   box-shadow: 0 10px 24px rgba(37, 53, 80, 0.12);
+  display: flex;
+  flex-direction: column;
 }
 
 .product-card__media {
   position: relative;
   min-height: 200px;
   overflow: hidden;
+  border-radius: 20px 20px 0 0;
   background: linear-gradient(145deg, #07111f, #1d2738 50%, #0f1830);
 }
 
@@ -564,6 +566,18 @@
 
 .product-card__body {
   padding: 1rem 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.product-card__body .price-row {
+  margin-top: auto;
+  padding-top: 0.9rem;
+}
+
+.product-card__body .details-button {
+  margin-top: 0.9rem;
 }
 
 .product-card__body h3 {
@@ -580,14 +594,17 @@
   margin-top: 0.45rem;
 }
 
-.star {
-  color: #c4cfdd;
-  font-size: 1.05rem;
+.card-rating-row {
+  display: flex;
+  align-items: center;
+  margin-top: 0.45rem;
 }
 
-.star--filled {
-  color: #f5b400;
+.card-rating-row .star-rating {
+  margin-top: 0;
 }
+
+
 
 .reviews {
   display: inline-block;
@@ -599,24 +616,76 @@
 .performance-meter {
   position: relative;
   margin-top: 0.85rem;
-  padding: 0.75rem 0.85rem;
-  border-radius: 12px;
+  padding: 0.45rem 0.75rem;
+  border-radius: 10px;
   background: rgba(22, 180, 90, 0.08);
   border: 1px solid rgba(22, 180, 90, 0.18);
 }
 
+.product-card--gaming .performance-meter {
+  background: rgba(34, 99, 255, 0.08);
+  border-color: rgba(34, 99, 255, 0.18);
+}
+
+.performance-meter__row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.performance-meter__label {
+  display: flex;
+  align-items: center;
+  gap: 0.28rem;
+  flex: 1;
+  color: #15803d;
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.product-card--gaming .performance-meter__label {
+  color: #236dff;
+}
+
+.performance-meter__val {
+  display: flex;
+  align-items: baseline;
+  gap: 0.1rem;
+  color: #17a34a;
+  font-size: 0.8rem;
+}
+
+.product-card--gaming .performance-meter__val {
+  color: #236dff;
+}
+
+.performance-meter__val strong {
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.performance-meter__val span {
+  font-size: 0.75rem;
+  opacity: 0.75;
+}
+
 .performance-meter__info {
-  position: relative;
   cursor: help;
   line-height: 1;
+  color: #15803d;
+  opacity: 0.7;
+}
+
+.product-card--gaming .performance-meter__info {
+  color: #236dff;
 }
 
 .performance-meter__tooltip {
   display: none;
   position: absolute;
-  bottom: calc(100% + 8px);
+  top: calc(100% + 6px);
+  left: 0;
   right: 0;
-  width: 210px;
   background: #0f172a;
   color: #e2e8f0;
   border-radius: 10px;
@@ -642,54 +711,14 @@
   color: #94a3b8;
 }
 
-.performance-meter__info:hover .performance-meter__tooltip {
+.performance-meter:has(.performance-meter__info:hover) .performance-meter__tooltip {
   display: block;
 }
 
-.product-card--gaming .performance-meter {
-  background: rgba(34, 99, 255, 0.08);
-  border-color: rgba(34, 99, 255, 0.18);
-}
-
-.performance-meter__header,
-.performance-meter__value {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-}
-
-.performance-meter__header {
-  color: #15803d;
-  font-weight: 800;
-  font-size: 0.9rem;
-}
-
-.product-card--gaming .performance-meter__header {
-  color: #236dff;
-}
-
-.performance-meter__value {
-  margin-top: 0.2rem;
-  color: #17a34a;
-}
-
-.product-card--gaming .performance-meter__value {
-  color: #236dff;
-}
-
-.performance-meter__value strong {
-  font-size: 1.3rem;
-}
-
-.performance-meter__value span {
-  font-size: 0.94rem;
-}
-
 .performance-label-row {
-  margin-top: 0.85rem;
+  margin-top: 0.6rem;
   display: grid;
-  gap: 0.45rem;
+  gap: 0.4rem;
   color: #374458;
   font-size: 0.92rem;
   font-weight: 700;
@@ -711,7 +740,7 @@
 }
 
 .price-row {
-  margin-top: 0.9rem;
+  margin-top: 0;
   display: grid;
   gap: 0.15rem;
 }
@@ -1973,12 +2002,6 @@
   flex-shrink: 0;
 }
 
-.chat-header__icon {
-  display: inline-flex;
-  align-items: center;
-  color: #2196f3;
-}
-
 .chat-header__info {
   display: flex;
   flex-direction: column;
@@ -1986,10 +2009,18 @@
 }
 
 .chat-header__title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   font-size: 1.08rem;
   font-weight: 800;
-  color: #16243c;
+  color: #17417a;
   margin: 0;
+}
+
+.chat-header__title svg {
+  color: #1560ef;
+  flex-shrink: 0;
 }
 
 .chat-header__subtitle {
@@ -2362,6 +2393,19 @@
   margin: 0.3rem 0.5rem;
 }
 
+.nav-user__menu-logout {
+  color: #dc2626 !important;
+}
+
+.nav-user__menu-logout svg {
+  color: #dc2626 !important;
+}
+
+.nav-user__menu-logout:hover {
+  background: #fff0f0 !important;
+  color: #b91c1c !important;
+}
+
 /* =========================================================
    Badge del carrito
    ========================================================= */
@@ -2652,6 +2696,7 @@
   border: 1px solid rgba(219, 228, 240, 0.96);
   box-shadow: 0 4px 16px rgba(37, 53, 80, 0.08);
   overflow: hidden;
+  padding-bottom: 1.25rem;
 }
 
 .compra-card__header {
@@ -2730,6 +2775,7 @@
   gap: 0.5rem;
   flex-wrap: wrap;
   margin-top: 0.5rem;
+  padding: 0 1.4rem;
 }
 
 .mis-config-btn {
@@ -2786,4 +2832,5 @@
 .mis-config-delete-error {
   margin: 0.25rem 0 0;
   font-size: 0.82rem;
+  padding: 0 1.4rem;
 }

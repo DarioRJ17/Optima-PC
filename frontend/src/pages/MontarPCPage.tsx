@@ -6,7 +6,7 @@ import ComponentDetailModal from './montarPC/ComponentDetailModal.tsx'
 import ComponentSidePanel from './montarPC/ComponentSidePanel'
 import SummaryPane from './montarPC/SummaryPane'
 import './montarPC/MontarPCPage.css'
-import { Cpu, CircuitBoard, MemoryStick, Gpu, HardDrive, PlugZap, Box, Fan } from 'lucide-react'
+import { Cpu, CircuitBoard, MemoryStick, Gpu, HardDrive, PlugZap, Box, Fan, Wrench } from 'lucide-react'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.trim() || 'http://localhost:8080'
 
@@ -226,7 +226,7 @@ export function MontarPCPage({ onBack, onAddToCart }: MontarPCPageProps) {
           ← Volver al inicio
         </button>
         <div className="header-title">
-          <h1>Monta tu propio PC</h1>
+          <h1><Wrench size={26} strokeWidth={1.75} aria-hidden="true" />Monta tu propio PC</h1>
           <p>Selecciona cada componente para crear tu ordenador personalizado</p>
         </div>
       </header>

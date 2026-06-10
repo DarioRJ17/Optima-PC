@@ -1,7 +1,8 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { BrowserRouter, Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 import './App.css'
 import { AppLogo } from './components/common'
+import { ScrollToTop } from './components/ScrollToTop'
 import { AuthPage } from './pages/AuthPage.tsx'
 import { HomePage } from './pages/HomePage'
 import { InitialSurveyPage } from './pages/InitialSurveyPage'
@@ -12,7 +13,7 @@ import { AuthProvider } from './auth/AuthContext'
 import { useAuth } from './auth/useAuth'
 import { MontarPCPage } from './pages/MontarPCPage'
 import { ReciclajePage } from './pages/ReciclajePage'
-import { Recycle, Wrench, Bot, LogIn, UserPlus, ShoppingCart, Menu, Heart, Package, Bookmark } from 'lucide-react'
+import { Recycle, Wrench, Bot, LogIn, UserPlus, ShoppingCart, Menu, Heart, Package, Bookmark, CircleUser, LogOut } from 'lucide-react'
 import { ChatbotPage } from './pages/ChatbotPage'
 import { FavoritosPage } from './pages/FavoritosPage'
 import { CarritoPage } from './pages/CarritoPage'
@@ -36,6 +37,17 @@ function AppShell() {
   const { user, setAuth, logout, token } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
+  const userMenuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false)
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) setUserMenuOpen(false)
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
   const [recommendationsRefreshKey, setRecommendationsRefreshKey] = useState(0)
   const [favoritosIds, setFavoritosIds] = useState<Set<number>>(new Set())
   const [favoritosLoaded, setFavoritosLoaded] = useState(false)
@@ -408,6 +420,7 @@ function AppShell() {
 
   return (
     <div className="app-root">
+      <ScrollToTop />
       <header className="topbar">
         <button className="brand-button" type="button" onClick={() => navigate('/')}>
           <AppLogo />
@@ -416,7 +429,7 @@ function AppShell() {
         <nav className="topbar-actions" aria-label="Navegación principal">
           {user ? (
             <>
-              <div className="nav-user">
+              <div className="nav-user" ref={menuRef}>
                 <button
                   type="button"
                   className="nav-chip nav-chip--menu"
@@ -466,7 +479,7 @@ function AppShell() {
                   </div>
                 ) : null}
               </div>
-              <div className="nav-user">
+              <div className="nav-user" ref={userMenuRef}>
                 <button
                   type="button"
                   className="nav-chip nav-chip--menu"
@@ -474,7 +487,7 @@ function AppShell() {
                   aria-haspopup="true"
                   aria-expanded={userMenuOpen}
                 >
-                  <span aria-hidden="true">👤</span>
+                  <CircleUser size={16} strokeWidth={1.75} aria-hidden="true" />
                   <span>{user.nombre}</span>
                   <span aria-hidden="true">⌄</span>
                 </button>
@@ -517,12 +530,14 @@ function AppShell() {
                     <button
                       type="button"
                       role="menuitem"
+                      className="nav-user__menu-logout"
                       onClick={() => {
                         logout()
                         navigate('/')
                         setUserMenuOpen(false)
                       }}
                     >
+                      <LogOut size={16} strokeWidth={1.75} aria-hidden="true" />
                       Cerrar sesión
                     </button>
                   </div>
@@ -531,8 +546,8 @@ function AppShell() {
             </>
           ) : (
             <>
-              <div className="nav-user">
-                <button 
+              <div className="nav-user" ref={menuRef}>
+                <button
                   type="button"
                   className="nav-chip nav-chip--menu"
                   onClick={() => setMenuOpen((s) => !s)}

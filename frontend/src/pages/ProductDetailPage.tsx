@@ -181,7 +181,7 @@ export function ProductDetailPage({ productId: propProductId, onBack, onReviewSu
     )
   }
 
-  const rating = Math.max(1, Math.min(5, Math.round(product.valoracionMedia || 0)))
+  const rating = Math.max(0, Math.min(5, product.valoracionMedia || 0))
   const price = product.precioReducido ?? product.precio
 
   return (

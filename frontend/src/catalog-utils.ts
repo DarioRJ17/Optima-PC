@@ -66,7 +66,7 @@ export function buildPerformance(value: number) {
 }
 
 export function toProductCard(item: CatalogPremontado, section: CatalogSectionKey): ProductCard {
-  const rating = Math.max(1, Math.min(5, Math.round(item.valoracionMedia || 0)))
+  const rating = Math.max(0, Math.min(5, item.valoracionMedia || 0))
   const performance = buildPerformance(item.rendimientoPorEuro || 0)
   const price = item.precioReducido ?? item.precio
 

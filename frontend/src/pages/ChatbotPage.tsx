@@ -93,9 +93,11 @@ export function ChatbotPage() {
     <div className="chat-page">
       <div className="chat-container">
         <div className="chat-header">
-          <div className="chat-header__icon" aria-hidden="true"><Bot size={30} strokeWidth={1.75} /></div>
           <div className="chat-header__info">
-            <h1 className="chat-header__title">Asistente OptimaPc</h1>
+            <h1 className="chat-header__title">
+              <Bot size={24} strokeWidth={1.75} aria-hidden="true" />
+              Asistente OptimaPc
+            </h1>
             <p className="chat-header__subtitle">
               Pregúntame sobre premontados o cómo usar la web
             </p>

@@ -9,7 +9,7 @@ import type {
 import ComponentDetailModal from './montarPC/ComponentDetailModal.tsx'
 import ComponentSidePanel from './montarPC/ComponentSidePanel'
 import './ReciclajePage.css'
-import { Cpu, Gpu, MemoryStick, HardDrive } from 'lucide-react'
+import { Cpu, Gpu, MemoryStick, HardDrive, Recycle } from 'lucide-react'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.trim() || 'http://localhost:8080'
 
@@ -171,7 +171,7 @@ export function ReciclajePage({ onBack }: ReciclajePageProps) {
           ← Volver al inicio
         </button>
         <div className="header-title">
-          <h1>Reciclaje de componentes</h1>
+          <h1><Recycle size={26} strokeWidth={1.75} aria-hidden="true" />Reciclaje de componentes</h1>
           <p>
             Indica los componentes que ya tienes y el sistema calculará las mejores configuraciones
             posibles a su alrededor, según el tipo de uso.

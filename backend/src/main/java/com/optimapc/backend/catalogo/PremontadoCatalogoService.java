@@ -286,6 +286,11 @@ public class PremontadoCatalogoService {
     // Helpers
     // -------------------------------------------------------------------------
 
+    public void normalizarLista(List<Premontado> premontados) {
+        inicializarColecciones(premontados);
+        rendimientoService.normalizarLista(premontados);
+    }
+
     private void inicializarColecciones(List<Premontado> premontados) {
         premontados.forEach(this::inicializarColecciones);
     }

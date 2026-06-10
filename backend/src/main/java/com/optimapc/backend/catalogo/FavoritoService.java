@@ -82,8 +82,16 @@ public class FavoritoService {
 
     @Transactional(readOnly = true)
     public List<FavoritoDto> listarDeUsuario(Long usuarioId) {
-        return favoritoRepository.findAllByUsuario_IdOrderByFechaGuardadoDesc(usuarioId)
-                .stream()
+        List<Favorito> favoritos = favoritoRepository.findAllByUsuario_IdOrderByFechaGuardadoDesc(usuarioId);
+
+        // Normalizar rendimientoPorEuro sobre el conjunto antes de mapear,
+        // ya que es un campo @Transient que requiere contexto de lista completa.
+        List<com.optimapc.backend.modelo.Premontado> premontados = favoritos.stream()
+                .map(Favorito::getPremontado)
+                .toList();
+        premontadoCatalogoService.normalizarLista(premontados);
+
+        return favoritos.stream()
                 .map(this::toDto)
                 .toList();
     }
