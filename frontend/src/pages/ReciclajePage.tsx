@@ -278,9 +278,15 @@ export function ReciclajePage({ onBack }: ReciclajePageProps) {
 
       <ComponentSidePanel
         isOpen={sidePanelOpen !== null}
+        tipo={sidePanelOpen || ''}
         title={COMPONENT_TYPES.find((t) => t.id === sidePanelOpen)?.label || ''}
         components={availableComponents}
-        selectedComponentId={getSelectedComponentByType(sidePanelOpen || '')?.id}
+        selectedComponentIds={
+          getSelectedComponentByType(sidePanelOpen || '')?.id !== undefined
+            ? [getSelectedComponentByType(sidePanelOpen || '')!.id]
+            : []
+        }
+        selectedComponentsContext={[]}
         loading={loadingComponents}
         error={componentsError}
         onClose={() => setSidePanelOpen(null)}
