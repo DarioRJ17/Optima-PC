@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -28,6 +29,7 @@ import com.optimapc.backend.montarPC.RendimientoService;
 import com.optimapc.backend.modelo.Procesador;
 import com.optimapc.backend.modelo.RefrigeradorCPU;
 import com.optimapc.backend.modelo.TarjetaGrafica;
+import com.optimapc.backend.pedido.ItemPedidoRepository;
 import com.optimapc.backend.usuario.PerfilUsuarioRepository;
 import com.optimapc.backend.usuario.Usuario;
 import com.optimapc.backend.usuario.UsuarioRepository;
@@ -40,18 +42,21 @@ public class PremontadoCatalogoService {
     private final UsuarioRepository usuarioRepository;
     private final RendimientoService rendimientoService;
     private final PerfilUsuarioRepository perfilUsuarioRepository;
+    private final ItemPedidoRepository itemPedidoRepository;
 
     public PremontadoCatalogoService(
             PremontadoRepository premontadoRepository,
             ValoracionRepository valoracionRepository,
             UsuarioRepository usuarioRepository,
             RendimientoService rendimientoService,
-            PerfilUsuarioRepository perfilUsuarioRepository) {
+            PerfilUsuarioRepository perfilUsuarioRepository,
+            ItemPedidoRepository itemPedidoRepository) {
         this.premontadoRepository = premontadoRepository;
         this.valoracionRepository = valoracionRepository;
         this.usuarioRepository = usuarioRepository;
         this.rendimientoService = rendimientoService;
         this.perfilUsuarioRepository = perfilUsuarioRepository;
+        this.itemPedidoRepository = itemPedidoRepository;
     }
 
     // -------------------------------------------------------------------------
@@ -81,6 +86,13 @@ public class PremontadoCatalogoService {
         inicializarColecciones(premontados);
         rendimientoService.normalizarLista(premontados);
 
+        // Una sola query agrega todas las compras por premontado; el mapa permite
+        // consultar el conteo por ID en O(1) sin problema N+1 al construir los DTOs.
+        Map<Long, Long> comprasPorId = itemPedidoRepository.sumComprasPorPremontado().stream()
+                .collect(Collectors.toMap(
+                        row -> (Long) row[0],
+                        row -> (Long) row[1]));
+
         return premontados.stream()
                 .filter(p -> minPrice == null || getPrecioEfectivo(p) >= minPrice)
                 .filter(p -> maxPrice == null || getPrecioEfectivo(p) <= maxPrice)
@@ -88,7 +100,7 @@ public class PremontadoCatalogoService {
                 .filter(p -> reacondicionado == null || p.getEsReacondicionado().equals(reacondicionado))
                 .filter(p -> tipos == null || tipos.isEmpty() ||
                         p.getUsosPrevistos().stream().anyMatch(tipos::contains))
-                .map(this::toDto)
+                .map(p -> toDto(p, comprasPorId.getOrDefault(p.getId(), 0L)))
                 .sorted(Comparator.comparing(PremontadoCatalogoDto::valoracionMedia, Comparator.reverseOrder())
                         .thenComparing(PremontadoCatalogoDto::descuento, Comparator.nullsLast(Comparator.reverseOrder()))
                         .thenComparing(PremontadoCatalogoDto::titulo))
@@ -101,6 +113,10 @@ public class PremontadoCatalogoService {
     }
 
     public PremontadoCatalogoDto toDto(Premontado premontado) {
+        return toDto(premontado, 0L);
+    }
+
+    public PremontadoCatalogoDto toDto(Premontado premontado, long numeroCompras) {
         inicializarColecciones(premontado);
 
         List<Valoracion> valoraciones = premontado.getValoraciones();
@@ -140,7 +156,8 @@ public class PremontadoCatalogoService {
                 valoraciones.size(),
                 premontado.getFavorita(),
                 premontado.getRendimientoPorEuro(),
-                componentesDto);
+                componentesDto,
+                numeroCompras);
     }
 
     private String asignarNombre(ConfiguracionComponente cfg) {

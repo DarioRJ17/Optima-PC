@@ -19,5 +19,6 @@ public record PremontadoCatalogoDto(
         Integer numeroValoraciones,
         Boolean favorita,
         Double rendimientoPorEuro,
-        List<ComponenteDto> componentes) {
+        List<ComponenteDto> componentes,
+        long numeroCompras) {
 }

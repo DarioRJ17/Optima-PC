@@ -167,8 +167,8 @@ export function HomePage({
   const bestSellers = [...filteredCatalogItems]
     .sort(
       (left, right) =>
-        (right.valoracionMedia || 0) - (left.valoracionMedia || 0) ||
-        (right.numeroValoraciones || 0) - (left.numeroValoraciones || 0)
+        (right.numeroCompras || 0) - (left.numeroCompras || 0) ||
+        (right.valoracionMedia || 0) - (left.valoracionMedia || 0)
     )
     .slice(0, 3)
 

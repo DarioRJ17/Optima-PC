@@ -35,6 +35,7 @@ export type CatalogPremontado = {
   favorita: boolean | null
   rendimientoPorEuro: number
   componentes: PCComponent[]
+  numeroCompras: number
 }
 
 export type PCComponent = {
