@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
@@ -59,20 +61,23 @@ public class ChatService {
 
     private final PremontadoRepository premontadoRepository;
     private final RestTemplate restTemplate;
-    private final String ollamaUrl;
-    private final String ollamaModel;
+    private final String llmUrl;
+    private final String llmModel;
+    private final String llmApiKey;
 
     public ChatService(
             PremontadoRepository premontadoRepository,
-            @Value("${ollama.url:http://localhost:11434/api/chat}") String ollamaUrl,
-            @Value("${ollama.model:qwen2.5:7b}") String ollamaModel) {
+            @Value("${llm.url:https://api.groq.com/openai/v1/chat/completions}") String llmUrl,
+            @Value("${llm.model:llama-3.1-8b-instant}") String llmModel,
+            @Value("${llm.api-key:}") String llmApiKey) {
         this.premontadoRepository = premontadoRepository;
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setConnectTimeout(CHAT_CONNECT_TIMEOUT_MS);
         requestFactory.setReadTimeout(CHAT_READ_TIMEOUT_MS);
         this.restTemplate = new RestTemplate(requestFactory);
-        this.ollamaUrl = ollamaUrl;
-        this.ollamaModel = ollamaModel;
+        this.llmUrl = llmUrl;
+        this.llmModel = llmModel;
+        this.llmApiKey = llmApiKey;
     }
 
     @Transactional(readOnly = true)
@@ -102,24 +107,32 @@ public class ChatService {
         mensajes.add(Map.of("role", "user", "content", mensaje));
 
         Map<String, Object> body = new LinkedHashMap<>();
-        body.put("model", ollamaModel);
+        body.put("model", llmModel);
         body.put("messages", mensajes);
-        body.put("stream", false);
-        body.put("options", Map.of("temperature", 0.3, "top_p", 0.9, "num_predict", 300));
+        body.put("temperature", 0.3);
+        body.put("max_tokens", 300);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", "application/json");
+        if (llmApiKey != null && !llmApiKey.isBlank()) {
+            headers.set("Authorization", "Bearer " + llmApiKey);
+        }
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
 
         try {
-            ResponseEntity<OllamaChatResponse> resp = restTemplate.postForEntity(
-                    ollamaUrl, body, OllamaChatResponse.class);
+            ResponseEntity<GroqChatResponse> resp = restTemplate.postForEntity(
+                    llmUrl, request, GroqChatResponse.class);
 
-            OllamaChatResponse chatResp = resp.getBody();
-            if (chatResp == null || chatResp.message() == null
-                    || chatResp.message().content() == null
-                    || chatResp.message().content().isBlank()) {
+            GroqChatResponse chatResp = resp.getBody();
+            if (chatResp == null || chatResp.choices() == null || chatResp.choices().isEmpty()
+                    || chatResp.choices().get(0).message() == null
+                    || chatResp.choices().get(0).message().content() == null
+                    || chatResp.choices().get(0).message().content().isBlank()) {
                 return CHAT_FALLBACK;
             }
-            return chatResp.message().content().trim();
+            return chatResp.choices().get(0).message().content().trim();
         } catch (RestClientException ex) {
-            log.error("Error al llamar a Ollama [{}]: {}", ollamaUrl, ex.getMessage());
+            log.error("Error al llamar al LLM [{}]: {}", llmUrl, ex.getMessage());
             return CHAT_FALLBACK;
         }
     }
@@ -325,6 +338,7 @@ public class ChatService {
         return Math.round(value * 10.0) / 10.0;
     }
 
-    private record OllamaChatMessage(String role, String content) {}
-    private record OllamaChatResponse(OllamaChatMessage message) {}
+    private record GroqChatMessage(String role, String content) {}
+    private record GroqChatChoice(GroqChatMessage message) {}
+    private record GroqChatResponse(List<GroqChatChoice> choices) {}
 }
