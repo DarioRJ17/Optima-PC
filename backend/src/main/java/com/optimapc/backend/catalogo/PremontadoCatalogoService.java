@@ -21,7 +21,6 @@ import com.optimapc.backend.modelo.ConfiguracionComponente;
 import com.optimapc.backend.modelo.FuenteAlimentacion;
 import com.optimapc.backend.modelo.MemoriaRAM;
 import com.optimapc.backend.modelo.PlacaBase;
-import com.optimapc.backend.modelo.PerfilUsuario;
 import com.optimapc.backend.modelo.Premontado;
 import com.optimapc.backend.modelo.TipoUso;
 import com.optimapc.backend.modelo.Valoracion;
@@ -179,7 +178,7 @@ public class PremontadoCatalogoService {
             if (p.getConsumoWatts() != null) res += " | " + p.getConsumoWatts() + " W";
             else if (p.getTdp() != null) res += " | " + p.getTdp() + " W";
         } else if (comp instanceof MemoriaRAM ram) {
-            res = ram.getTipoDDR() + " | " + ram.getVelocidad() + " MHz | " + ram.getGbPorModulo() + "x" + ram.getNumModulos() + " GB | " + "CL" + ram.getLatenciaCAS();
+            res = ram.getTipoDDR() + " | " + ram.getVelocidad() + " MHz | " + "x" + ram.getNumModulos() + ram.getGbPorModulo() + " GB | " + "CL" + ram.getLatenciaCAS();
             if (ram.getConsumoWatts() != null) res += " | " + ram.getConsumoWatts() + " W";
         } else if (comp instanceof Almacenamiento a) {
             res = a.getCapacidad() + " GB " + a.getTipo() + " | Interfaz: " + a.getInterfaz() + " | FF: " + a.getFactorForma();

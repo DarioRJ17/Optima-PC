@@ -17,7 +17,7 @@ interface ComponentType {
 interface Props {
   componentTypes: ComponentType[]
   selectedComponents: SelectedComponent[]
-  onRemove: (tipo: string) => void
+  onRemove: (tipo: string, id?: number) => void
   totalPrice: number
   requiredCount: number
   equilibrio: EquilibrioData | null
@@ -73,6 +73,33 @@ export default function SummaryPane({
 
       <div className="summary-content">
         {componentTypes.map((type) => {
+          if (type.id === 'memoria-ram') {
+            const rams = selectedComponents.filter((c) => c.tipo === 'memoria-ram')
+            return (
+              <div key={type.id} className="summary-item">
+                <span className="summary-label">{type.label}</span>
+                {rams.length > 0 ? (
+                  <div className="summary-value summary-value--multi">
+                    {rams.map((ram) => (
+                      <div key={ram.id} className="summary-multi-row">
+                        <span className="component-name">{ram.nombre}</span>
+                        <button
+                          className="remove-button"
+                          onClick={() => onRemove('memoria-ram', ram.id)}
+                          title="Eliminar"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <span className="summary-empty">No seleccionado</span>
+                )}
+              </div>
+            )
+          }
+
           const selected = selectedComponents.find((c) => c.tipo === type.id)
           return (
             <div key={type.id} className="summary-item">

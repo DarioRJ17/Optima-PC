@@ -363,6 +363,18 @@
   max-width: 150px;
 }
 
+.summary-value--multi {
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.summary-multi-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .component-name {
   color: #16243c;
   font-weight: 500;

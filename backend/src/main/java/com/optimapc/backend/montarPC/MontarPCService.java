@@ -206,7 +206,7 @@ public class MontarPCService {
             if (p.getConsumoWatts() != null) res += " | " + p.getConsumoWatts() + " W";
             else if (p.getTdp() != null) res += " | " + p.getTdp() + " W";
         } else if (componente instanceof MemoriaRAM ram) {
-            res = ram.getTipoDDR() + " | " + ram.getVelocidad() + " MHz | " + ram.getGbPorModulo() + "x" + ram.getNumModulos() + " GB | CL" + ram.getLatenciaCAS();
+            res = ram.getTipoDDR() + " | " + ram.getVelocidad() + " MHz | " + ram.getNumModulos() + "x" + ram.getGbPorModulo() + " GB | CL" + ram.getLatenciaCAS();
             if (ram.getConsumoWatts() != null) res += " | " + ram.getConsumoWatts() + " W";
         } else if (componente instanceof Almacenamiento a) {
             res = a.getCapacidad() + " GB " + a.getTipo() + " | Interfaz: " + a.getInterfaz() + " | FF: " + a.getFactorForma();

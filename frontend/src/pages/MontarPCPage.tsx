@@ -131,35 +131,37 @@ export function MontarPCPage({ onBack, onAddToCart }: MontarPCPageProps) {
   }
 
   const handleSelectComponent = (component: CompatiblePCComponent) => {
-    // Buscar si ya existe un componente de este tipo
-    const existingIndex = selectedComponents.findIndex((c) => c.tipo === component.tipo)
+    const entry: SelectedComponent = {
+      id: component.id,
+      tipo: component.tipo,
+      nombre: component.nombre,
+      precio: component.precio,
+    }
 
-    if (existingIndex >= 0) {
-      // Reemplazar el existente
-      const updated = [...selectedComponents]
-      updated[existingIndex] = {
-        id: component.id,
-        tipo: component.tipo,
-        nombre: component.nombre,
-        precio: component.precio,
+    if (component.tipo === 'memoria-ram') {
+      // Para RAM: añadir si no está ya seleccionada (mismo ID), ignorar si ya existe
+      const alreadySelected = selectedComponents.some((c) => c.id === component.id)
+      if (!alreadySelected) {
+        setSelectedComponents([...selectedComponents, entry])
       }
-      setSelectedComponents(updated)
     } else {
-      // Añadir nuevo
-      setSelectedComponents([
-        ...selectedComponents,
-        {
-          id: component.id,
-          tipo: component.tipo,
-          nombre: component.nombre,
-          precio: component.precio,
-        },
-      ])
+      const existingIndex = selectedComponents.findIndex((c) => c.tipo === component.tipo)
+      if (existingIndex >= 0) {
+        const updated = [...selectedComponents]
+        updated[existingIndex] = entry
+        setSelectedComponents(updated)
+      } else {
+        setSelectedComponents([...selectedComponents, entry])
+      }
     }
   }
 
-  const handleRemoveComponent = (tipo: string) => {
-    setSelectedComponents(selectedComponents.filter((c) => c.tipo !== tipo))
+  const handleRemoveComponent = (tipo: string, id?: number) => {
+    if (tipo === 'memoria-ram' && id !== undefined) {
+      setSelectedComponents(selectedComponents.filter((c) => c.id !== id))
+    } else {
+      setSelectedComponents(selectedComponents.filter((c) => c.tipo !== tipo))
+    }
   }
 
   const getSelectedComponentByType = (tipo: string) => {
@@ -261,8 +263,9 @@ export function MontarPCPage({ onBack, onAddToCart }: MontarPCPageProps) {
           <h2>Componentes</h2>
           <div className="components-list">
             {COMPONENT_TYPES.map((type) => {
-              const selected = getSelectedComponentByType(type.id)
               const isRequired = type.id !== 'refrigerador-cpu'
+              const selectedRams = selectedComponents.filter((c) => c.tipo === 'memoria-ram')
+              const selected = type.id === 'memoria-ram' ? null : getSelectedComponentByType(type.id)
 
               return (
                 <div key={type.id} className="component-item">
@@ -282,7 +285,13 @@ export function MontarPCPage({ onBack, onAddToCart }: MontarPCPageProps) {
                       </span>
                     )}
                     <span className="component-status">
-                      {selected ? (
+                      {type.id === 'memoria-ram' ? (
+                        selectedRams.length > 0 ? (
+                          <span className="status-selected">✓ {selectedRams.length} kit{selectedRams.length > 1 ? 's' : ''} seleccionado{selectedRams.length > 1 ? 's' : ''}</span>
+                        ) : (
+                          <span className="status-empty">No seleccionado</span>
+                        )
+                      ) : selected ? (
                         <span className="status-selected">✓ {selected.nombre}</span>
                       ) : (
                         <span className="status-empty">No seleccionado</span>
@@ -327,7 +336,7 @@ export function MontarPCPage({ onBack, onAddToCart }: MontarPCPageProps) {
         isOpen={detailModalOpen}
         onClose={handleCloseDetailModal}
         onSelect={handleSelectComponent}
-        isSelected={selectedComponentDetail?.id === selectedComponents.find((c) => c.tipo === selectedComponentDetail?.tipo)?.id}
+        isSelected={selectedComponents.some((c) => c.id === selectedComponentDetail?.id)}
       />
 
       <ComponentSidePanel
@@ -335,7 +344,11 @@ export function MontarPCPage({ onBack, onAddToCart }: MontarPCPageProps) {
         tipo={sidePanelOpen || ''}
         title={COMPONENT_TYPES.find((t) => t.id === sidePanelOpen)?.label || ''}
         components={availableComponents}
-        selectedComponentId={getSelectedComponentByType(sidePanelOpen || '')?.id}
+        selectedComponentIds={
+          sidePanelOpen === 'memoria-ram'
+            ? selectedComponents.filter((c) => c.tipo === 'memoria-ram').map((c) => c.id)
+            : selectedComponents.filter((c) => c.tipo === sidePanelOpen).map((c) => c.id)
+        }
         loading={loading}
         error={error}
         onClose={handleCloseSidePanel}

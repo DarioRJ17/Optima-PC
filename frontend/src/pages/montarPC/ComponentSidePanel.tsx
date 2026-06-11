@@ -10,7 +10,7 @@ interface Props {
   tipo: string
   title: string
   components: CompatiblePCComponent[]
-  selectedComponentId?: number
+  selectedComponentIds: number[]
   loading: boolean
   error: string
   onClose: () => void
@@ -23,7 +23,7 @@ export default function ComponentSidePanel({
   tipo,
   title,
   components,
-  selectedComponentId,
+  selectedComponentIds,
   loading,
   error,
   onClose,
@@ -176,7 +176,7 @@ export default function ComponentSidePanel({
                   <ComponentOptionCard
                     key={component.id}
                     component={component}
-                    isSelected={selectedComponentId === component.id}
+                    isSelected={selectedComponentIds.includes(component.id)}
                     onSelect={onSelect}
                     onViewDetails={onViewDetails}
                   />
