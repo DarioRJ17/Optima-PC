@@ -349,6 +349,7 @@ export function MontarPCPage({ onBack, onAddToCart }: MontarPCPageProps) {
             ? selectedComponents.filter((c) => c.tipo === 'memoria-ram').map((c) => c.id)
             : selectedComponents.filter((c) => c.tipo === sidePanelOpen).map((c) => c.id)
         }
+        selectedComponentsContext={selectedComponents}
         loading={loading}
         error={error}
         onClose={handleCloseSidePanel}

@@ -11,11 +11,40 @@ interface Props {
   title: string
   components: CompatiblePCComponent[]
   selectedComponentIds: number[]
+  selectedComponentsContext: { tipo: string }[]
   loading: boolean
   error: string
   onClose: () => void
   onSelect: (component: CompatiblePCComponent) => void
   onViewDetails: (component: CompatiblePCComponent) => void
+}
+
+function getEmptyReasons(tipo: string, selected: { tipo: string }[]): string[] {
+  const has = (t: string) => selected.some((c) => c.tipo === t)
+  const reasons: string[] = []
+
+  if (tipo === 'procesador' && has('placa-base')) {
+    reasons.push('Socket incompatible con la placa base seleccionada')
+  }
+  if (tipo === 'placa-base') {
+    if (has('procesador')) reasons.push('Socket incompatible con el procesador seleccionado')
+    if (has('memoria-ram')) reasons.push('Ninguna placa base es compatible con los kits de RAM seleccionados')
+    if (has('caja')) reasons.push('Factor de forma incompatible con la caja seleccionada')
+  }
+  if (tipo === 'memoria-ram' && has('placa-base')) {
+    reasons.push('La placa base seleccionada no es compatible con este tipo de memoria o se han llenado todas las ranuras')
+  }
+  if (tipo === 'caja' && has('placa-base')) {
+    reasons.push('Factor de forma incompatible con la placa base seleccionada')
+  }
+  if (tipo === 'fuente-alimentacion' && selected.length > 0) {
+    reasons.push('El consumo estimado supera la potencia de todas las fuentes disponibles')
+  }
+
+  if (reasons.length === 0) {
+    return [selected.length > 0 ? 'No hay componentes compatibles con la configuración actual' : 'No hay componentes disponibles']
+  }
+  return reasons
 }
 
 export default function ComponentSidePanel({
@@ -24,6 +53,7 @@ export default function ComponentSidePanel({
   title,
   components,
   selectedComponentIds,
+  selectedComponentsContext,
   loading,
   error,
   onClose,
@@ -62,6 +92,11 @@ export default function ComponentSidePanel({
     setPriceMin(null)
     setPriceMax(null)
   }
+
+  const emptyReasons = useMemo(
+    () => getEmptyReasons(tipo, selectedComponentsContext),
+    [tipo, selectedComponentsContext]
+  )
 
   const filteredComponents = useMemo(() => {
     const byAttributes = applyFilters(components, activeFilters, priceMin, priceMax, tipo)
@@ -164,9 +199,20 @@ export default function ComponentSidePanel({
 
             {!loading && !error && filteredComponents.length === 0 && (
               <div className="side-panel-empty">
-                {components.length > 0
-                  ? 'Ningún componente coincide con los filtros aplicados'
-                  : 'No hay componentes disponibles'}
+                {components.length > 0 ? (
+                  'Ningún componente coincide con los filtros aplicados'
+                ) : emptyReasons.length === 1 ? (
+                  emptyReasons[0]
+                ) : (
+                  <div className="empty-reasons">
+                    <p className="empty-reasons-title">Posibles causas:</p>
+                    <ul className="empty-reasons-list">
+                      {emptyReasons.map((r) => (
+                        <li key={r}>{r}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             )}
 

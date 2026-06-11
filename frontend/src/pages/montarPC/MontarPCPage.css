@@ -360,26 +360,39 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  max-width: 150px;
+  flex: 1;
+  min-width: 0;
+  justify-content: flex-end;
+}
+
+.summary-item--multi {
+  align-items: flex-start;
 }
 
 .summary-value--multi {
   flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
+  align-items: stretch;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
 }
 
 .summary-multi-row {
   display: flex;
   align-items: center;
   gap: 4px;
+  width: 100%;
 }
 
 .component-name {
   color: #16243c;
   font-weight: 500;
-  word-break: break-word;
   font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  flex: 1;
 }
 
 .remove-button {

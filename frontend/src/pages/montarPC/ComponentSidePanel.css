@@ -226,6 +226,26 @@
   padding: 16px;
   height: auto;
   min-height: 200px;
+  flex-direction: column;
+}
+
+.empty-reasons {
+  text-align: left;
+}
+
+.empty-reasons-title {
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  color: #5a6a7e;
+}
+
+.empty-reasons-list {
+  list-style: disc;
+  padding-left: 18px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .side-panel-components {

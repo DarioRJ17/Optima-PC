@@ -76,7 +76,7 @@ export default function SummaryPane({
           if (type.id === 'memoria-ram') {
             const rams = selectedComponents.filter((c) => c.tipo === 'memoria-ram')
             return (
-              <div key={type.id} className="summary-item">
+              <div key={type.id} className="summary-item summary-item--multi">
                 <span className="summary-label">{type.label}</span>
                 {rams.length > 0 ? (
                   <div className="summary-value summary-value--multi">

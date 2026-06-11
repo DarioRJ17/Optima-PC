@@ -41,28 +41,38 @@ public interface CompatibilityService {
             return isCompatibleProcesadorVSPlacaBase((Procesador) candidate, placaBaseSeleccionada);
         }
 
-        if (candidate instanceof PlacaBase && componentesDelTipo.contains("procesador")) {
-            Procesador procesadorSeleccionado = (Procesador) selected.stream()
-                    .filter(c -> c instanceof Procesador)
+        // PlacaBase: aplica todas las restricciones relevantes acumulativamente
+        if (candidate instanceof PlacaBase placaCandidate) {
+            if (componentesDelTipo.contains("procesador")) {
+                Procesador procesadorSeleccionado = (Procesador) selected.stream()
+                        .filter(c -> c instanceof Procesador)
+                        .findFirst()
+                        .orElse(null);
+                if (!isCompatiblePlacaBaseVSProcesador(placaCandidate, procesadorSeleccionado)) return false;
+            }
+            if (componentesDelTipo.contains("memoria-ram")) {
+                List<MemoriaRAM> ramsSeleccionadas = selected.stream()
+                        .filter(c -> c instanceof MemoriaRAM)
+                        .map(c -> (MemoriaRAM) c)
+                        .collect(Collectors.toList());
+                if (!isCompatiblePlacaBaseVSRam(placaCandidate, ramsSeleccionadas)) return false;
+            }
+            if (componentesDelTipo.contains("caja")) {
+                Caja cajaSeleccionada = (Caja) selected.stream()
+                        .filter(c -> c instanceof Caja)
+                        .findFirst()
+                        .orElse(null);
+                if (!isCompatiblePlacaVSCaja(placaCandidate, cajaSeleccionada)) return false;
+            }
+            return true;
+        }
+
+        if (candidate instanceof MemoriaRAM && componentesDelTipo.contains("placa-base")) {
+            PlacaBase placaBaseSeleccionada = (PlacaBase) selected.stream()
+                    .filter(c -> c instanceof PlacaBase)
                     .findFirst()
                     .orElse(null);
-            return isCompatiblePlacaBaseVSProcesador((PlacaBase) candidate, procesadorSeleccionado);
-        }
-
-        if (candidate instanceof MemoriaRAM  && componentesDelTipo.contains("placa-base")) {
-            PlacaBase placaBaseSeleccionada = (PlacaBase) selected.stream()
-                .filter(c -> c instanceof PlacaBase)
-                .findFirst()
-                .orElse(null);
             return isCompatibleRamVSPlacaBase((MemoriaRAM) candidate, placaBaseSeleccionada, selected);
-        }
-
-        if (candidate instanceof PlacaBase && componentesDelTipo.contains("memoria-ram")) {
-            List<MemoriaRAM> ramsSeleccionadas = selected.stream()
-                .filter(c -> c instanceof MemoriaRAM)
-                .map(c -> (MemoriaRAM) c)
-                .collect(Collectors.toList());
-            return isCompatiblePlacaBaseVSRam((PlacaBase) candidate, ramsSeleccionadas);
         }
 
         if (candidate instanceof Caja && componentesDelTipo.contains("placa-base")) {
@@ -71,14 +81,6 @@ public interface CompatibilityService {
                     .findFirst()
                     .orElse(null);
             return isCompatibleCajaVSPlaca((Caja) candidate, placaBaseSeleccionada);
-        }
-
-        if (candidate instanceof PlacaBase && componentesDelTipo.contains("caja")) {
-            Caja cajaSeleccionada = (Caja) selected.stream()
-                    .filter(c -> c instanceof Caja)
-                    .findFirst()
-                    .orElse(null);
-            return isCompatiblePlacaVSCaja((PlacaBase) candidate, cajaSeleccionada);
         }
 
         // Power checks:
