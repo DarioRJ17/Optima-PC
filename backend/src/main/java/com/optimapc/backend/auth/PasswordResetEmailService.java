@@ -3,6 +3,8 @@ package com.optimapc.backend.auth;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -14,6 +16,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class PasswordResetEmailService {
+
+    private static final Logger log = LoggerFactory.getLogger(PasswordResetEmailService.class);
 
     private final ObjectProvider<JavaMailSender> mailSenderProvider;
     private final String frontendBaseUrl;
@@ -57,6 +61,7 @@ public class PasswordResetEmailService {
         try {
             mailSender.send(message);
         } catch (MailException exception) {
+            log.error("Error al enviar correo de recuperación a {}: {}", recipientEmail, exception.getMessage(), exception);
             throw new ResponseStatusException(
                     HttpStatus.SERVICE_UNAVAILABLE,
                     "No se pudo enviar el correo de recuperación",
