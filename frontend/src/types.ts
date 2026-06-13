@@ -159,7 +159,11 @@ export type FavoritoDto = {
 }
 
 export type CartItem = {
+  // Para premontados es el id real de la ConfiguracionPC en BD.
+  // Para builds personalizadas es un id temporal local (negativo) hasta que se
+  // persiste en el checkout; en ese caso viaja componenteIds para crearla.
   configuracionId: number
+  componenteIds?: number[]
   nombre: string
   precio: number
   imagenUrl?: string | null

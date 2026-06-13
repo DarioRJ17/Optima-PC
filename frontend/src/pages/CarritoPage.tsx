@@ -33,18 +33,37 @@ export function CarritoPage({ cartItems, onRemoveFromCart, onUpdateQuantity, onC
     setError('')
 
     try {
+      // Las builds personalizadas aún no existen en BD: se crean ahora (ya hay
+      // sesión) para obtener su configuracionId real. Los premontados ya lo tienen.
+      const items = []
+      for (const item of cartItems) {
+        let configuracionId = item.configuracionId
+        if (item.componenteIds) {
+          const crear = await fetch(`${API_BASE_URL}/api/configuracion-pc`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ componenteIds: item.componenteIds }),
+          })
+          if (!crear.ok) {
+            setError('No se pudo procesar una de tus configuraciones. Inténtalo de nuevo.')
+            return
+          }
+          const data = (await crear.json()) as { id: number }
+          configuracionId = data.id
+        }
+        items.push({ configuracionId, cantidad: item.cantidad })
+      }
+
       const response = await fetch(`${API_BASE_URL}/api/pedidos`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          items: cartItems.map((item) => ({
-            configuracionId: item.configuracionId,
-            cantidad: item.cantidad,
-          })),
-        }),
+        body: JSON.stringify({ items }),
       })
 
       if (!response.ok) {

@@ -62,8 +62,6 @@ export function MontarPCPage({ onBack, onAddToCart }: MontarPCPageProps) {
   const [selectedComponentDetail, setSelectedComponentDetail] = useState<CompatiblePCComponent | null>(null)
   const [equilibrio, setEquilibrio] = useState<EquilibrioData | null>(null)
   const [consumo, setConsumo] = useState<ConsumoData | null>(null)
-  const [completing, setCompleting] = useState(false)
-  const [completeError, setCompleteError] = useState('')
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState('')
   const [saveSuccess, setSaveSuccess] = useState(false)
@@ -210,39 +208,18 @@ export function MontarPCPage({ onBack, onAddToCart }: MontarPCPageProps) {
     }
   }
 
-  const handleComplete = async (ids: number[]) => {
-    if (!isAuthenticated || !token) {
-      navigate('/login')
-      return
-    }
-    setCompleting(true)
-    setCompleteError('')
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/configuracion-pc`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ componenteIds: ids }),
-      })
-      if (!response.ok) {
-        setCompleteError('No se pudo guardar la configuración. Inténtalo de nuevo.')
-        return
-      }
-      const data = (await response.json()) as { id: number; precio: number }
-      onAddToCart?.({
-        configuracionId: data.id,
-        nombre: 'Configuración personalizada',
-        precio: data.precio,
-        cantidad: 1,
-      })
-      navigate('/carrito')
-    } catch {
-      setCompleteError('No se pudo conectar con el servidor.')
-    } finally {
-      setCompleting(false)
-    }
+  // Añadir al carrito es local: no se persiste la configuración aquí (igual que
+  // un premontado). El id es temporal y negativo para no chocar con ids reales;
+  // la ConfiguracionPC se crea al hacer el pedido en el carrito. Ver CarritoPage.
+  const handleComplete = (ids: number[]) => {
+    onAddToCart?.({
+      configuracionId: -Date.now(),
+      componenteIds: ids,
+      nombre: 'Configuración personalizada',
+      precio: totalPrice,
+      cantidad: 1,
+    })
+    navigate('/carrito')
   }
 
   return (
@@ -322,8 +299,8 @@ export function MontarPCPage({ onBack, onAddToCart }: MontarPCPageProps) {
           equilibrio={equilibrio}
           consumo={consumo}
           onComplete={handleComplete}
-          completing={completing}
-          completeError={completeError}
+          completing={false}
+          completeError={''}
           onSave={isAuthenticated ? handleSave : undefined}
           saving={saving}
           saveError={saveError}
