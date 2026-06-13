@@ -427,7 +427,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		Caja caja = componenteMasBarato(Caja.class,
 				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
 		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
-				r -> r.getTamano() != null && r.getTamano().contains("240"));
+				r -> Integer.valueOf(240).equals(r.getTamano()));
 		Premontado p = new Premontado();
 		p.setNombre("Data science");
 		p.setFavorita(Boolean.FALSE);
@@ -573,7 +573,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		Caja caja = componenteMasBarato(Caja.class,
 				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
 		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
-				r -> r.getPrecio() != null && r.getPrecio() >= 30.0 && (r.getTamano() == null || r.getTamano().isBlank()));
+				r -> r.getPrecio() != null && r.getPrecio() >= 30.0 && r.getTamano() == null);
 		Premontado p = new Premontado();
 		p.setNombre("Gaming alto 1080p");
 		p.setFavorita(Boolean.FALSE);
@@ -611,7 +611,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		Caja caja = componenteMasBarato(Caja.class,
 				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
 		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
-				r -> r.getPrecio() != null && r.getPrecio() >= 30.0 && (r.getTamano() == null || r.getTamano().isBlank()));
+				r -> r.getPrecio() != null && r.getPrecio() >= 30.0 && r.getTamano() == null);
 		Premontado p = new Premontado();
 		p.setNombre("Gaming 1440p entrada");
 		p.setFavorita(Boolean.FALSE);
@@ -650,7 +650,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		Caja caja = componenteMasBarato(Caja.class,
 				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
 		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
-				r -> r.getTamano() != null && r.getTamano().contains("240"));
+				r -> Integer.valueOf(240).equals(r.getTamano()));
 		Premontado p = new Premontado();
 		p.setNombre("Gaming 1440p");
 		p.setFavorita(Boolean.TRUE);
@@ -688,7 +688,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		Caja caja = componenteMasBarato(Caja.class,
 				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
 		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
-				r -> r.getTamano() != null && r.getTamano().contains("360"));
+				r -> Integer.valueOf(360).equals(r.getTamano()));
 		Premontado p = new Premontado();
 		p.setNombre("Gaming 1440p alto");
 		p.setFavorita(Boolean.FALSE);
@@ -727,7 +727,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		Caja caja = componenteMasBarato(Caja.class,
 				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
 		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
-				r -> r.getTamano() != null && r.getTamano().contains("360"));
+				r -> Integer.valueOf(360).equals(r.getTamano()));
 		Premontado p = new Premontado();
 		p.setNombre("Gaming 4K");
 		p.setFavorita(Boolean.FALSE);
@@ -766,7 +766,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		Caja caja = componenteMasBarato(Caja.class,
 				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
 		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
-				r -> r.getTamano() != null && r.getTamano().contains("360"));
+				r -> Integer.valueOf(360).equals(r.getTamano()));
 		Premontado p = new Premontado();
 		p.setNombre("Gaming extremo");
 		p.setFavorita(Boolean.FALSE);
@@ -879,7 +879,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		Caja caja = componenteMasBarato(Caja.class,
 				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
 		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
-				r -> r.getPrecio() != null && r.getPrecio() >= 30.0 && (r.getTamano() == null || r.getTamano().isBlank()));
+				r -> r.getPrecio() != null && r.getPrecio() >= 30.0 && r.getTamano() == null);
 		Premontado p = new Premontado();
 		p.setNombre("Edición vídeo 1080p");
 		p.setFavorita(Boolean.FALSE);
@@ -919,7 +919,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		Caja caja = componenteMasBarato(Caja.class,
 				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
 		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
-				r -> r.getTamano() != null && r.getTamano().contains("360"));
+				r -> Integer.valueOf(360).equals(r.getTamano()));
 		Premontado p = new Premontado();
 		p.setNombre("Edición vídeo 4K");
 		p.setFavorita(Boolean.FALSE);
@@ -959,7 +959,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		Caja caja = componenteMasBarato(Caja.class,
 				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
 		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
-				r -> r.getTamano() != null && r.getTamano().contains("360"));
+				r -> Integer.valueOf(360).equals(r.getTamano()));
 		Premontado p = new Premontado();
 		p.setNombre("Edición profesional 4K");
 		p.setFavorita(Boolean.FALSE);
@@ -998,7 +998,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		Caja caja = componenteMasBarato(Caja.class,
 				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
 		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
-				r -> r.getTamano() != null && r.getTamano().contains("360"));
+				r -> Integer.valueOf(360).equals(r.getTamano()));
 		Premontado p = new Premontado();
 		p.setNombre("Motion graphics y 3D");
 		p.setFavorita(Boolean.FALSE);
@@ -1077,7 +1077,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		Caja caja = componenteMasBarato(Caja.class,
 				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
 		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
-				r -> r.getTamano() != null && r.getTamano().contains("240"));
+				r -> Integer.valueOf(240).equals(r.getTamano()));
 		Premontado p = new Premontado();
 		p.setNombre("Streaming profesional");
 		p.setFavorita(Boolean.FALSE);
@@ -1115,7 +1115,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		Caja caja = componenteMasBarato(Caja.class,
 				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
 		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
-				r -> r.getTamano() != null && r.getTamano().contains("240"));
+				r -> Integer.valueOf(240).equals(r.getTamano()));
 		Premontado p = new Premontado();
 		p.setNombre("Creador de contenido");
 		p.setFavorita(Boolean.FALSE);
@@ -1190,7 +1190,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		Caja caja = componenteMasBarato(Caja.class,
 				c -> c.getTipo() != null && c.getTipo().toUpperCase().contains("ATX"));
 		RefrigeradorCPU cooler = componenteMasBarato(RefrigeradorCPU.class,
-				r -> r.getTamano() != null && r.getTamano().contains("240"));
+				r -> Integer.valueOf(240).equals(r.getTamano()));
 		Premontado p = new Premontado();
 		p.setNombre("Workstation versátil");
 		p.setFavorita(Boolean.FALSE);
@@ -1434,10 +1434,14 @@ public class CsvDataLoader implements ApplicationRunner {
 		for (CSVRecord record : leerCsv("data/cpu-cooler.csv")) {
 			RefrigeradorCPU refrigerador = new RefrigeradorCPU();
 			mapearBase(refrigerador, record);
-			refrigerador.setRpm(texto(record, "rpm"));
-			refrigerador.setNivelRuido(texto(record, "noise_level"));
+			Double[] rpm = parseRango(texto(record, "rpm"));
+			refrigerador.setRpmMin(rpm[0] == null ? null : rpm[0].intValue());
+			refrigerador.setRpmMax(rpm[1] == null ? null : rpm[1].intValue());
+			Double[] nivelRuido = parseRango(texto(record, "noise_level"));
+			refrigerador.setNivelRuidoMin(nivelRuido[0]);
+			refrigerador.setNivelRuidoMax(nivelRuido[1]);
 			refrigerador.setColor(texto(record, "color"));
-			refrigerador.setTamano(texto(record, "size"));
+			refrigerador.setTamano(parseInteger(record, "size"));
 			entityManager.persist(refrigerador);
 		}
 	}
@@ -1507,5 +1511,24 @@ public class CsvDataLoader implements ApplicationRunner {
 		}
 
 		return Double.valueOf(value);
+	}
+
+	/**
+	 * Interpreta valores tipo rango del CSV: "600,3000" -> [600, 3000];
+	 * un valor único "1550" -> [1550, 1550]; vacío o no numérico -> [null, null].
+	 */
+	private Double[] parseRango(String value) {
+		if (value == null) {
+			return new Double[] { null, null };
+		}
+
+		String[] partes = value.split(",");
+		try {
+			Double min = Double.valueOf(partes[0].trim());
+			Double max = partes.length > 1 ? Double.valueOf(partes[1].trim()) : min;
+			return new Double[] { min, max };
+		} catch (NumberFormatException e) {
+			return new Double[] { null, null };
+		}
 	}
 }

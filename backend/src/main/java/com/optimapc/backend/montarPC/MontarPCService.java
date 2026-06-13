@@ -199,7 +199,9 @@ public class MontarPCService {
     private String buildSpecification(Componente componente) {
         String res = "";
         if (componente instanceof TarjetaGrafica tg) {
-            res = tg.getMemoria() + " GB | " + tg.getLongitud() + " mm | " + formatFrecuencia(tg.getFrecuenciaBase(), tg.getFrecuenciaBoost());
+            res = tg.getMemoria() + " GB";
+            if (tg.getLongitud() != null) res += " | " + tg.getLongitud() + " mm";
+            res += " | " + formatFrecuencia(tg.getFrecuenciaBase(), tg.getFrecuenciaBoost());
             if (tg.getConsumoWatts() != null) res += " | " + tg.getConsumoWatts() + " W";
         } else if (componente instanceof Procesador p) {
             res = p.getSocket() + " | " + p.getNucleos() + " núcleos | " + formatFrecuencia(p.getFrecuenciaBase(), p.getFrecuenciaBoost());
@@ -218,20 +220,31 @@ public class MontarPCService {
             res = fa.getPotencia() + " W | " + fa.getTipo() + " | Modular: " + fa.getModular();
             if (fa.getConsumoWatts() != null) res += " | " + fa.getConsumoWatts() + " W";
         } else if (componente instanceof Caja c) {
-            res = c.getTipo() + " | Panel lateral: " + c.getPanelLateral();
+            res = c.getTipo();
+            if (c.getPanelLateral() != null) res += " | Panel lateral: " + c.getPanelLateral();
             if (c.getConsumoWatts() != null) res += " | " + c.getConsumoWatts() + " W";
         } else if (componente instanceof RefrigeradorCPU r) {
-            res = r.getRpm() + " RPM | " + r.getNivelRuido() + " dBA";
-            if (r.getConsumoWatts() != null) res += " | " + r.getConsumoWatts() + " W";
+            String rpm = formatRango(r.getRpmMin(), r.getRpmMax());
+            if (!rpm.isEmpty()) res += rpm + " RPM";
+            String ruido = formatRango(r.getNivelRuidoMin(), r.getNivelRuidoMax());
+            if (!ruido.isEmpty()) res += (res.isEmpty() ? "" : " | ") + ruido + " dBA";
+            if (r.getConsumoWatts() != null) res += (res.isEmpty() ? "" : " | ") + r.getConsumoWatts() + " W";
         }
         return res;
     }
 
     private String formatFrecuencia(Number base, Number boost) {
-        if (boost != null) {
-            return base + "-" + boost + " MHz";
-        }
+        if (base == null && boost == null) return "";
+        if (base == null) return boost + " MHz";
+        if (boost != null) return base + "-" + boost + " MHz";
         return base + " MHz";
+    }
+
+    private String formatRango(Number min, Number max) {
+        if (min == null && max == null) return "";
+        if (min == null) return String.valueOf(max);
+        if (max == null || max.equals(min)) return String.valueOf(min);
+        return min + "-" + max;
     }
 
     public Optional<ComponenteDetalleDto> getComponenteDetalle(Long id) {
@@ -328,8 +341,11 @@ public class MontarPCService {
             }
             case "refrigerador-cpu" -> {
                 RefrigeradorCPU refrigerador = (RefrigeradorCPU) componente;
-                detalles.put("rpm", refrigerador.getRpm());
-                detalles.put("nivelRuido", refrigerador.getNivelRuido());
+                String rpm = formatRango(refrigerador.getRpmMin(), refrigerador.getRpmMax());
+                String nivelRuido = formatRango(refrigerador.getNivelRuidoMin(), refrigerador.getNivelRuidoMax());
+                detalles.put("rpm", rpm.isEmpty() ? null : rpm + " RPM");
+                detalles.put("nivelRuido", nivelRuido.isEmpty() ? null : nivelRuido + " dBA");
+                detalles.put("nivelRuidoMax", refrigerador.getNivelRuidoMax());
                 detalles.put("tamano", refrigerador.getTamano());
                 detalles.put("color", refrigerador.getColor());
             }

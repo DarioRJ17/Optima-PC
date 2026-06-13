@@ -193,8 +193,11 @@ public class PremontadoCatalogoService {
             res = c.getTipo() + " | Panel lateral: " + c.getPanelLateral();
             if (c.getConsumoWatts() != null) res += " | " + c.getConsumoWatts() + " W";
         } else if (comp instanceof RefrigeradorCPU r) {
-            res = r.getRpm() + " RPM | " + r.getNivelRuido() + " dBA";
-            if (r.getConsumoWatts() != null) res += " | " + r.getConsumoWatts() + " W";
+            String rpm = formatRango(r.getRpmMin(), r.getRpmMax());
+            if (rpm != null) res += rpm + " RPM";
+            String ruido = formatRango(r.getNivelRuidoMin(), r.getNivelRuidoMax());
+            if (ruido != null) res += (res.isEmpty() ? "" : " | ") + ruido + " dBA";
+            if (r.getConsumoWatts() != null) res += (res.isEmpty() ? "" : " | ") + r.getConsumoWatts() + " W";
         }
         return res;
     }
@@ -204,6 +207,13 @@ public class PremontadoCatalogoService {
             return base + "-" + boost + " MHz";
         }
         return base + " MHz";
+    }
+
+    private String formatRango(Number min, Number max) {
+        if (min == null && max == null) return "";
+        if (min == null) return String.valueOf(max);
+        if (max == null || max.equals(min)) return String.valueOf(min);
+        return min + "-" + max;
     }
 
     private String construirTitulo(Premontado premontado) {

@@ -11,8 +11,10 @@ import lombok.Setter;
 @Table(name = "refrigeradores_cpu")
 public class RefrigeradorCPU extends Componente {
 
-    private String rpm;
-    private String nivelRuido;
+    private Integer rpmMin;
+    private Integer rpmMax;
+    private Double nivelRuidoMin;
+    private Double nivelRuidoMax;
     private String color;
-    private String tamano;
+    private Integer tamano;
 }

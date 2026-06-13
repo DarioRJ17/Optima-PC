@@ -158,8 +158,17 @@ const FILTER_SPECS: Record<string, FilterSpec[]> = {
     },
   ],
   'refrigerador-cpu': [
-    { key: 'nivelRuido', label: 'Nivel de ruido', type: 'checkbox' },
-    { key: 'tamano', label: 'Tamaño', type: 'checkbox' },
+    {
+      key: 'nivelRuidoMax',
+      label: 'Nivel de ruido',
+      type: 'bucket',
+      buckets: [
+        { label: 'Silencioso (≤25 dBA)', min: 0, max: 25 },
+        { label: 'Moderado (25–35 dBA)', min: 25.01, max: 35 },
+        { label: 'Ruidoso (>35 dBA)', min: 35.01, max: Infinity },
+      ],
+    },
+    { key: 'tamano', label: 'Tamaño (mm)', type: 'checkbox' },
   ],
   caja: [
     { key: 'tipo', label: 'Factor de forma', type: 'checkbox' },
@@ -194,6 +203,7 @@ export function applyFilters(
         const normalized = spec.normalize ? spec.normalize(rawVal) : String(rawVal ?? '')
         if (!selected.has(normalized)) return false
       } else if (spec.type === 'bucket') {
+        if (rawVal === null || rawVal === undefined) return false
         const numVal = Number(rawVal)
         const matches = spec.buckets!.some(
           (b) => selected.has(b.label) && numVal >= b.min && numVal <= b.max,

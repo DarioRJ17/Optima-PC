@@ -52,6 +52,7 @@ export default function ComponentDetailModal({
       if (key.toLowerCase().includes('precio')) return `${value.toFixed(2)}€`
       if (key.toLowerCase().includes('frecuencia') || key.toLowerCase().includes('velocidad')) return `${value} MHz`
       if (key.toLowerCase().includes('potencia') || key.toLowerCase().includes('tdp')) return `${value}W`
+      if (key.toLowerCase().includes('longitud') || key.toLowerCase().includes('tamano')) return `${value} mm`
       if (key.toLowerCase().includes('capacidad') || key.toLowerCase().includes('memoria') || key.toLowerCase().includes('gb')) {
         return `${value}`
       }
@@ -60,7 +61,43 @@ export default function ComponentDetailModal({
     return String(value)
   }
 
+  const LABELS: Record<string, string> = {
+    socket: 'Socket',
+    nucleos: 'Núcleos',
+    frecuenciaBase: 'Frecuencia base',
+    frecuenciaBoost: 'Frecuencia turbo',
+    microarquitectura: 'Microarquitectura',
+    tdp: 'TDP',
+    graficaIntegrada: 'Gráfica integrada',
+    tipoDDR: 'Tipo de memoria',
+    factorForma: 'Factor de forma',
+    memoriaMaxima: 'Memoria máxima',
+    ranurasMemoria: 'Ranuras de memoria',
+    velocidad: 'Velocidad',
+    gbPorModulo: 'GB por módulo',
+    numModulos: 'Nº de módulos',
+    totalGB: 'Capacidad total',
+    latenciaCAS: 'Latencia CAS',
+    modelo: 'Modelo',
+    fabricante: 'Fabricante',
+    memoria: 'Memoria',
+    longitud: 'Longitud',
+    capacidad: 'Capacidad',
+    interfaz: 'Interfaz',
+    tipo: 'Tipo',
+    potencia: 'Potencia',
+    eficiencia: 'Eficiencia',
+    modular: 'Modular',
+    panelLateral: 'Panel lateral',
+    rpm: 'RPM',
+    nivelRuido: 'Nivel de ruido',
+    tamano: 'Tamaño',
+    color: 'Color',
+    consumoWatts: 'Consumo',
+  }
+
   const formatLabel = (key: string): string => {
+    if (LABELS[key]) return LABELS[key]
     return key
       .replace(/([A-Z])/g, ' $1')
       .replace(/^./, (str) => str.toUpperCase())
