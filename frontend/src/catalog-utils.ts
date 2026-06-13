@@ -1,4 +1,4 @@
-import type { CatalogPremontado, ProductCard } from './types'
+import type { CardBadge, CatalogPremontado, ProductCard } from './types'
 
 export type CatalogSectionKey = 'featured' | 'offers' | 'refurbished' | 'recommended'
 
@@ -11,6 +11,33 @@ export function formatEuro(value: number) {
 
 function normalizarUso(uso: string) {
   return uso.toUpperCase()
+}
+
+// Etiqueta legible de cada tipo de uso individual (para listarlos en el detalle).
+const USO_LABELS: Record<string, string> = {
+  GAMING: 'Gaming',
+  OFIMATICA: 'Ofimática',
+  PROGRAMACION: 'Programación',
+  EDICION: 'Edición',
+  STREAMING: 'Streaming',
+}
+
+// Prioridad para elegir el uso "principal" que se muestra en la tarjeta.
+const USO_PRIORIDAD = ['GAMING', 'EDICION', 'STREAMING', 'PROGRAMACION', 'OFIMATICA']
+
+export function usoLabel(uso: string) {
+  return USO_LABELS[normalizarUso(uso)] ?? uso
+}
+
+// Usos del premontado ordenados por prioridad (el principal primero).
+export function usosOrdenados(item: CatalogPremontado): string[] {
+  return item.usosPrevistos
+    .map(normalizarUso)
+    .sort((a, b) => {
+      const ia = USO_PRIORIDAD.indexOf(a)
+      const ib = USO_PRIORIDAD.indexOf(b)
+      return (ia === -1 ? Number.MAX_SAFE_INTEGER : ia) - (ib === -1 ? Number.MAX_SAFE_INTEGER : ib)
+    })
 }
 
 export function buildBadge(item: CatalogPremontado) {
@@ -38,20 +65,33 @@ export function buildTone(item: CatalogPremontado): ProductCard['tone'] {
   return 'laptop'
 }
 
-export function buildRibbon(item: CatalogPremontado, section: CatalogSectionKey) {
+// Etiquetas de la tarjeta: un uso principal + "Multiuso" si tiene más, y
+// siempre descuento y reacondicionado cuando apliquen. En la sección de
+// recomendados se antepone "Para ti".
+export function buildCardBadges(item: CatalogPremontado, section: CatalogSectionKey): CardBadge[] {
+  const badges: CardBadge[] = []
+
   if (section === 'recommended') {
-    return 'Para ti'
+    badges.push({ label: 'Para ti', variant: 'foryou' })
   }
 
-  if (section === 'offers' && item.descuento) {
-    return `-${item.descuento}%`
+  const usos = usosOrdenados(item)
+  if (usos.length > 0) {
+    badges.push({ label: usoLabel(usos[0]), variant: 'use' })
+  }
+  if (usos.length > 1) {
+    badges.push({ label: 'Multiuso', variant: 'more' })
   }
 
-  if (section === 'refurbished' && item.esReacondicionado) {
-    return 'Reacondicionado'
+  if ((item.descuento ?? 0) > 0) {
+    badges.push({ label: `-${item.descuento}%`, variant: 'discount' })
   }
 
-  return 'Trending'
+  if (item.esReacondicionado) {
+    badges.push({ label: 'Reacondicionado', variant: 'refurb' })
+  }
+
+  return badges
 }
 
 export function buildPerformanceLabel(value: number) {
@@ -73,8 +113,7 @@ export function toProductCard(item: CatalogPremontado, section: CatalogSectionKe
   return {
     id: item.id,
     title: item.titulo,
-    badge: buildBadge(item),
-    ribbon: buildRibbon(item, section),
+    badges: buildCardBadges(item, section),
     rating,
     reviews: item.numeroValoraciones,
     performance,

@@ -103,8 +103,13 @@ export function ProductCardView({
   return (
     <article className={`product-card product-card--${product.tone}`}>
       <div className="product-card__media">
-        <span className="pill pill--primary">{product.badge}</span>
-        <span className="pill pill--accent">{product.ribbon}</span>
+        <div className="product-card__badges">
+          {product.badges.map((badge) => (
+            <span key={badge.label} className={`card-badge card-badge--${badge.variant}`}>
+              {badge.label}
+            </span>
+          ))}
+        </div>
         <div className="product-card__shine" aria-hidden="true" />
         <img className="product-card__image" src={product.imageUrl || heroImage} alt="" aria-hidden="true" />
         {onToggleFavorite !== undefined && (

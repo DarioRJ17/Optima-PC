@@ -30,6 +30,7 @@ import com.optimapc.backend.modelo.ConfiguracionComponente;
 import com.optimapc.backend.modelo.ConfiguracionPC;
 import com.optimapc.backend.modelo.FuenteAlimentacion;
 import com.optimapc.backend.modelo.MemoriaRAM;
+import com.optimapc.backend.modelo.PerfilUsuario;
 import com.optimapc.backend.modelo.PlacaBase;
 import com.optimapc.backend.modelo.Procesador;
 import com.optimapc.backend.modelo.Premontado;
@@ -197,7 +198,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		p.setDescuento(0);
 		p.setSistemaOperativo(TipoSO.LINUX);
 		p.setStock(15);
-		p.setEsReacondicionado(Boolean.FALSE);
+		p.setEsReacondicionado(Boolean.TRUE);
 		p.setUsosPrevistos(Set.of(TipoUso.OFIMATICA));
 		agregarComponente(p, "CPU", cpu, 1);
 		agregarComponente(p, "Placa base", placa, 1);
@@ -329,7 +330,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		p.setDescuento(0);
 		p.setSistemaOperativo(TipoSO.LINUX);
 		p.setStock(10);
-		p.setEsReacondicionado(Boolean.FALSE);
+		p.setEsReacondicionado(Boolean.TRUE);
 		p.setUsosPrevistos(Set.of(TipoUso.PROGRAMACION));
 		agregarComponente(p, "CPU", cpu, 1);
 		agregarComponente(p, "Placa base", placa, 1);
@@ -396,7 +397,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		p.setDescripcion("12 núcleos Zen 3 para compilaciones paralelas, stacks Docker y pipelines CI/CD locales. 32 GB RAM y 2 TB SSD para imágenes y volúmenes grandes.");
 		p.setMarca("OptimaWork");
 		p.setDescuento(0);
-		p.setSistemaOperativo(TipoSO.LINUX);
+		p.setSistemaOperativo(TipoSO.SIN_SO);
 		p.setStock(6);
 		p.setEsReacondicionado(Boolean.FALSE);
 		p.setUsosPrevistos(Set.of(TipoUso.PROGRAMACION));
@@ -474,7 +475,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		p.setDescuento(10);
 		p.setSistemaOperativo(TipoSO.WINDOWS);
 		p.setStock(12);
-		p.setEsReacondicionado(Boolean.FALSE);
+		p.setEsReacondicionado(Boolean.TRUE);
 		p.setUsosPrevistos(Set.of(TipoUso.GAMING));
 		agregarComponente(p, "CPU", cpu, 1);
 		agregarComponente(p, "GPU", gpu, 1);
@@ -507,7 +508,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		p.setDescripcion("Equipo gaming por debajo de los 900 €. GPU de generación actual para 1080p a 60+ FPS en títulos AAA con ajustes altos. Excelente relación calidad-precio.");
 		p.setMarca("OptimaPC");
 		p.setDescuento(5);
-		p.setSistemaOperativo(TipoSO.WINDOWS);
+		p.setSistemaOperativo(TipoSO.SIN_SO);
 		p.setStock(10);
 		p.setEsReacondicionado(Boolean.FALSE);
 		p.setUsosPrevistos(Set.of(TipoUso.GAMING, TipoUso.STREAMING));
@@ -773,7 +774,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		p.setDescripcion("Sin compromisos: 16 núcleos con 3D V-Cache y la GPU más potente del mercado. Diseñado para 4K a 120+ FPS en cualquier título presente y futuro.");
 		p.setMarca("OptimaPC");
 		p.setDescuento(0);
-		p.setSistemaOperativo(TipoSO.WINDOWS);
+		p.setSistemaOperativo(TipoSO.SIN_SO);
 		p.setStock(2);
 		p.setEsReacondicionado(Boolean.FALSE);
 		p.setUsosPrevistos(Set.of(TipoUso.GAMING));
@@ -851,7 +852,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		p.setDescuento(0);
 		p.setSistemaOperativo(TipoSO.WINDOWS);
 		p.setStock(8);
-		p.setEsReacondicionado(Boolean.FALSE);
+		p.setEsReacondicionado(Boolean.TRUE);
 		p.setUsosPrevistos(Set.of(TipoUso.EDICION));
 		agregarComponente(p, "CPU", cpu, 1);
 		agregarComponente(p, "GPU", gpu, 1);
@@ -886,7 +887,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		p.setDescripcion("12 núcleos para renderizar líneas de tiempo complejas en Premiere o Resolve. GPU acelera efectos y exportación H.265. Ideal para youtubers y videógrafos.");
 		p.setMarca("OptimaPC");
 		p.setDescuento(0);
-		p.setSistemaOperativo(TipoSO.WINDOWS);
+		p.setSistemaOperativo(TipoSO.SIN_SO);
 		p.setStock(6);
 		p.setEsReacondicionado(Boolean.FALSE);
 		p.setUsosPrevistos(Set.of(TipoUso.EDICION, TipoUso.STREAMING));
@@ -1048,7 +1049,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		p.setDescuento(5);
 		p.setSistemaOperativo(TipoSO.WINDOWS);
 		p.setStock(7);
-		p.setEsReacondicionado(Boolean.FALSE);
+		p.setEsReacondicionado(Boolean.TRUE);
 		p.setUsosPrevistos(Set.of(TipoUso.STREAMING, TipoUso.GAMING));
 		agregarComponente(p, "CPU", cpu, 1);
 		agregarComponente(p, "GPU", gpu, 1);
@@ -1084,7 +1085,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		p.setDescripcion("12 núcleos AM5 para streams 1440p con bitrate alto, editar los VODs y jugar sin cuellos de botella. GPU de élite con el mejor encoder de nueva generación.");
 		p.setMarca("OptimaPC");
 		p.setDescuento(0);
-		p.setSistemaOperativo(TipoSO.WINDOWS);
+		p.setSistemaOperativo(TipoSO.SIN_SO);
 		p.setStock(4);
 		p.setEsReacondicionado(Boolean.FALSE);
 		p.setUsosPrevistos(Set.of(TipoUso.STREAMING, TipoUso.GAMING));
@@ -1249,6 +1250,14 @@ public class CsvDataLoader implements ApplicationRunner {
 		usuario.setApellidos(apellidos);
 		usuario.setPassword(passwordEncoder.encode(passwordPlano));
 		entityManager.persist(usuario);
+
+		// Perfil vacío con scores a 0 (vía @PrePersist), igual que al pulsar
+		// "Omitir por ahora" en la encuesta. Sin él, las acciones de compra,
+		// valoración y favorito usan findByUsuario_Id(...).ifPresent(...) y no
+		// tendrían perfil que actualizar para los usuarios del seeder.
+		PerfilUsuario perfil = new PerfilUsuario();
+		perfil.setUsuario(usuario);
+		entityManager.persist(perfil);
 	}
 
 	private void asegurarUsuario(String email, String nombre, String apellidos, String passwordPlano) {

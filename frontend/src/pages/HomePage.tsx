@@ -2,7 +2,6 @@ import type { Dispatch, SetStateAction } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Star, TrendingUp, Tag, RefreshCw } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
-import heroImage from '../assets/hero.png'
 import { ProductCardView } from '../components/common'
 import { toProductCard, type CatalogSectionKey } from '../catalog-utils'
 import type { AuthMode, CatalogPremontado, SelectedFilters } from '../types'
@@ -372,10 +371,11 @@ export function HomePage({
         <section className="hero-panel">
           <div className="hero-copy">
             <p className="eyebrow">Tu tienda para gaming, oficina y reacondicionados</p>
-            <h1>Encuentra el ordenador que encaja con cada uso</h1>
+            <h1>Encuentra el ordenador acorde a tus necesidades</h1>
             <p>
-              Compara rendimiento, precio y estado de forma rápida. La home está pensada para
-              que puedas explorar categorías y volver al acceso desde la barra superior.
+              Elige entre equipos premontados listos para usar, móntalo tú mismo pieza a pieza
+              o ahorra con un reacondicionado con garantía. Compara rendimiento y precio y
+              llévate el ordenador perfecto para ti.
             </p>
             {!isAuthenticated ? (
               <div className="hero-actions">
@@ -390,10 +390,14 @@ export function HomePage({
             {catalogLoading ? <p className="catalog-message">Cargando catálogo real...</p> : null}
             {catalogError ? <p className="catalog-message catalog-message--error">{catalogError}</p> : null}
           </div>
-          <div className="hero-visual" aria-hidden="true">
-            <img src={heroImage} alt="" />
-            <span className="hero-visual__tag hero-visual__tag--top">Equipos destacados</span>
-            <span className="hero-visual__tag hero-visual__tag--bottom">Listos para comprar</span>
+          <div className="hero-visual">
+            <p className="hero-visual__title">Comprar con OptimaPC es fácil</p>
+            <ul className="hero-visual__list">
+              <li>Configura tu PC pieza a pieza con compatibilidad comprobada al instante.</li>
+              <li>Premontados listos para gaming, trabajo y creación de contenido.</li>
+              <li>Reacondicionados con garantía y al mejor precio.</li>
+              <li>Recomendaciones personalizadas según tu uso y tu presupuesto.</li>
+            </ul>
           </div>
         </section>
 

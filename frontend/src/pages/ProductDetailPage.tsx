@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { Check, ShoppingCart } from 'lucide-react'
 import heroImage from '../assets/hero.png'
 import { useAuth } from '../auth/useAuth'
 import { PCComponentItem, RatingSummary, StarRating, UserReviewItem } from '../components/common'
-import { buildBadge, formatEuro } from '../catalog-utils'
+import { buildBadge, formatEuro, usoLabel, usosOrdenados } from '../catalog-utils'
 import type { CartItem, CatalogPremontado, UserReview } from '../types'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.trim() || 'http://localhost:8080'
@@ -200,7 +201,13 @@ export function ProductDetailPage({ productId: propProductId, onBack, onReviewSu
             <span className="pill pill--primary">{buildBadge(product)}</span>
 
             <h1>{product.titulo}</h1>
-            <p className="product-brand">{product.marca}</p>
+            <p className="product-brand"><strong>Marca:</strong> {product.marca}</p>
+
+            {product.usosPrevistos.length > 0 && (
+              <p className="product-usos">
+                <strong>Tipos de uso:</strong> {usosOrdenados(product).map(usoLabel).join(', ')}
+              </p>
+            )}
 
             <div className="product-rating-inline">
               <span className="rating-count">
@@ -238,7 +245,15 @@ export function ProductDetailPage({ productId: propProductId, onBack, onReviewSu
                     cantidad: 1,
                   })}
                 >
-                  {enCarrito ? '✓ Añadido al carrito' : '🛒 Añadir al carrito'}
+                  {enCarrito ? (
+                    <>
+                      <Check size={18} aria-hidden="true" /> Añadido al carrito
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingCart size={18} aria-hidden="true" /> Añadir al carrito
+                    </>
+                  )}
                 </button>
               )
             })()}
@@ -247,7 +262,13 @@ export function ProductDetailPage({ productId: propProductId, onBack, onReviewSu
               {product.sistemaOperativo && (
                 <div className="highlight-item">
                   <span className="highlight-icon">✓</span>
-                  <span>Sistema operativo {product.sistemaOperativo} incluido</span>
+                  { product.sistemaOperativo === "WINDOWS"
+                    ? <span>Windows 11 Pro preinstalado</span>
+                    : product.sistemaOperativo === "LINUX"
+                      ? <span>Linux preinstalado</span>
+                      : <span>Sistema operativo no incluido</span>
+                  }
+                  
                 </div>
               )}
               <div className="highlight-item">
@@ -272,54 +293,6 @@ export function ProductDetailPage({ productId: propProductId, onBack, onReviewSu
             {product.componentes.map((component) => (
               <PCComponentItem key={component.id} component={component} />
             ))}
-          </div>
-        </section>
-
-        <section className="product-connectivity">
-          <h2>Conectividad y puertos</h2>
-          <div className="ports-grid">
-            <div className="port-item">
-              <p className="port-name">DisplayPort 1.4</p>
-              <p className="port-count">x3</p>
-            </div>
-            <div className="port-item">
-              <p className="port-name">Ethernet RJ45</p>
-              <p className="port-count">x1</p>
-            </div>
-            <div className="port-item">
-              <p className="port-name">Audio Jack 3.5mm</p>
-              <p className="port-count">x2</p>
-            </div>
-          </div>
-        </section>
-
-        <section className="product-features">
-          <h2>Características adicionales</h2>
-          <div className="features-grid">
-            <div className="feature-item">
-              <span className="feature-icon">✓</span>
-              <span>Sistema operativo Windows 11 Pro incluido</span>
-            </div>
-            <div className="feature-item">
-              <span className="feature-icon">✓</span>
-              <span>Refrigeración líquida AIO 280mm</span>
-            </div>
-            <div className="feature-item">
-              <span className="feature-icon">✓</span>
-              <span>WiFi 6E y Bluetooth 5.2 integrados</span>
-            </div>
-            <div className="feature-item">
-              <span className="feature-icon">✓</span>
-              <span>Iluminación RGB sincronizable</span>
-            </div>
-            <div className="feature-item">
-              <span className="feature-icon">✓</span>
-              <span>Montaje y testeo profesional incluido</span>
-            </div>
-            <div className="feature-item">
-              <span className="feature-icon">✓</span>
-              <span>Garantía de 3 años</span>
-            </div>
           </div>
         </section>
 

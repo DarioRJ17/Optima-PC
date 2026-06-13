@@ -112,11 +112,17 @@ export type ComponenteDetalle = PCComponent & {
   detalles: Record<string, unknown>
 }
 
+export type CardBadgeVariant = 'use' | 'more' | 'discount' | 'refurb' | 'foryou'
+
+export type CardBadge = {
+  label: string
+  variant: CardBadgeVariant
+}
+
 export type ProductCard = {
   id: number
   title: string
-  badge: string
-  ribbon: string
+  badges: CardBadge[]
   rating: number
   reviews: number
   performance: number
