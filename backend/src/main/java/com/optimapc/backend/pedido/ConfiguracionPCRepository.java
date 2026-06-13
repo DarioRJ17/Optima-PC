@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.optimapc.backend.modelo.ConfiguracionPC;
+import com.optimapc.backend.domain.ConfiguracionPC;
 
 public interface ConfiguracionPCRepository extends JpaRepository<ConfiguracionPC, Long> {
 

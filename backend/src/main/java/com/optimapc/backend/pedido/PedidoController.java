@@ -1,5 +1,8 @@
 package com.optimapc.backend.pedido;
 
+import com.optimapc.backend.pedido.dto.PedidoDto;
+import com.optimapc.backend.pedido.dto.CrearPedidoRequest;
+
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;

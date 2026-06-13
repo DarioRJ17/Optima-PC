@@ -1,5 +1,7 @@
 package com.optimapc.backend.catalogo;
 
+import com.optimapc.backend.catalogo.dto.FavoritoDto;
+
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;

@@ -1,5 +1,10 @@
 package com.optimapc.backend.pedido;
 
+import com.optimapc.backend.pedido.dto.PedidoDto;
+import com.optimapc.backend.pedido.dto.ItemPedidoRequest;
+import com.optimapc.backend.pedido.dto.ItemPedidoDto;
+import com.optimapc.backend.pedido.dto.CrearPedidoRequest;
+
 import java.util.List;
 import java.util.Locale;
 
@@ -9,13 +14,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.optimapc.backend.modelo.ConfiguracionPC;
-import com.optimapc.backend.modelo.ItemPedido;
-import com.optimapc.backend.modelo.Pedido;
-import com.optimapc.backend.modelo.Premontado;
-import com.optimapc.backend.modelo.TipoUso;
-import com.optimapc.backend.usuario.PerfilUsuarioRepository;
-import com.optimapc.backend.usuario.Usuario;
+import com.optimapc.backend.domain.ConfiguracionPC;
+import com.optimapc.backend.domain.ItemPedido;
+import com.optimapc.backend.domain.Pedido;
+import com.optimapc.backend.domain.Premontado;
+import com.optimapc.backend.domain.TipoUso;
+import com.optimapc.backend.recomendacion.PerfilUsuarioRepository;
+import com.optimapc.backend.domain.Usuario;
 import com.optimapc.backend.usuario.UsuarioRepository;
 
 @Service

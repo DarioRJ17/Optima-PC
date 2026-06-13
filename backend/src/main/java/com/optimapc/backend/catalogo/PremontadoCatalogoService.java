@@ -1,5 +1,10 @@
 package com.optimapc.backend.catalogo;
 
+import com.optimapc.backend.catalogo.dto.ValoracionRequest;
+import com.optimapc.backend.catalogo.dto.ValoracionDto;
+import com.optimapc.backend.catalogo.dto.ComponenteDto;
+import com.optimapc.backend.catalogo.dto.PremontadoCatalogoDto;
+
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -14,23 +19,23 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.optimapc.backend.modelo.Almacenamiento;
-import com.optimapc.backend.modelo.Caja;
-import com.optimapc.backend.modelo.Componente;
-import com.optimapc.backend.modelo.ConfiguracionComponente;
-import com.optimapc.backend.modelo.FuenteAlimentacion;
-import com.optimapc.backend.modelo.MemoriaRAM;
-import com.optimapc.backend.modelo.PlacaBase;
-import com.optimapc.backend.modelo.Premontado;
-import com.optimapc.backend.modelo.TipoUso;
-import com.optimapc.backend.modelo.Valoracion;
+import com.optimapc.backend.domain.Almacenamiento;
+import com.optimapc.backend.domain.Caja;
+import com.optimapc.backend.domain.Componente;
+import com.optimapc.backend.domain.ConfiguracionComponente;
+import com.optimapc.backend.domain.FuenteAlimentacion;
+import com.optimapc.backend.domain.MemoriaRAM;
+import com.optimapc.backend.domain.PlacaBase;
+import com.optimapc.backend.domain.Premontado;
+import com.optimapc.backend.domain.TipoUso;
+import com.optimapc.backend.domain.Valoracion;
 import com.optimapc.backend.montarPC.RendimientoService;
-import com.optimapc.backend.modelo.Procesador;
-import com.optimapc.backend.modelo.RefrigeradorCPU;
-import com.optimapc.backend.modelo.TarjetaGrafica;
+import com.optimapc.backend.domain.Procesador;
+import com.optimapc.backend.domain.RefrigeradorCPU;
+import com.optimapc.backend.domain.TarjetaGrafica;
 import com.optimapc.backend.pedido.ItemPedidoRepository;
-import com.optimapc.backend.usuario.PerfilUsuarioRepository;
-import com.optimapc.backend.usuario.Usuario;
+import com.optimapc.backend.recomendacion.PerfilUsuarioRepository;
+import com.optimapc.backend.domain.Usuario;
 import com.optimapc.backend.usuario.UsuarioRepository;
 
 @Service

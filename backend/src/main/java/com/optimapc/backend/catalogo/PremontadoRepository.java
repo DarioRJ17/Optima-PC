@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.optimapc.backend.modelo.Premontado;
+import com.optimapc.backend.domain.Premontado;
 
 public interface PremontadoRepository extends JpaRepository<Premontado, Long> {
 

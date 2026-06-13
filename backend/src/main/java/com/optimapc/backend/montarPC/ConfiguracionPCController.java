@@ -1,5 +1,9 @@
 package com.optimapc.backend.montarPC;
 
+import com.optimapc.backend.montarPC.dto.GuardarConfiguracionRequest;
+import com.optimapc.backend.montarPC.dto.ConsumoDto;
+import com.optimapc.backend.montarPC.dto.ConfiguracionGuardadaDto;
+
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -13,10 +17,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.optimapc.backend.catalogo.ComponenteDto;
+import com.optimapc.backend.catalogo.dto.ComponenteDto;
 import com.optimapc.backend.montarPC.dto.CompatibleComponenteDto;
 import com.optimapc.backend.montarPC.dto.ComponenteDetalleDto;
-import com.optimapc.backend.montarPC.EquilibrioResult;
 
 import jakarta.validation.Valid;
 

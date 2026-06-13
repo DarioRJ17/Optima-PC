@@ -10,12 +10,12 @@ import java.util.stream.Collectors;
 
 import com.optimapc.backend.montarPC.dto.CompatibilityWarningDto;
 
-import com.optimapc.backend.modelo.Caja;
-import com.optimapc.backend.modelo.Componente;
-import com.optimapc.backend.modelo.FuenteAlimentacion;
-import com.optimapc.backend.modelo.MemoriaRAM;
-import com.optimapc.backend.modelo.PlacaBase;
-import com.optimapc.backend.modelo.Procesador;
+import com.optimapc.backend.domain.Caja;
+import com.optimapc.backend.domain.Componente;
+import com.optimapc.backend.domain.FuenteAlimentacion;
+import com.optimapc.backend.domain.MemoriaRAM;
+import com.optimapc.backend.domain.PlacaBase;
+import com.optimapc.backend.domain.Procesador;
 
 /**
  * Hook interface for component compatibility logic.

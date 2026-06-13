@@ -1,5 +1,8 @@
 package com.optimapc.backend.montarPC;
 
+import com.optimapc.backend.montarPC.dto.MiConfiguracionDto;
+import com.optimapc.backend.montarPC.dto.MiConfiguracionComponenteDto;
+
 import java.util.List;
 
 import org.springframework.dao.DataIntegrityViolationException;
@@ -8,11 +11,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.optimapc.backend.modelo.Componente;
-import com.optimapc.backend.modelo.ConfiguracionComponente;
-import com.optimapc.backend.modelo.ConfiguracionPC;
+import com.optimapc.backend.domain.Componente;
+import com.optimapc.backend.domain.ConfiguracionComponente;
+import com.optimapc.backend.domain.ConfiguracionPC;
 import com.optimapc.backend.pedido.ConfiguracionPCRepository;
-import com.optimapc.backend.usuario.Usuario;
+import com.optimapc.backend.domain.Usuario;
 import com.optimapc.backend.usuario.UsuarioRepository;
 
 @Service

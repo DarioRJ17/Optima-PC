@@ -1,5 +1,7 @@
 package com.optimapc.backend.montarPC;
 
+import com.optimapc.backend.montarPC.dto.ComponenteDesbalanceado;
+
 import java.util.List;
 
 // Resultado del cálculo de equilibrio de una configuración de PC.

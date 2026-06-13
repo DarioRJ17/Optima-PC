@@ -1,5 +1,13 @@
 package com.optimapc.backend.catalogo;
 
+import com.optimapc.backend.chatbot.dto.ChatResponse;
+import com.optimapc.backend.chatbot.dto.ChatRequest;
+import com.optimapc.backend.chatbot.ChatService;
+import com.optimapc.backend.recomendacion.ScoringService;
+import com.optimapc.backend.catalogo.dto.ValoracionRequest;
+import com.optimapc.backend.catalogo.dto.ValoracionDto;
+import com.optimapc.backend.catalogo.dto.PremontadoCatalogoDto;
+
 import java.util.List;
 import java.util.Set;
 
@@ -15,10 +23,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.optimapc.backend.modelo.TipoUso;
-import com.optimapc.backend.modelo.Premontado;
+import com.optimapc.backend.domain.TipoUso;
+import com.optimapc.backend.domain.Premontado;
 import com.optimapc.backend.montarPC.RendimientoService;
-import com.optimapc.backend.usuario.PerfilUsuarioService;
+import com.optimapc.backend.recomendacion.PerfilUsuarioService;
 
 import jakarta.validation.Valid;
 

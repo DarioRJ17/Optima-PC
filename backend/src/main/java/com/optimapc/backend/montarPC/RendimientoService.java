@@ -1,5 +1,7 @@
 package com.optimapc.backend.montarPC;
 
+import com.optimapc.backend.montarPC.dto.ComponenteDesbalanceado;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -8,14 +10,14 @@ import java.util.Map;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
-import com.optimapc.backend.modelo.Almacenamiento;
-import com.optimapc.backend.modelo.ConfiguracionComponente;
-import com.optimapc.backend.modelo.ConfiguracionPC;
-import com.optimapc.backend.modelo.Componente;
-import com.optimapc.backend.modelo.MemoriaRAM;
-import com.optimapc.backend.modelo.Procesador;
-import com.optimapc.backend.modelo.TarjetaGrafica;
-import com.optimapc.backend.modelo.TipoUso;
+import com.optimapc.backend.domain.Almacenamiento;
+import com.optimapc.backend.domain.ConfiguracionComponente;
+import com.optimapc.backend.domain.ConfiguracionPC;
+import com.optimapc.backend.domain.Componente;
+import com.optimapc.backend.domain.MemoriaRAM;
+import com.optimapc.backend.domain.Procesador;
+import com.optimapc.backend.domain.TarjetaGrafica;
+import com.optimapc.backend.domain.TipoUso;
 
 @Service
 public class RendimientoService {

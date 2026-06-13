@@ -2,7 +2,7 @@ package com.optimapc.backend.auth;
 
 import java.time.LocalDateTime;
 
-import com.optimapc.backend.usuario.Usuario;
+import com.optimapc.backend.domain.Usuario;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -1,5 +1,8 @@
 package com.optimapc.backend.montarPC;
 
+import com.optimapc.backend.montarPC.dto.ConsumoDto;
+import com.optimapc.backend.montarPC.dto.ConfiguracionGuardadaDto;
+
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.HashMap;
@@ -11,21 +14,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.optimapc.backend.catalogo.ComponenteDto;
+import com.optimapc.backend.catalogo.dto.ComponenteDto;
 import com.optimapc.backend.montarPC.dto.CompatibleComponenteDto;
 import com.optimapc.backend.montarPC.dto.ComponenteDetalleDto;
 import com.optimapc.backend.montarPC.dto.CompatibilityWarningDto;
-import com.optimapc.backend.modelo.Componente;
-import com.optimapc.backend.modelo.Almacenamiento;
-import com.optimapc.backend.modelo.Caja;
-import com.optimapc.backend.modelo.ConfiguracionComponente;
-import com.optimapc.backend.modelo.ConfiguracionPC;
-import com.optimapc.backend.modelo.FuenteAlimentacion;
-import com.optimapc.backend.modelo.MemoriaRAM;
-import com.optimapc.backend.modelo.PlacaBase;
-import com.optimapc.backend.modelo.Procesador;
-import com.optimapc.backend.modelo.RefrigeradorCPU;
-import com.optimapc.backend.modelo.TarjetaGrafica;
+import com.optimapc.backend.domain.Componente;
+import com.optimapc.backend.domain.Almacenamiento;
+import com.optimapc.backend.domain.Caja;
+import com.optimapc.backend.domain.ConfiguracionComponente;
+import com.optimapc.backend.domain.ConfiguracionPC;
+import com.optimapc.backend.domain.FuenteAlimentacion;
+import com.optimapc.backend.domain.MemoriaRAM;
+import com.optimapc.backend.domain.PlacaBase;
+import com.optimapc.backend.domain.Procesador;
+import com.optimapc.backend.domain.RefrigeradorCPU;
+import com.optimapc.backend.domain.TarjetaGrafica;
 import com.optimapc.backend.pedido.ConfiguracionPCRepository;
 
 @Service

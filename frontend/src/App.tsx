@@ -1,24 +1,24 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { BrowserRouter, Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 import './App.css'
-import { AppLogo } from './components/common'
-import { ScrollToTop } from './components/ScrollToTop'
-import { AuthPage } from './pages/AuthPage.tsx'
-import { HomePage } from './pages/HomePage'
-import { InitialSurveyPage } from './pages/InitialSurveyPage'
-import { ProductDetailPage } from './pages/ProductDetailPage'
-import { PasswordRecoveryPage } from './pages/PasswordRecoveryPage'
-import { PasswordResetPage } from './pages/PasswordResetPage'
-import { AuthProvider } from './auth/AuthContext'
-import { useAuth } from './auth/useAuth'
-import { MontarPCPage } from './pages/MontarPCPage'
-import { ReciclajePage } from './pages/ReciclajePage'
+import { AppLogo } from '@/shared/components/common'
+import { ScrollToTop } from '@/shared/components/ScrollToTop'
+import { AuthPage } from '@/features/auth/AuthPage'
+import { HomePage } from '@/features/catalogo/HomePage'
+import { InitialSurveyPage } from '@/features/recomendacion/InitialSurveyPage'
+import { ProductDetailPage } from '@/features/catalogo/ProductDetailPage'
+import { PasswordRecoveryPage } from '@/features/auth/PasswordRecoveryPage'
+import { PasswordResetPage } from '@/features/auth/PasswordResetPage'
+import { AuthProvider } from '@/features/auth/AuthContext'
+import { useAuth } from '@/features/auth/useAuth'
+import { MontarPCPage } from '@/features/montarPC/MontarPCPage'
+import { ReciclajePage } from '@/features/reciclaje/ReciclajePage'
 import { Recycle, Wrench, Bot, LogIn, UserPlus, ShoppingCart, Menu, Heart, Package, Bookmark, CircleUser, LogOut } from 'lucide-react'
-import { ChatbotPage } from './pages/ChatbotPage'
-import { FavoritosPage } from './pages/FavoritosPage'
-import { CarritoPage } from './pages/CarritoPage'
-import { ComprasPage } from './pages/ComprasPage'
-import { MisConfiguracionesPage } from './pages/MisConfiguracionesPage'
+import { ChatbotPage } from '@/features/chatbot/ChatbotPage'
+import { FavoritosPage } from '@/features/cuenta/FavoritosPage'
+import { CarritoPage } from '@/features/pedido/CarritoPage'
+import { ComprasPage } from '@/features/pedido/ComprasPage'
+import { MisConfiguracionesPage } from '@/features/cuenta/MisConfiguracionesPage'
 import type {
   ApiError,
   AuthMode,
@@ -28,9 +28,9 @@ import type {
   LoginData,
   RegisterData,
   SelectedFilters,
-} from './types'
+} from '@/shared/types'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.trim() || 'http://localhost:8080'
+import { API_BASE_URL, authHeader } from '@/api/client'
 
 function AppShell() {
   const navigate = useNavigate()
@@ -115,7 +115,7 @@ function AppShell() {
 
         const response = await fetch(url.toString(), {
           signal: controller.signal,
-          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+          headers: authHeader(token),
         })
 
         if (!response.ok) {
@@ -161,7 +161,7 @@ function AppShell() {
         const response = await fetch(`${API_BASE_URL}/api/catalogo/premontados/recomendaciones`, {
           signal: controller.signal,
           headers: {
-            Authorization: `Bearer ${token}`,
+            ...authHeader(token),
           },
         })
 
@@ -203,7 +203,7 @@ function AppShell() {
     const loadFavoritos = async () => {
       try {
         const response = await fetch(`${API_BASE_URL}/api/catalogo/favoritos`, {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: authHeader(token),
           signal: controller.signal,
         })
         if (response.ok) {
@@ -236,7 +236,7 @@ function AppShell() {
     try {
       await fetch(`${API_BASE_URL}/api/catalogo/premontados/${premontadoId}/favoritos`, {
         method: esFavorito ? 'DELETE' : 'POST',
-        headers: { Authorization: `Bearer ${token}` },
+        headers: authHeader(token),
       })
       refreshRecommendations()
     } catch {
@@ -264,7 +264,7 @@ function AppShell() {
           method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+              ...authHeader(token),
             },
           body: JSON.stringify({ password: registerData.password }),
         })

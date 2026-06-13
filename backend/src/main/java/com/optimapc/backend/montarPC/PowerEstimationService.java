@@ -2,15 +2,15 @@ package com.optimapc.backend.montarPC;
 
 import java.util.List;
 
-import com.optimapc.backend.modelo.Almacenamiento;
-import com.optimapc.backend.modelo.Caja;
-import com.optimapc.backend.modelo.Componente;
-import com.optimapc.backend.modelo.FuenteAlimentacion;
-import com.optimapc.backend.modelo.MemoriaRAM;
-import com.optimapc.backend.modelo.PlacaBase;
-import com.optimapc.backend.modelo.Procesador;
-import com.optimapc.backend.modelo.RefrigeradorCPU;
-import com.optimapc.backend.modelo.TarjetaGrafica;
+import com.optimapc.backend.domain.Almacenamiento;
+import com.optimapc.backend.domain.Caja;
+import com.optimapc.backend.domain.Componente;
+import com.optimapc.backend.domain.FuenteAlimentacion;
+import com.optimapc.backend.domain.MemoriaRAM;
+import com.optimapc.backend.domain.PlacaBase;
+import com.optimapc.backend.domain.Procesador;
+import com.optimapc.backend.domain.RefrigeradorCPU;
+import com.optimapc.backend.domain.TarjetaGrafica;
 
 public class PowerEstimationService {
 

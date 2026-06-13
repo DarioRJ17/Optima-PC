@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.optimapc.backend.modelo.Favorito;
+import com.optimapc.backend.domain.Favorito;
 
 public interface FavoritoRepository extends JpaRepository<Favorito, Long> {
 

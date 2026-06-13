@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.optimapc.backend.modelo.Pedido;
+import com.optimapc.backend.domain.Pedido;
 
 public interface PedidoRepository extends JpaRepository<Pedido, Long> {
 

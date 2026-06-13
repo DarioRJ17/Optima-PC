@@ -1,5 +1,8 @@
 package com.optimapc.backend.montarPC;
 
+import com.optimapc.backend.montarPC.dto.MiConfiguracionDto;
+import com.optimapc.backend.montarPC.dto.GuardarConfiguracionNombradaRequest;
+
 import java.util.List;
 
 import org.springframework.http.HttpStatus;

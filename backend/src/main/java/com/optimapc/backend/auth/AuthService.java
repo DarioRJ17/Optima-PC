@@ -20,7 +20,7 @@ import com.optimapc.backend.auth.dto.PasswordResetRequest;
 import com.optimapc.backend.auth.dto.PasswordStrength;
 import com.optimapc.backend.auth.dto.RegisterRequest;
 import com.optimapc.backend.auth.dto.ResetPasswordRequest;
-import com.optimapc.backend.usuario.Usuario;
+import com.optimapc.backend.domain.Usuario;
 import com.optimapc.backend.usuario.UsuarioRepository;
 
 @Service

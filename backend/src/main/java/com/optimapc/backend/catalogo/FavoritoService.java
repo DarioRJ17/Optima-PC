@@ -1,5 +1,8 @@
 package com.optimapc.backend.catalogo;
 
+import com.optimapc.backend.catalogo.dto.FavoritoDto;
+import com.optimapc.backend.catalogo.dto.PremontadoCatalogoDto;
+
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -7,11 +10,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.optimapc.backend.modelo.Favorito;
-import com.optimapc.backend.modelo.Premontado;
-import com.optimapc.backend.modelo.TipoUso;
-import com.optimapc.backend.usuario.PerfilUsuarioRepository;
-import com.optimapc.backend.usuario.Usuario;
+import com.optimapc.backend.domain.Favorito;
+import com.optimapc.backend.domain.Premontado;
+import com.optimapc.backend.domain.TipoUso;
+import com.optimapc.backend.recomendacion.PerfilUsuarioRepository;
+import com.optimapc.backend.domain.Usuario;
 import com.optimapc.backend.usuario.UsuarioRepository;
 
 @Service
@@ -86,7 +89,7 @@ public class FavoritoService {
 
         // Normalizar rendimientoPorEuro sobre el conjunto antes de mapear,
         // ya que es un campo @Transient que requiere contexto de lista completa.
-        List<com.optimapc.backend.modelo.Premontado> premontados = favoritos.stream()
+        List<com.optimapc.backend.domain.Premontado> premontados = favoritos.stream()
                 .map(Favorito::getPremontado)
                 .toList();
         premontadoCatalogoService.normalizarLista(premontados);

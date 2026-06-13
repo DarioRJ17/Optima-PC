@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.optimapc.backend.modelo.Valoracion;
+import com.optimapc.backend.domain.Valoracion;
 
 public interface ValoracionRepository extends JpaRepository<Valoracion, Long> {
 

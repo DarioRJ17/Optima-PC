@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.optimapc.backend.modelo.Componente;
+import com.optimapc.backend.domain.Componente;
 
 /**
  * Default CompatibilityService that explicitly reminds developer to implement rules.
