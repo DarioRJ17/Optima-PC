@@ -68,9 +68,6 @@ public class ConfiguracionPC {
     private Double indicadorEquilibrio; // se basará en rendimientoScore para mostrar un "equilibrio" entre componentes, que no estén descompensados (ej: CPU muy potente y GPU muy floja).
 
     @Transient
-    private Double rendimientoScore; // se calcula en el servicio de rendimiento basado en una serie de reglas entre componentes
-
-    @Transient
     private Double rendimientoPorEuro; // se normaliza el rendimientoScore dividiéndolo por el precio y comparándolo con maximo y mínimo
 
     @Transient
@@ -91,13 +88,8 @@ public class ConfiguracionPC {
     @OneToMany(mappedBy = "configuracion", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ConfiguracionComponente> componentes = new ArrayList<>();
 
-    public void agregarComponente(ConfiguracionComponente configuracionComponente) { // TODO: Ver cuando llegue el momento
+    public void agregarComponente(ConfiguracionComponente configuracionComponente) {
         componentes.add(configuracionComponente);
         configuracionComponente.setConfiguracion(this);
-    }
-
-    public void eliminarComponente(ConfiguracionComponente configuracionComponente) { // TODO: Ver cuando llegue el momento
-        componentes.remove(configuracionComponente);
-        configuracionComponente.setConfiguracion(null);
     }
 }

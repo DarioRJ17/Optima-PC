@@ -33,7 +33,6 @@ import com.optimapc.backend.domain.Premontado;
 import com.optimapc.backend.domain.Procesador;
 import com.optimapc.backend.domain.TarjetaGrafica;
 import com.optimapc.backend.domain.TipoUso;
-import com.optimapc.backend.domain.Valoracion;
 
 @Service
 public class ChatService {
@@ -237,11 +236,6 @@ public class ChatService {
     }
 
     private String serializarPremontadoParaChat(Premontado premontado) {
-        List<Valoracion> valoraciones = premontado.getValoraciones();
-        double valoracionMedia = valoraciones.isEmpty()
-                ? 0.0
-                : valoraciones.stream().mapToInt(Valoracion::getPuntuacion).average().orElse(0.0);
-
         String usos = premontado.getUsosPrevistos().isEmpty()
                 ? "No especificado"
                 : premontado.getUsosPrevistos().stream().map(Enum::name).collect(Collectors.joining(", "));
@@ -257,7 +251,7 @@ public class ChatService {
         joiner.add("Usos: " + usos);
         joiner.add("SO: " + (premontado.getSistemaOperativo() != null ? premontado.getSistemaOperativo().name() : "No especificado"));
         joiner.add("Reacondicionado: " + (Boolean.TRUE.equals(premontado.getEsReacondicionado()) ? "sí" : "no"));
-        joiner.add("Valoración: " + redondear(valoracionMedia) + "/5 (" + valoraciones.size() + " valoraciones)");
+        joiner.add("Valoración: " + redondear(premontado.valoracionMedia()) + "/5 (" + premontado.getNumeroValoraciones() + " valoraciones)");
         joiner.add("CPU: " + describirProcesador(procesador));
         joiner.add("GPU: " + describirGrafica(grafica));
         joiner.add("RAM: " + describirRam(ram));

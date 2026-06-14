@@ -123,11 +123,6 @@ public class PremontadoCatalogoService {
     public PremontadoCatalogoDto toDto(Premontado premontado, long numeroCompras) {
         inicializarColecciones(premontado);
 
-        List<Valoracion> valoraciones = premontado.getValoraciones();
-        double valoracionMedia = valoraciones.isEmpty()
-                ? 0.0
-                : valoraciones.stream().mapToInt(Valoracion::getPuntuacion).average().orElse(0.0);
-
         List<ComponenteDto> componentesDto = premontado.getComponentes().stream()
                 .map(cfg -> {
                     String nombre = asignarNombre(cfg);
@@ -156,8 +151,8 @@ public class PremontadoCatalogoService {
                 premontado.getEsReacondicionado(),
                 premontado.getPrecio(),
                 premontado.getPrecioReducido(),
-                redondear(valoracionMedia),
-                valoraciones.size(),
+                redondear(premontado.valoracionMedia()),
+                premontado.getNumeroValoraciones(),
                 premontado.getFavorita(),
                 premontado.getRendimientoPorEuro(),
                 componentesDto,

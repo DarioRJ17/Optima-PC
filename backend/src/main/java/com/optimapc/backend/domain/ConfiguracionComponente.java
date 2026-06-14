@@ -33,11 +33,4 @@ public class ConfiguracionComponente {
     @JoinColumn(name = "configuracion_id", nullable = false)
     private ConfiguracionPC configuracion;
 
-    public void asociarComponente(Componente componente) {
-        this.componente = componente;
-    }
-
-    public void quitarComponente() {
-        this.componente = null;
-    }
 }

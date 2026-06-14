@@ -154,7 +154,6 @@ public class RendimientoService {
 
         List<Double> ratios = configs.stream().map(config -> {
             double score = calcularScore(config, tipoUso);
-            config.setRendimientoScore(score);
             double precio = config.getPrecioEfectivo();
             return precio > 0 ? score / precio : 0.0;
         }).toList();

@@ -1333,7 +1333,7 @@ public class CsvDataLoader implements ApplicationRunner {
 		ConfiguracionComponente configuracionComponente = new ConfiguracionComponente();
 		configuracionComponente.setCategoria(categoria);
 		configuracionComponente.setCantidad(cantidad);
-		configuracionComponente.asociarComponente(componente);
+		configuracionComponente.setComponente(componente);
 		configuracion.agregarComponente(configuracionComponente);
 	}
 
@@ -1405,7 +1405,6 @@ public class CsvDataLoader implements ApplicationRunner {
 			Almacenamiento almacenamiento = new Almacenamiento();
 			mapearBase(almacenamiento, record);
 			almacenamiento.setCapacidad(parseInteger(record, "capacity"));
-			almacenamiento.setPrecioPorGB(parseDouble(record, "price_per_gb"));
 			almacenamiento.setTipo(texto(record, "type"));
 			almacenamiento.setFactorForma(texto(record, "form_factor"));
 			almacenamiento.setInterfaz(texto(record, "interface"));

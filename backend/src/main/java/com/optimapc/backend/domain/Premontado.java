@@ -45,13 +45,13 @@ public class Premontado extends ConfiguracionPC {
     private Boolean esReacondicionado;
 
     @Transient
-    private Double valoracionMedia() {
+    public Double valoracionMedia() {
         if (valoraciones.isEmpty()) return 0.0;
         return valoraciones.stream().mapToInt(Valoracion::getPuntuacion).average().getAsDouble();
     }
 
     @Transient
-    private Integer getNumeroValoraciones() {
+    public Integer getNumeroValoraciones() {
         if (valoraciones.isEmpty()) return 0;
         return valoraciones.size();
     }

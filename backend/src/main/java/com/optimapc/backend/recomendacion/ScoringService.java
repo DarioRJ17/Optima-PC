@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import com.optimapc.backend.domain.PerfilUsuario;
 import com.optimapc.backend.domain.Premontado;
 import com.optimapc.backend.domain.TipoUso;
-import com.optimapc.backend.domain.Valoracion;
 
 @Service
 public class ScoringService {
@@ -35,7 +34,7 @@ public class ScoringService {
         // primero la mejor valoración media y luego la mejor relación rendimiento/€
         Comparator<Premontado> orden = Comparator
                 .comparingDouble((Premontado premontado) -> calcularScoreFinal(perfil, premontado))
-                .thenComparingDouble(this::valoracionMedia)
+                .thenComparingDouble(Premontado::valoracionMedia)
                 .thenComparingDouble(premontado -> valorSeguro(premontado.getRendimientoPorEuro()))
                 .reversed();
 
@@ -44,17 +43,6 @@ public class ScoringService {
                 .filter(premontado -> cumpleFiltroReacondicionado(perfil, premontado))
                 .sorted(orden)
                 .toList();
-    }
-
-    private double valoracionMedia(Premontado premontado) {
-        if (premontado.getValoraciones() == null || premontado.getValoraciones().isEmpty()) {
-            return SCORE_MINIMO;
-        }
-
-        return premontado.getValoraciones().stream()
-                .mapToInt(Valoracion::getPuntuacion)
-                .average()
-                .orElse(SCORE_MINIMO);
     }
 
     private boolean cumpleFiltroPresupuesto(PerfilUsuario perfil, Premontado premontado) {

@@ -113,7 +113,6 @@ class RendimientoServiceTest {
         ConfiguracionPC a = config(gpu(1L, 16, 2600, 1000.0));
         ConfiguracionPC b = config(gpu(2L, 8, 2000, 500.0));
         service.normalizarLista(List.of(a, b));
-        assertThat(a.getRendimientoScore()).isNotNull();
         assertThat(a.getRendimientoPorEuro()).isBetween(0.0, 100.0);
         assertThat(b.getRendimientoPorEuro()).isBetween(0.0, 100.0);
     }
