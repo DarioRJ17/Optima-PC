@@ -1,6 +1,7 @@
 package com.optimapc.backend.montarPC;
 
 import static com.optimapc.backend.support.TestData.almacenamiento;
+import static com.optimapc.backend.support.TestData.caja;
 import static com.optimapc.backend.support.TestData.config;
 import static com.optimapc.backend.support.TestData.gpu;
 import static com.optimapc.backend.support.TestData.procesador;
@@ -14,7 +15,11 @@ import org.junit.jupiter.api.Test;
 
 import com.optimapc.backend.domain.Almacenamiento;
 import com.optimapc.backend.domain.Caja;
+import com.optimapc.backend.domain.ConfiguracionComponente;
 import com.optimapc.backend.domain.ConfiguracionPC;
+import com.optimapc.backend.domain.MemoriaRAM;
+import com.optimapc.backend.domain.Procesador;
+import com.optimapc.backend.domain.TarjetaGrafica;
 import com.optimapc.backend.domain.TipoUso;
 
 class RendimientoServiceTest {
@@ -125,5 +130,70 @@ class RendimientoServiceTest {
         service.normalizarLista(List.of(delTipo, otro), TipoUso.GAMING);
         assertThat(delTipo.getRendimientoPorEuro()).isBetween(0.0, 100.0);
         assertThat(otro.getRendimientoPorEuro()).isBetween(0.0, 100.0);
+    }
+
+    @Test
+    void ignoraComponenteNuloYCantidadNula() {
+        ConfiguracionPC c = new ConfiguracionPC();
+
+        // Componente null -> se ignora en el bucle de sub-scores
+        ConfiguracionComponente sinComponente = new ConfiguracionComponente();
+        sinComponente.setCantidad(1);
+        c.agregarComponente(sinComponente);
+
+        // Cantidad null -> se interpreta como 1
+        ConfiguracionComponente ramSinCantidad = new ConfiguracionComponente();
+        ramSinCantidad.setComponente(ram(1L, "DDR5", 2, 16, 6000, 100.0));
+        ramSinCantidad.setCantidad(null);
+        c.agregarComponente(ramSinCantidad);
+
+        assertThat(service.calcularScore(c, TipoUso.OFIMATICA)).isGreaterThan(0.0);
+    }
+
+    @Test
+    void componenteNoPuntuableNoAportaScore() {
+        // Una caja no es CPU/GPU/RAM/almacenamiento: ningún instanceof entra
+        ConfiguracionPC c = config(caja(1L, "ATX", 50.0));
+        assertThat(service.calcularScore(c, TipoUso.GAMING)).isZero();
+    }
+
+    @Test
+    void componentesConCamposNulosNoRompenElCalculo() {
+        Procesador cpu = new Procesador();
+        cpu.setId(1L);
+        cpu.setPrecio(100.0); // nucleos y frecuencias null
+
+        TarjetaGrafica gpu = new TarjetaGrafica();
+        gpu.setId(2L);
+        gpu.setPrecio(100.0); // memoria y frecuencias null
+
+        MemoriaRAM ram = new MemoriaRAM();
+        ram.setId(3L);
+        ram.setPrecio(50.0); // modulos/gb/velocidad null
+
+        Almacenamiento sto = new Almacenamiento();
+        sto.setId(4L);
+        sto.setPrecio(50.0); // capacidad/interfaz/tipo null
+
+        ConfiguracionPC c = config(cpu, gpu, ram, sto);
+        assertThat(service.calcularScore(c, TipoUso.GAMING)).isZero();
+    }
+
+    @Test
+    void gpuSinFrecuenciaBoostUsaLaFrecuenciaBase() {
+        TarjetaGrafica gpu = new TarjetaGrafica();
+        gpu.setId(1L);
+        gpu.setPrecio(100.0);
+        gpu.setMemoria(8);
+        gpu.setFrecuenciaBase(2000); // boost null -> usa base
+        assertThat(service.scoreNormalizado(gpu)).isGreaterThan(0.0);
+    }
+
+    @Test
+    void normalizarListaConPrecioCeroAsignaRendimientoCero() {
+        // Sin componentes -> precio 0 -> ratio 0 y máximo 0
+        ConfiguracionPC sinPrecio = new ConfiguracionPC();
+        service.normalizarLista(List.of(sinPrecio));
+        assertThat(sinPrecio.getRendimientoPorEuro()).isZero();
     }
 }

@@ -116,4 +116,95 @@ class ScoringServiceTest {
 
         assertThat(resultado).containsExactly(mejorValorado, peorValorado);
     }
+
+    @Test
+    void perfilSoloConUsosSecundariosRecomienda() {
+        // tipoUsoFrecuente == null pero hay usos secundarios -> debe recomendar (no lista vacía)
+        PerfilUsuario perfil = new PerfilUsuario();
+        perfil.setTipoUsoFrecuente(null);
+        perfil.setScoreTipoUsoFrecuente(null); // fuerza el valor por defecto en valorSeguro
+        perfil.setUsosSecundarios(List.of(TipoUso.GAMING));
+        perfil.setScoreUsosSecundarios(1.0);
+
+        Premontado gaming = premontado(1L, 1000.0, false, TipoUso.GAMING);
+        Premontado ofimatica = premontado(2L, 1000.0, false, TipoUso.OFIMATICA);
+
+        List<Premontado> resultado = service.recomendarPremontados(perfil, List.of(ofimatica, gaming));
+
+        assertThat(resultado).containsExactly(gaming, ofimatica);
+    }
+
+    @Test
+    void coincidenciaSoloConUsoSecundarioPuntuaParcial() {
+        // El uso frecuente prioriza (score 1.0), pero el premontado solo coincide con el secundario
+        PerfilUsuario perfil = perfilGaming();
+        perfil.setUsosSecundarios(List.of(TipoUso.EDICION));
+
+        Premontado gaming = premontado(1L, 1000.0, false, TipoUso.GAMING);
+        Premontado soloEdicion = premontado(2L, 1000.0, false, TipoUso.EDICION);
+
+        List<Premontado> resultado = service.recomendarPremontados(perfil, List.of(soloEdicion, gaming));
+
+        // gaming (coincidencia total) por delante de edicion (coincidencia parcial por uso secundario)
+        assertThat(resultado).containsExactly(gaming, soloEdicion);
+    }
+
+    @Test
+    void presupuestoPorDebajoDeLaVentanaFiltra() {
+        PerfilUsuario perfil = perfilGaming();
+        perfil.setPresupuestoEstimado(1000.0); // ventana [500, 1500]
+
+        Premontado dentro = premontado(1L, 1000.0, false, TipoUso.GAMING);
+        Premontado demasiadoBarato = premontado(2L, 100.0, false, TipoUso.GAMING);
+
+        List<Premontado> resultado = service.recomendarPremontados(perfil, List.of(dentro, demasiadoBarato));
+
+        assertThat(resultado).containsExactly(dentro);
+    }
+
+    @Test
+    void aplicaElPrecioConDescuentoAlFiltrarPorPresupuesto() {
+        PerfilUsuario perfil = perfilGaming();
+        perfil.setPresupuestoEstimado(500.0); // ventana [0, 1000]
+
+        // Precio base 1100 (fuera de ventana) pero con 50% de descuento -> 550 (dentro)
+        Premontado conDescuento = premontado(1L, 1100.0, false, TipoUso.GAMING);
+        conDescuento.setDescuento(50);
+
+        List<Premontado> resultado = service.recomendarPremontados(perfil, List.of(conDescuento));
+
+        assertThat(resultado).containsExactly(conDescuento);
+    }
+
+    @Test
+    void preferenciaReacondicionadoConScoreBajoNoAplicaBonus() {
+        PerfilUsuario perfil = perfilGaming();
+        perfil.setPreferenciaDeReacondicionado(true);
+        perfil.setScorePreferenciaDeReacondicionado(0.05); // < umbral 0.1 -> sin bonus
+
+        Premontado nuevoMejorValorado = premontado(1L, 1000.0, false, TipoUso.GAMING);
+        nuevoMejorValorado.getValoraciones().addAll(valoraciones(5, 5));
+        Premontado reacondicionado = premontado(2L, 1000.0, true, TipoUso.GAMING);
+        reacondicionado.getValoraciones().addAll(valoraciones(1));
+
+        List<Premontado> resultado = service.recomendarPremontados(perfil, List.of(reacondicionado, nuevoMejorValorado));
+
+        // Sin bonus, el nuevo (mejor valorado) gana al reacondicionado
+        assertThat(resultado).containsExactly(nuevoMejorValorado, reacondicionado);
+    }
+
+    @Test
+    void scoresNulosUsanValorPorDefectoSinRomper() {
+        // Ambos scores null -> prioriza uso frecuente y el peso cae al valor por defecto (0.0)
+        PerfilUsuario perfil = new PerfilUsuario();
+        perfil.setTipoUsoFrecuente(TipoUso.GAMING);
+        perfil.setScoreTipoUsoFrecuente(null);
+        perfil.setScoreUsosSecundarios(null);
+
+        Premontado gaming = premontado(1L, 1000.0, false, TipoUso.GAMING);
+
+        List<Premontado> resultado = service.recomendarPremontados(perfil, List.of(gaming));
+
+        assertThat(resultado).containsExactly(gaming);
+    }
 }

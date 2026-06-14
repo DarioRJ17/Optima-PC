@@ -170,4 +170,199 @@ class CompatibilityServiceTest {
     void componenteNoRamNoGeneraAvisos() {
         assertThat(CompatibilityService.buildWarnings(procesador(1L, "AM5", 8, 5.0, 105, 300.0), List.of())).isEmpty();
     }
+
+    // --- Sin componente del tipo requerido en la selección: regla no aplica -> compatible ---
+
+    @Test
+    void procesadorSinPlacaSeleccionadaEsCompatible() {
+        assertThat(CompatibilityService.isCompatible(procesador(1L, "AM5", 8, 5.0, 105, 300.0), List.of())).isTrue();
+    }
+
+    @Test
+    void ramSinPlacaSeleccionadaEsCompatible() {
+        assertThat(CompatibilityService.isCompatible(ram(1L, "DDR5", 2, 16, 6000, 150.0), List.of())).isTrue();
+    }
+
+    @Test
+    void cajaSinPlacaSeleccionadaEsCompatible() {
+        assertThat(CompatibilityService.isCompatible(caja(1L, "ATX", 80.0), List.of())).isTrue();
+    }
+
+    // --- Placa candidata: incompatibilidad con la caja seleccionada ---
+
+    @Test
+    void placaIncompatibleSiLaCajaNoAdmiteSuFactorForma() {
+        PlacaBase placa = placaBase(1L, "AM5", "DDR5", "ATX", 4, 128, 200.0);
+        var cajaMini = caja(2L, "Mini ITX", 90.0);
+        assertThat(CompatibilityService.isCompatible(placa, List.of(cajaMini))).isFalse();
+    }
+
+    // --- Fuente ya seleccionada que sí soporta el componente añadido ---
+
+    @Test
+    void componenteAdicionalAceptadoSiLaFuenteAguanta() {
+        var fuentePotente = fuente(1L, 1000, 120.0);
+        Procesador cpu = procesador(2L, "AM5", 8, 5.0, 100, 300.0);
+        var candidata = gpu(3L, 16, 2600, 1200.0);
+        assertThat(CompatibilityService.isCompatible(candidata, List.of(fuentePotente, cpu))).isTrue();
+    }
+
+    // --- Sockets nulos en ambas direcciones ---
+
+    @Test
+    void procesadorIncompatibleSiLaPlacaNoTieneSocket() {
+        Procesador cpu = procesador(1L, "AM5", 8, 5.0, 105, 300.0);
+        PlacaBase placa = placaBase(2L, "AM5", "DDR5", "ATX", 4, 128, 200.0);
+        placa.setSocket(null);
+        assertThat(CompatibilityService.isCompatible(cpu, List.of(placa))).isFalse();
+    }
+
+    @Test
+    void placaCandidataSinSocketEsIncompatible() {
+        PlacaBase placa = placaBase(1L, "AM5", "DDR5", "ATX", 4, 128, 200.0);
+        placa.setSocket(null);
+        Procesador cpu = procesador(2L, "AM5", 8, 5.0, 105, 300.0);
+        assertThat(CompatibilityService.isCompatible(placa, List.of(cpu))).isFalse();
+    }
+
+    @Test
+    void placaIncompatibleSiElProcesadorNoTieneSocket() {
+        PlacaBase placa = placaBase(1L, "AM5", "DDR5", "ATX", 4, 128, 200.0);
+        Procesador cpu = procesador(2L, "AM5", 8, 5.0, 105, 300.0);
+        cpu.setSocket(null);
+        assertThat(CompatibilityService.isCompatible(placa, List.of(cpu))).isFalse();
+    }
+
+    // --- DDR nulo / distinto en ambas direcciones ---
+
+    @Test
+    void ramIncompatibleSiLaPlacaNoTieneDDR() {
+        MemoriaRAM memoria = ram(1L, "DDR5", 2, 16, 6000, 150.0);
+        PlacaBase placa = placaBase(2L, "AM5", "DDR5", "ATX", 4, 128, 200.0);
+        placa.setTipoDDR(null);
+        assertThat(CompatibilityService.isCompatible(memoria, List.of(placa))).isFalse();
+    }
+
+    @Test
+    void ramSinTipoDDREsIncompatible() {
+        MemoriaRAM memoria = ram(1L, "DDR5", 2, 16, 6000, 150.0);
+        memoria.setTipoDDR(null);
+        PlacaBase placa = placaBase(2L, "AM5", "DDR5", "ATX", 4, 128, 200.0);
+        assertThat(CompatibilityService.isCompatible(memoria, List.of(placa))).isFalse();
+    }
+
+    @Test
+    void ramCandidataDeOtraGeneracionEsIncompatible() {
+        MemoriaRAM memoria = ram(1L, "DDR4", 2, 16, 3200, 100.0);
+        PlacaBase placa = placaBase(2L, "AM5", "DDR5", "ATX", 4, 128, 200.0);
+        assertThat(CompatibilityService.isCompatible(memoria, List.of(placa))).isFalse();
+    }
+
+    @Test
+    void placaCandidataSinDDREsIncompatible() {
+        PlacaBase placa = placaBase(1L, "AM5", "DDR5", "ATX", 4, 128, 200.0);
+        placa.setTipoDDR(null);
+        MemoriaRAM memoria = ram(2L, "DDR5", 2, 16, 6000, 150.0);
+        assertThat(CompatibilityService.isCompatible(placa, List.of(memoria))).isFalse();
+    }
+
+    @Test
+    void placaIncompatibleSiAlgunaRamNoTieneDDR() {
+        PlacaBase placa = placaBase(1L, "AM5", "DDR5", "ATX", 4, 128, 200.0);
+        MemoriaRAM memoria = ram(2L, "DDR5", 2, 16, 6000, 150.0);
+        memoria.setTipoDDR(null);
+        assertThat(CompatibilityService.isCompatible(placa, List.of(memoria))).isFalse();
+    }
+
+    // --- Caja vs placa: tipo / factor de forma nulos ---
+
+    @Test
+    void cajaSinTipoEsIncompatibleConLaPlaca() {
+        var cajaSinTipo = caja(1L, null, 80.0);
+        PlacaBase placa = placaBase(2L, "AM5", "DDR5", "ATX", 4, 128, 200.0);
+        assertThat(CompatibilityService.isCompatibleCajaVSPlaca(cajaSinTipo, placa)).isFalse();
+    }
+
+    @Test
+    void cajaVsPlacaSinFactorFormaEsIncompatible() {
+        var cajaAtx = caja(1L, "ATX", 80.0);
+        PlacaBase placa = placaBase(2L, "AM5", "DDR5", null, 4, 128, 200.0);
+        assertThat(CompatibilityService.isCompatibleCajaVSPlaca(cajaAtx, placa)).isFalse();
+    }
+
+    @Test
+    void placaVsCajaSinTipoEsIncompatible() {
+        PlacaBase placa = placaBase(1L, "AM5", "DDR5", "ATX", 4, 128, 200.0);
+        var cajaSinTipo = caja(2L, null, 80.0);
+        assertThat(CompatibilityService.isCompatiblePlacaVSCaja(placa, cajaSinTipo)).isFalse();
+    }
+
+    @Test
+    void placaVsCajaSinFactorFormaEsIncompatible() {
+        PlacaBase placa = placaBase(1L, "AM5", "DDR5", null, 4, 128, 200.0);
+        var cajaAtx = caja(2L, "ATX", 80.0);
+        assertThat(CompatibilityService.isCompatiblePlacaVSCaja(placa, cajaAtx)).isFalse();
+    }
+
+    // --- Caja: tipo HTPC y tipo desconocido ---
+
+    @Test
+    void cajaHtpcAdmitePlacaMiniItx() {
+        var cajaHtpc = caja(1L, "HTPC", 70.0);
+        PlacaBase placa = placaBase(2L, "AM5", "DDR5", "Mini ITX", 2, 64, 150.0);
+        assertThat(CompatibilityService.isCompatibleCajaVSPlaca(cajaHtpc, placa)).isTrue();
+    }
+
+    @Test
+    void cajaDeTipoDesconocidoNoAdmiteNingunaPlaca() {
+        var cajaRara = caja(1L, "Cubo exótico", 70.0);
+        PlacaBase placa = placaBase(2L, "AM5", "DDR5", "ATX", 4, 128, 200.0);
+        assertThat(CompatibilityService.isCompatibleCajaVSPlaca(cajaRara, placa)).isFalse();
+    }
+
+    // --- Límites de RAM con campos nulos ---
+
+    @Test
+    void ramSinNumeroDeModulosRespetaLimites() {
+        MemoriaRAM memoria = ram(1L, "DDR5", 2, 16, 6000, 150.0);
+        memoria.setNumModulos(null);
+        PlacaBase placa = placaBase(2L, "AM5", "DDR5", "ATX", 4, 128, 200.0);
+        assertThat(CompatibilityService.isCompatible(memoria, List.of(placa))).isTrue();
+    }
+
+    @Test
+    void ramSinGbPorModuloRespetaLimites() {
+        MemoriaRAM memoria = ram(1L, "DDR5", 2, 16, 6000, 150.0);
+        memoria.setGbPorModulo(null);
+        PlacaBase placa = placaBase(2L, "AM5", "DDR5", "ATX", 4, 128, 200.0);
+        assertThat(CompatibilityService.isCompatible(memoria, List.of(placa))).isTrue();
+    }
+
+    @Test
+    void placaSinLimitesDeRamEsCompatible() {
+        PlacaBase placa = placaBase(1L, "AM5", "DDR5", "ATX", 4, 128, 200.0);
+        placa.setRanurasMemoria(null);
+        placa.setMemoriaMaxima(null);
+        MemoriaRAM memoria = ram(2L, "DDR5", 8, 64, 6000, 150.0);
+        assertThat(CompatibilityService.isCompatible(memoria, List.of(placa))).isTrue();
+    }
+
+    // --- Avisos de RAM: ramas "sin diferencia" y valor candidato nulo ---
+
+    @Test
+    void ramConMismosParametrosNoGeneraAvisos() {
+        MemoriaRAM candidata = ram(1L, "DDR5", 2, 16, 6000, 150.0);
+        MemoriaRAM seleccionada = ram(2L, "DDR5", 2, 16, 6000, 150.0);
+        assertThat(CompatibilityService.buildWarnings(candidata, List.of(seleccionada))).isEmpty();
+    }
+
+    @Test
+    void ramCandidataSinFrecuenciaNoAvisaPorFrecuencia() {
+        MemoriaRAM candidata = ram(1L, "DDR5", 2, 16, 6000, 150.0);
+        candidata.setVelocidad(null); // sin frecuencia -> no compara frecuencia
+        MemoriaRAM seleccionada = ram(2L, "DDR5", 2, 8, 5200, 150.0); // distinta capacidad
+        assertThat(CompatibilityService.buildWarnings(candidata, List.of(seleccionada)))
+                .extracting(CompatibilityWarningDto::code)
+                .containsExactly("ram_capacity_mismatch");
+    }
 }
