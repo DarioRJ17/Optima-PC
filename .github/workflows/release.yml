@@ -55,7 +55,7 @@ jobs:
         run: git push origin HEAD:refs/heads/main
 
       - name: Análisis de SonarCloud (rama main)
-        uses: SonarSource/sonarqube-scan-action@v4
+        uses: SonarSource/sonarqube-scan-action@v6
         with:
           args: -Dsonar.branch.name=main
         env:
