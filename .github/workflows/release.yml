@@ -5,14 +5,18 @@ name: Release
 #   2. Cuando quieras desplegar, etiqueta el commit que quieres llevar a producción:
 #        git tag deploy-1
 #        git push origin deploy-1
-#   3. Este workflow ejecuta TODA la suite de tests del backend.
+#   3. Este workflow ejecuta TODA la suite de tests del backend (con cobertura JaCoCo).
 #   4. Si pasan, hace fast-forward de `main` al commit etiquetado y lo sube.
 #   5. El push a `main` dispara el webhook de Render (Auto-Deploy = "On Commit") y se despliega.
+#   6. Lanza el análisis de calidad en SonarCloud sobre `main` (el código final/desplegado).
 #
-# Si los tests fallan, `main` no se toca y no hay despliegue.
+# Si los tests fallan, `main` no se toca, no hay despliegue ni análisis.
 #
 # Nota: el push a `main` lo hace el GITHUB_TOKEN, así que NO vuelve a disparar `ci.yml`
 # (protección anti-bucle de GitHub Actions). El gate son los tests de ESTE workflow.
+#
+# Análisis Sonar: se hace aquí (no en `ci.yml`) para fotografiar solo el código final.
+# Requiere el secret SONAR_TOKEN y el Automatic Analysis DESACTIVADO en SonarCloud.
 
 on:
   push:
@@ -49,3 +53,11 @@ jobs:
 
       - name: Promocionar el commit etiquetado a main
         run: git push origin HEAD:refs/heads/main
+
+      - name: Análisis de SonarCloud (rama main)
+        uses: SonarSource/sonarqube-scan-action@v4
+        with:
+          args: -Dsonar.branch.name=main
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io

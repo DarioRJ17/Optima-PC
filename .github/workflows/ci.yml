@@ -2,6 +2,8 @@ name: CI
 
 # Se ejecuta en cada push a `develop` (rama de trabajo del TFG).
 # Ejecuta toda la suite de tests del backend como feedback continuo, SIN desplegar.
+# El análisis de calidad (SonarCloud) NO se hace aquí, sino sobre `main` en `release.yml`,
+# porque la foto de calidad que interesa es la del código final/desplegado.
 #
 # El despliegue lo hace `release.yml` cuando subes una etiqueta `deploy-*`:
 # ese workflow vuelve a correr los tests y, si pasan, promociona el commit a `main`,
