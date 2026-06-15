@@ -1,0 +1,37 @@
+name: CI
+
+# Se ejecuta en cada push a main (en el TFG se hace commit directo a main, sin ramas).
+# Ejecuta toda la suite de tests del backend y reporta el resultado como "check" del commit.
+#
+# Despliegue: NO se hace desde aquí. En Render, cada servicio (backend y frontend) debe tener
+#   Settings -> Auto-Deploy -> "After CI Checks Pass"
+# Así Render despliega automáticamente SOLO si este workflow pasa.
+# (No hacen falta Deploy Hooks ni secretos: la "puerta" la pone el check de este workflow.)
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    name: Ejecutar tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Configurar Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Dar permisos al Maven Wrapper
+        run: chmod +x mvnw
+
+      - name: Ejecutar todos los tests
+        run: ./mvnw -B test
