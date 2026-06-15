@@ -1,0 +1,51 @@
+name: Release
+
+# Despliegue por etiqueta (CD). Flujo:
+#   1. El desarrollo se sube a la rama `develop`.
+#   2. Cuando quieras desplegar, etiqueta el commit que quieres llevar a producción:
+#        git tag deploy-1
+#        git push origin deploy-1
+#   3. Este workflow ejecuta TODA la suite de tests del backend.
+#   4. Si pasan, hace fast-forward de `main` al commit etiquetado y lo sube.
+#   5. El push a `main` dispara el webhook de Render (Auto-Deploy = "On Commit") y se despliega.
+#
+# Si los tests fallan, `main` no se toca y no hay despliegue.
+#
+# Nota: el push a `main` lo hace el GITHUB_TOKEN, así que NO vuelve a disparar `ci.yml`
+# (protección anti-bucle de GitHub Actions). El gate son los tests de ESTE workflow.
+
+on:
+  push:
+    tags:
+      - 'deploy-*'
+
+permissions:
+  contents: write   # necesario para que el workflow pueda empujar a `main`
+
+jobs:
+  test-and-promote:
+    name: Tests y promoción a main
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # historial completo para poder actualizar `main`
+
+      - name: Configurar Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Dar permisos al Maven Wrapper
+        working-directory: backend
+        run: chmod +x mvnw
+
+      - name: Ejecutar todos los tests
+        working-directory: backend
+        run: ./mvnw -B test
+
+      - name: Promocionar el commit etiquetado a main
+        run: git push origin HEAD:refs/heads/main

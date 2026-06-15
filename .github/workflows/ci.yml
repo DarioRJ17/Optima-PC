@@ -1,16 +1,15 @@
 name: CI
 
-# Se ejecuta en cada push a main (en el TFG se hace commit directo a main, sin ramas).
-# Ejecuta toda la suite de tests del backend y reporta el resultado como "check" del commit.
+# Se ejecuta en cada push a `develop` (rama de trabajo del TFG).
+# Ejecuta toda la suite de tests del backend como feedback continuo, SIN desplegar.
 #
-# Despliegue: NO se hace desde aquí. En Render, cada servicio (backend y frontend) debe tener
-#   Settings -> Auto-Deploy -> "After CI Checks Pass"
-# Así Render despliega automáticamente SOLO si este workflow pasa.
-# (No hacen falta Deploy Hooks ni secretos: la "puerta" la pone el check de este workflow.)
+# El despliegue lo hace `release.yml` cuando subes una etiqueta `deploy-*`:
+# ese workflow vuelve a correr los tests y, si pasan, promociona el commit a `main`,
+# lo que dispara el despliegue en Render (Auto-Deploy = "On Commit" sobre `main`).
 
 on:
   push:
-    branches: [main]
+    branches: [develop]
 
 jobs:
   test:
