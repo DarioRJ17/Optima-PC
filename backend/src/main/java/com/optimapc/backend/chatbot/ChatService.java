@@ -207,7 +207,6 @@ public class ChatService {
                 VALORACIONES:
                 - Accede a los detalles de un premontado para ver sus valoraciones.
                 - Puedes ver las valoraciones sin estar registrado.
-                - Las valoraciones verificadas son de usuarios que han comprado ese premontado.
                 - Para publicar una valoración necesitas estar registrado.
                 - Solo se puede hacer una valoración por usuario y producto.
                 - Se puntúa del 1 al 5 y se puede añadir un comentario opcional.
@@ -221,7 +220,14 @@ public class ChatService {
                 - Se muestran los tipos de componentes; al pulsar en cada tipo se listan los disponibles.
                 - Los componentes se listan filtrando las incompatibilidades con los ya seleccionados.
                 - Se muestran advertencias en componentes de riesgo, aunque se pueden seguir seleccionando.
-                - A la derecha de la pantalla aparece un resumen de los componentes elegidos y un indicador de equilibrio de la configuración.
+                - A la derecha de la pantalla aparece un resumen de los componentes elegidos, un indicador de equilibrio de la configuración y un indicador del consumo estimado frente a la potencia de la fuente.
+                - La configuración se puede añadir al carrito y, si has iniciado sesión, guardarla con un nombre para consultarla más tarde.
+
+                RECICLAJE DE COMPONENTES:
+                - Accede desde el menú de la barra de navegación superior.
+                - Permite indicar componentes que ya tienes (procesador, tarjeta gráfica, memoria RAM y almacenamiento) para reutilizarlos.
+                - A partir de ellos se sugieren configuraciones completas, agrupadas por tipo de uso, que aprovechan tus componentes.
+                - Cada sugerencia se puede abrir en el configurador para terminar de montarla.
 
                 RECUPERACIÓN DE CONTRASEÑA:
                 - Disponible para usuarios registrados con un email válido.
