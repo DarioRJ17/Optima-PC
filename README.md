@@ -8,13 +8,18 @@ Proyecto de TFG: plataforma web para la recomendación y gestión de componentes
 
 ### 1. Requisitos previos
 
-- **Git**
-- **Java JDK 21**
-- **Node.js (LTS) + npm**
-- **PostgreSQL 16.x / 17.x**
+- **Git** → https://git-scm.com/downloads
+- **Java JDK 21** → https://adoptium.net/temurin/releases/?version=21
+- **Node.js (LTS) + npm** → https://nodejs.org/
+- **PostgreSQL 16.x / 17.x** → https://www.postgresql.org/download/
   - Crear una base de datos: `optimapc_db`
 - **API key de Groq** (gratuita) → https://console.groq.com/keys
   - El asistente de chat usa la API de Groq (modelo `llama-3.1-8b-instant` por defecto).
+- **Secreto para JWT** (lo generas tú, no se descarga de ningún sitio)
+  - Sirve para **firmar los tokens JWT** que autentican a los usuarios. Debe ser una cadena aleatoria de **al menos 32 caracteres**. Para generar uno:
+    ```bash
+    openssl rand -base64 32
+    ```
 
 ### 2. Clonar el repositorio
 
@@ -81,14 +86,9 @@ El frontend se expone en: `http://localhost:5173`
   - **Frontend:** React + TypeScript + Vite
   - **Chat:** Groq con modelo `llama-3.1-8b-instant` (API en la nube, compatible con OpenAI)
 
-- Ejecutar tests del backend:
+- Ejecutar los tests del backend (genera además el informe de cobertura de JaCoCo):
   ```bash
   cd backend
-  ./mvnw test     # o mvnw.cmd test en Windows
+  ./mvnw test          # mvnw.cmd test en Windows (cmd)
   ```
-
-- Construir el frontend para producción:
-  ```bash
-  cd frontend
-  npm run build
-  ```
+  Tras la ejecución, el informe de cobertura queda en `backend/target/site/jacoco/index.html`.
